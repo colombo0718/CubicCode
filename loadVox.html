@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Three.js PLY 檔案示例</title>
+    <style>
+      body { margin: 0; }
+    </style>
+  </head>
+  <body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://threejs.org/build/three.module.js",
+                "three/addons/": "https://threejs.org/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+      import * as THREE from 'three';
+      import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+      import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+      // 創建場景、相機和渲染器
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // 添加燈光
+      var ambientLight = new THREE.AmbientLight(0xffffff, .5); // 產生柔和的光
+      scene.add(ambientLight);
+
+      var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
+      directionalLight.position.set(0, 0, 1);
+    //   directionalLight.castShadow = true; // 讓此光能產生陰影
+      scene.add(directionalLight);
+
+      const loader1 = new VOXLoader();
+				loader1.load( './fighter.vox', function ( chunks ) {
+
+                    console.log(chunks)
+					for ( let i = 0; i < chunks.length; i ++ ) {
+
+						const chunk = chunks[ i ];
+
+						// displayPalette( chunk.palette );
+
+						const mesh = new VOXMesh( chunk );
+						mesh.scale.setScalar( .1 );
+						scene.add( mesh );
+                        console.log(i,mesh.position)
+					}
+
+				} );
+
+
+    //   // 載入 PLY 模型
+    //   const loader = new PLYLoader();
+    //   loader.load('http://localhost:8000/model.ply', function (geometry) {
+
+    //     geometry.computeVertexNormals();
+    //     // 創建材質
+    //     var material = new THREE.MeshStandardMaterial({vertexColors: true,roughness: 1});
+
+    //     // 創建模型並將其添加到場景中
+    //     var fighter = new THREE.Mesh(geometry, material);
+    //     fighter.castShadow = true; // 讓物體能投影
+    //     fighter.receiveShadow = true; // 讓物體能接收陰影
+    //     scene.add(fighter);
+
+    //     // 開始動畫
+    //     setInterval(animate, 16); // 每秒約 60 幀的更新率
+    //     function animate() {
+    //     fighter.rotation.x += 0.02;
+    //     fighter.rotation.y += 0.01;
+    //     renderer.render(scene, camera);
+    //   }
+    //   });
+
+      // 設置相機位置
+      camera.position.z = 10;
+
+      // 執行動畫更新
+
+    </script>
+  </body>
+</html>
