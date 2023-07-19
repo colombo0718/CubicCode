@@ -37,8 +37,9 @@
       scene.add(directionalLight);
 
       const loader1 = new VOXLoader();
-				loader1.load( './fighter.vox', function ( chunks ) {
-
+				// loader1.load( 'https://cubiccode.vercel.app/fighter.vox', function ( chunks ) {
+                loader1.load( './fighter.vox', function ( chunks ) {
+                    var meshes= new THREE.Object3D();
                     console.log(chunks)
 					for ( let i = 0; i < chunks.length; i ++ ) {
 
@@ -48,36 +49,18 @@
 
 						const mesh = new VOXMesh( chunk );
 						mesh.scale.setScalar( .1 );
-						scene.add( mesh );
+						meshes.add( mesh );
                         console.log(i,mesh.position)
 					}
-
+                    scene.add( meshes );
+                    // 開始動畫
+                    setInterval(animate, 16); // 每秒約 60 幀的更新率
+                    function animate() {
+                        meshes.rotation.x += 0.02;
+                        meshes.rotation.y += 0.01;
+                        renderer.render(scene, camera);
+                    }
 				} );
-
-
-    //   // 載入 PLY 模型
-    //   const loader = new PLYLoader();
-    //   loader.load('http://localhost:8000/model.ply', function (geometry) {
-
-    //     geometry.computeVertexNormals();
-    //     // 創建材質
-    //     var material = new THREE.MeshStandardMaterial({vertexColors: true,roughness: 1});
-
-    //     // 創建模型並將其添加到場景中
-    //     var fighter = new THREE.Mesh(geometry, material);
-    //     fighter.castShadow = true; // 讓物體能投影
-    //     fighter.receiveShadow = true; // 讓物體能接收陰影
-    //     scene.add(fighter);
-
-    //     // 開始動畫
-    //     setInterval(animate, 16); // 每秒約 60 幀的更新率
-    //     function animate() {
-    //     fighter.rotation.x += 0.02;
-    //     fighter.rotation.y += 0.01;
-    //     renderer.render(scene, camera);
-    //   }
-    //   });
-
       // 設置相機位置
       camera.position.z = 10;
 
