@@ -28,8 +28,8 @@
     scene.add(directionalLight);
 
     const loader1 = new VOXLoader();
-    // loader1.load( 'https://cubiccode.vercel.app/vox/fighter.vox', function ( chunks ) {
-    loader1.load( './vox/Bulbasaur.vox', function ( chunks ) {
+    loader1.load( 'https://cubiccode.vercel.app/vox/Bulbasaur.vox', function ( chunks ) {
+    // loader1.load( './vox/Bulbasaur.vox', function ( chunks ) {
         var meshes= new THREE.Object3D();
         console.log(chunks)
         for ( let i = 0; i < chunks.length; i ++ ) {
