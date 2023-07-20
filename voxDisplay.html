@@ -46,9 +46,9 @@
 
     // 添加OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enablePan=false
 
-
-
+    // 建置vox動畫必要物件
     const loader = new VOXLoader();
     var anima= new THREE.Object3D();
     const meshes = [];
