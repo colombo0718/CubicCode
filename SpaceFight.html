@@ -1,0 +1,117 @@
+<div id="canvas" style="width: 800px;height: 600px;"></div>
+<input type="file" id="fileInput" accept=".vox" />
+<div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+
+<script src="https://unpkg.com/blockly/blockly.min.js"></script>
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://threejs.org/build/three.module.js",
+            "three/addons/": "https://threejs.org/examples/jsm/"
+        }
+    }
+</script>
+<script type="module">
+    var workspace = Blockly.inject('blocklyDiv', {
+      toolbox: '<xml><block type="controls_if"></block></xml>'
+    });
+
+        // 监听代码生成事件
+        workspace.addChangeListener(function(event) {
+      if (event.type == Blockly.Events.BLOCK_CREATE ||
+          event.type == Blockly.Events.BLOCK_DELETE ||
+          event.type == Blockly.Events.BLOCK_CHANGE) {
+        // 获取生成的 JavaScript 代码
+        var code = Blockly.JavaScript.workspaceToCode(workspace);
+        console.log(code);
+      }
+    });
+
+    import * as THREE from 'three';
+    import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+
+    var fileInput = document.getElementById('fileInput');
+    var canvas = document.getElementById('canvas');
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    canvas.appendChild(renderer.domElement);
+
+    // 設置相機
+    camera.position.y = 20/Math.sqrt(2);
+    camera.position.z = 20/Math.sqrt(2);
+    camera.rotation.x=-Math.PI/4
+
+    // 添加燈光
+    var ambientLight = new THREE.AmbientLight(0xffffff, .5); // 產生柔和的光
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
+    directionalLight.position.set(1, 1, 0);
+    directionalLight.castShadow = true; // 讓此光能產生陰影
+    scene.add(directionalLight);
+    renderer.render(scene, camera);
+
+    // 添加網格
+    var gridSize = 100; // 網格大小
+    var gridDivisions = 10; // 網格分段數
+    var gridHelper1 = new THREE.GridHelper(gridSize, gridDivisions, 0x00ff00, 0x009900);
+    var gridHelper2 = new THREE.GridHelper(gridSize, gridDivisions, 0x00ff00, 0x009900);
+    gridHelper1.position.y = 0; // 放置在y=0的面上
+    gridHelper2.position.y = 0; // 放置在y=0的面上
+    gridHelper2.position.z = -100; // 放置在y=0的面上
+    scene.add(gridHelper1);
+    scene.add(gridHelper2);
+
+    renderer.render(scene, camera);
+
+    // 讀取檔案後
+    fileInput.addEventListener('change', function (event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function (event) {
+            var contents = event.target.result;
+            const loader = new VOXLoader();
+            var chunks= loader.parse(contents)
+            console.log(chunks)
+
+            const meshes = [];
+            var anima= new THREE.Object3D();
+            for ( let i = 0; i < chunks.length; i ++ ) {
+                // 讀入vox檔第i個子物件
+                const chunk = chunks[ i ];
+                const mesh = new VOXMesh( chunk );
+
+                mesh.scale.setScalar( .1 );
+                mesh.material.transparent=true
+                mesh.material.opacity=1.0
+                mesh.visible = false;
+
+                meshes.push(mesh);
+                anima.add( mesh );
+            }
+            anima.position.x=10
+            anima.position.z=7
+            scene.add(anima)
+
+            let currentIndex = 0;
+            setInterval(function() {
+                // 將前一個物件隱藏
+                if (meshes[currentIndex]) {
+                    meshes[currentIndex].visible = false;
+                }
+                currentIndex = (currentIndex + 1) % meshes.length;
+                // 將新的物件顯示
+                if (meshes[currentIndex]) {
+                    meshes[currentIndex].visible = true;
+                }
+                // anima.rotation.y += 0.03;
+                renderer.render(scene, camera);
+            },100)
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+</script>
