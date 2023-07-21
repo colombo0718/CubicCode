@@ -93,9 +93,10 @@
     }
 
     // 載入預設檔案
-    loader.load( 'https://cubiccode.vercel.app/vox/fight.vox', function ( chunks ) {
+    loader.load( 'https://cubiccode.vercel.app/vox/fighter.vox', function ( chunks ) {
     // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
         processVoxelAnimation(chunks);
+        anima.position.set(0,0,10)
           
         // 開始動畫
         setInterval(function() {
@@ -105,7 +106,7 @@
             // 將新的物件顯示
             meshes[currentIndex % meshes.length].visible = true;
 
-            controls.update(); // 需要加入這行才能讓OrbitControls工作
+            // controls.update(); // 需要加入這行才能讓OrbitControls工作
             renderer.render(scene, camera);
         },100)
     } );
