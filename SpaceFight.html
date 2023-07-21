@@ -1,6 +1,6 @@
 <div id="canvas" style="width: 800px;height: 600px;"></div>
-<input type="file" id="fileInput" accept=".vox" />
-
+<!-- <input type="file" id="fileInput" accept=".vox" /> -->
+<h3>A:向左 / D:向右 / Space:發射</h3>
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <script type="importmap">
     {
@@ -23,8 +23,8 @@
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
-    camera.position.y = 20/Math.sqrt(2);
-    camera.position.z = 20/Math.sqrt(2);
+    camera.position.y = 18/Math.sqrt(2);
+    camera.position.z = 18/Math.sqrt(2);
     camera.rotation.x=-Math.PI/4
 
     // 添加燈光
@@ -37,15 +37,23 @@
     scene.add(directionalLight);
 
     // 添加網格
+    var grids=[]
     var gridSize = 100; // 網格大小
     var gridDivisions = 10; // 網格分段數
-    var gridHelper1 = new THREE.GridHelper(gridSize, gridDivisions, 0x00ff00, 0x009900);
-    var gridHelper2 = new THREE.GridHelper(gridSize, gridDivisions, 0x00ff00, 0x009900);
-    gridHelper1.position.y = 0; // 放置在y=0的面上
-    gridHelper2.position.y = 0; // 放置在y=0的面上
-    gridHelper2.position.z = -100; // 放置在y=0的面上
-    scene.add(gridHelper1);
-    scene.add(gridHelper2);
+    var grid = new THREE.GridHelper(gridSize, gridDivisions, 0x00ff00, 0x009900);
+    grid.position.y = 0; // 放置在y=0的面上
+    var g1=grid.clone();g1.position.set(0,0,-200)
+    scene.add(g1);
+    grids.push(g1)
+    var g2=grid.clone();g2.position.set(0,0,-100)
+    scene.add(g2);
+    grids.push(g2)
+    var g3=grid.clone();g3.position.set(0,0,0)
+    scene.add(g3);
+    grids.push(g3)
+    var g4=grid.clone();g4.position.set(0,0,100)
+    scene.add(g4);
+    grids.push(g4)
 
     renderer.render(scene, camera);
 
@@ -53,8 +61,8 @@
     const loader = new VOXLoader();
     var fighter= new THREE.Object3D();
     scene.add( fighter );  
-    var bullet=new THREE.Object3D();
-    scene.add( bullet ); 
+    
+    // scene.add( bullet ); 
     const meshes = [];
     let currentIndex = 0;
 
@@ -78,11 +86,11 @@
         }
     }
 
-    // 載入預設檔案
+    // 載入預設戰機檔案
     loader.load( 'https://cubiccode.vercel.app/vox/fighter.vox', function ( chunks ) {
     // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
         processVoxelAnimation(chunks);
-        fighter.position.set(0,0,10)
+        fighter.position.set(0,1,10)
           
         // 開始vox動畫
         setInterval(function() {
@@ -91,6 +99,11 @@
             currentIndex +=1
             // 將新的物件顯示
             meshes[currentIndex % meshes.length].visible = true;
+
+            if(fire) {
+                bullets[bulletIndex%100].position.copy(fighter.position)
+                bulletIndex+=1
+            }
         },100)
         // 渲染與位移
         setInterval(function() {
@@ -104,19 +117,53 @@
                 fighter.position.x += .2;
                 fighter.rotation.z = -Math.PI/8
             }
+
+            for(let i=0;i<100;i++){
+                bullets[i].position.z-=.5
+            }
+
+            for(let i=0;i<4;i++){
+                grids[i].position.z+=.3
+                if(grids[i].position.z>100){
+                    grids[i].position.z=-200
+                }
+            }
+            
             renderer.render(scene, camera);
         },10)
     } );
 
+    // 加載100個子彈
+    var bullets=[]
+    loader.load( 'https://cubiccode.vercel.app/vox/bullet.vox', function ( chunks ) {
+        for (let i=0;i<100;i++){
+            let bullet=new THREE.Object3D() 
+            for (let i = 0; i < chunks.length; i++) {
+                const chunk = chunks[i];
+                const mesh = new VOXMesh(chunk);
+
+                mesh.scale.setScalar(.1);
+                bullet.add(mesh);
+            }
+            scene.add(bullet)
+            bullets.push(bullet)
+        }
+    } ); 
+
     let moveLeft = false;
     let moveRight = false;
-        
+
+    let fire = false    
+    let bulletIndex = 0
     document.addEventListener('keydown', function(event) {
+        // console.log(event.key)
         switch(event.key) {
             case 'a':case 'A':
                 moveLeft = true;break;
             case 'd':case 'D':
                 moveRight = true;break;
+            case ' ':
+                fire = true;break;                
         }
     });
 
@@ -126,55 +173,58 @@
                 moveLeft = false;break;
             case 'd':case 'D':
                 moveRight = false;break;
+            case ' ':
+                fire = false;break;                
+            }
         }
-    });
+    );
 
     // 讀取檔案後
-    fileInput.addEventListener('change', function (event) {
-        var file = event.target.files[0];
-        var reader = new FileReader();
+    // fileInput.addEventListener('change', function (event) {
+    //     var file = event.target.files[0];
+    //     var reader = new FileReader();
 
-        reader.onload = function (event) {
-            var contents = event.target.result;
-            const loader = new VOXLoader();
-            var chunks= loader.parse(contents)
-            console.log(chunks)
+    //     reader.onload = function (event) {
+    //         var contents = event.target.result;
+    //         const loader = new VOXLoader();
+    //         var chunks= loader.parse(contents)
+    //         console.log(chunks)
 
-            const meshes = [];
-            var fighter= new THREE.Object3D();
-            for ( let i = 0; i < chunks.length; i ++ ) {
-                // 讀入vox檔第i個子物件
-                const chunk = chunks[ i ];
-                const mesh = new VOXMesh( chunk );
+    //         const meshes = [];
+    //         var fighter= new THREE.Object3D();
+    //         for ( let i = 0; i < chunks.length; i ++ ) {
+    //             // 讀入vox檔第i個子物件
+    //             const chunk = chunks[ i ];
+    //             const mesh = new VOXMesh( chunk );
 
-                mesh.scale.setScalar( .1 );
-                mesh.material.transparent=true
-                mesh.material.opacity=1.0
-                mesh.visible = false;
+    //             mesh.scale.setScalar( .1 );
+    //             mesh.material.transparent=true
+    //             mesh.material.opacity=1.0
+    //             mesh.visible = false;
 
-                meshes.push(mesh);
-                anima.add( mesh );
-            }
-            // fighter.position.x=10
-            // fighter.position.z=7
-            // scene.add(fighter)
+    //             meshes.push(mesh);
+    //             anima.add( mesh );
+    //         }
+    //         // fighter.position.x=10
+    //         // fighter.position.z=7
+    //         // scene.add(fighter)
 
-            let currentIndex = 0;
-            setInterval(function() {
-                // 將前一個物件隱藏
-                if (meshes[currentIndex]) {
-                    meshes[currentIndex].visible = false;
-                }
-                currentIndex = (currentIndex + 1) % meshes.length;
-                // 將新的物件顯示
-                if (meshes[currentIndex]) {
-                    meshes[currentIndex].visible = true;
-                }
-                // fighter.rotation.y += 0.03;
-                renderer.render(scene, camera);
-            },100)
-        };
+    //         let currentIndex = 0;
+    //         setInterval(function() {
+    //             // 將前一個物件隱藏
+    //             if (meshes[currentIndex]) {
+    //                 meshes[currentIndex].visible = false;
+    //             }
+    //             currentIndex = (currentIndex + 1) % meshes.length;
+    //             // 將新的物件顯示
+    //             if (meshes[currentIndex]) {
+    //                 meshes[currentIndex].visible = true;
+    //             }
+    //             // fighter.rotation.y += 0.03;
+    //             renderer.render(scene, camera);
+    //         },100)
+    //     };
 
-        reader.readAsArrayBuffer(file);
-    });
+    //     reader.readAsArrayBuffer(file);
+    // });
 </script>
