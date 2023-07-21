@@ -1,6 +1,5 @@
 <div id="canvas" style="width: 800px;height: 600px;"></div>
 <input type="file" id="fileInput" accept=".vox" />
-<div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
 
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <script type="importmap">
@@ -12,21 +11,6 @@
     }
 </script>
 <script type="module">
-    var workspace = Blockly.inject('blocklyDiv', {
-      toolbox: '<xml><block type="controls_if"></block></xml>'
-    });
-
-        // 监听代码生成事件
-        workspace.addChangeListener(function(event) {
-      if (event.type == Blockly.Events.BLOCK_CREATE ||
-          event.type == Blockly.Events.BLOCK_DELETE ||
-          event.type == Blockly.Events.BLOCK_CHANGE) {
-        // 获取生成的 JavaScript 代码
-        var code = Blockly.JavaScript.workspaceToCode(workspace);
-        console.log(code);
-      }
-    });
-
     import * as THREE from 'three';
     import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
 
@@ -67,16 +51,18 @@
 
     // 建置vox動畫必要物件
     const loader = new VOXLoader();
-    var anima= new THREE.Object3D();
-    scene.add( anima );  
+    var fighter= new THREE.Object3D();
+    scene.add( fighter );  
+    var bullet=new THREE.Object3D();
+    scene.add( bullet ); 
     const meshes = [];
     let currentIndex = 0;
 
     // 建置vox動畫流程
     function processVoxelAnimation(chunks) {
         // 清除voxel動畫物件
-        while (anima.children.length > 0) { 
-            anima.remove(anima.children[0]); 
+        while (fighter.children.length > 0) { 
+            fighter.remove(fighter.children[0]); 
         }
         meshes.length = 0;
 
@@ -85,10 +71,10 @@
             const mesh = new VOXMesh(chunk);
 
             mesh.scale.setScalar(.1);
-            mesh.visible = false;
+            mesh.visible = false;   
 
             meshes.push(mesh);
-            anima.add(mesh);
+            fighter.add(mesh);
         }
     }
 
@@ -96,20 +82,52 @@
     loader.load( 'https://cubiccode.vercel.app/vox/fighter.vox', function ( chunks ) {
     // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
         processVoxelAnimation(chunks);
-        anima.position.set(0,0,10)
+        fighter.position.set(0,0,10)
           
-        // 開始動畫
+        // 開始vox動畫
         setInterval(function() {
             // 將前一個物件隱藏
             meshes[currentIndex % meshes.length].visible = false;
             currentIndex +=1
             // 將新的物件顯示
             meshes[currentIndex % meshes.length].visible = true;
-
-            // controls.update(); // 需要加入這行才能讓OrbitControls工作
-            renderer.render(scene, camera);
         },100)
+        // 渲染與位移
+        setInterval(function() {
+            fighter.rotation.z = 0
+            if(moveLeft && fighter.position.x>-10) {
+                fighter.position.x -= .2;
+                fighter.rotation.z = Math.PI/8
+            }
+
+            if(moveRight&& fighter.position.x<10) {
+                fighter.position.x += .2;
+                fighter.rotation.z = -Math.PI/8
+            }
+            renderer.render(scene, camera);
+        },10)
     } );
+
+    let moveLeft = false;
+    let moveRight = false;
+        
+    document.addEventListener('keydown', function(event) {
+        switch(event.key) {
+            case 'a':case 'A':
+                moveLeft = true;break;
+            case 'd':case 'D':
+                moveRight = true;break;
+        }
+    });
+
+    document.addEventListener('keyup', function(event) {
+        switch(event.key) {
+            case 'a':case 'A':
+                moveLeft = false;break;
+            case 'd':case 'D':
+                moveRight = false;break;
+        }
+    });
 
     // 讀取檔案後
     fileInput.addEventListener('change', function (event) {
@@ -123,7 +141,7 @@
             console.log(chunks)
 
             const meshes = [];
-            var anima= new THREE.Object3D();
+            var fighter= new THREE.Object3D();
             for ( let i = 0; i < chunks.length; i ++ ) {
                 // 讀入vox檔第i個子物件
                 const chunk = chunks[ i ];
@@ -137,9 +155,9 @@
                 meshes.push(mesh);
                 anima.add( mesh );
             }
-            anima.position.x=10
-            anima.position.z=7
-            scene.add(anima)
+            // fighter.position.x=10
+            // fighter.position.z=7
+            // scene.add(fighter)
 
             let currentIndex = 0;
             setInterval(function() {
@@ -152,7 +170,7 @@
                 if (meshes[currentIndex]) {
                     meshes[currentIndex].visible = true;
                 }
-                // anima.rotation.y += 0.03;
+                // fighter.rotation.y += 0.03;
                 renderer.render(scene, camera);
             },100)
         };
