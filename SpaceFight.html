@@ -40,27 +40,23 @@
     var grids=[]
     var gridSize = 100; // 網格大小
     var gridDivisions = 10; // 網格分段數
-    var grid = new THREE.GridHelper(gridSize, gridDivisions, 0x00ff00, 0x009900);
-    grid.position.y = 0; // 放置在y=0的面上
-    var g1=grid.clone();g1.position.set(0,0,-200)
-    scene.add(g1);
-    grids.push(g1)
-    var g2=grid.clone();g2.position.set(0,0,-100)
-    scene.add(g2);
-    grids.push(g2)
-    var g3=grid.clone();g3.position.set(0,0,0)
-    scene.add(g3);
-    grids.push(g3)
-    var g4=grid.clone();g4.position.set(0,0,100)
-    scene.add(g4);
-    grids.push(g4)
+    var gridColor1 = 0x00ff00;
+    var gridColor2 = 0x009900;
+    for (var i = -200; i <= 100; i += 100) {
+        var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
+        grid.position.set(0, 0, i);
+        scene.add(grid);
+        grids.push(grid);
+    }
 
     renderer.render(scene, camera);
 
     // 建置vox動畫必要物件
     const loader = new VOXLoader();
     var fighter= new THREE.Object3D();
-    scene.add( fighter );  
+    scene.add( fighter );
+    var energy = new THREE.Object3D();
+    scene.add( energy );
     
     // scene.add( bullet ); 
     const meshes = [];
@@ -145,10 +141,14 @@
                 mesh.scale.setScalar(.1);
                 bullet.add(mesh);
             }
+            bullet.position.set(0,0,-300)
             scene.add(bullet)
             bullets.push(bullet)
         }
     } ); 
+
+    // 加載能量石
+    
 
     let moveLeft = false;
     let moveRight = false;
