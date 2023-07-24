@@ -1,5 +1,5 @@
 <div id="canvas" style="width: 800px;height: 600px;"></div>
-<!-- <input type="file" id="fileInput" accept=".vox" /> -->
+<input type="file" id="fileInput" accept=".vox" />
 <h3>A:向左 / D:向右 / Space:發射</h3>
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <script type="importmap">
@@ -53,9 +53,9 @@
 
     // 建置vox動畫必要物件
     const loader = new VOXLoader();
-    var fighter= new THREE.Object3D();
+    const fighter= new THREE.Object3D();
     scene.add( fighter );
-    var energy = new THREE.Object3D();
+    const energy = new THREE.Object3D();
     scene.add( energy );
     
     // scene.add( bullet ); 
@@ -82,93 +82,29 @@
         }
     }
 
-    // 載入預設戰機檔案
+    // 載入預設戰機
     loader.load( 'https://cubiccode.vercel.app/vox/fighter.vox', function ( chunks ) {
     // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
         processVoxelAnimation(chunks);
         fighter.position.set(0,1,10)
-          
-        // 開始vox動畫
-        setInterval(function() {
-            // 將前一個物件隱藏
-            meshes[currentIndex % meshes.length].visible = false;
-            currentIndex +=1
-            // 將新的物件顯示
-            meshes[currentIndex % meshes.length].visible = true;
-
-            if(fire) {
-                bullets[bulletIndex%100].position.copy(fighter.position)
-                bulletIndex+=1
-            }
-        },100)
-        // // 渲染與位移
-        // setInterval(function() {
-        //     // 戰機移動+轉動
-        //     fighter.rotation.z = 0
-        //     if(moveLeft && fighter.position.x>-10) {
-        //         fighter.position.x -= .2;
-        //         fighter.rotation.z = Math.PI/8
-        //     }
-        //     if(moveRight&& fighter.position.x<10) {
-        //         fighter.position.x += .2;
-        //         fighter.rotation.z = -Math.PI/8
-        //     }
-        //     // 子彈飛行
-        //     for(let i=0;i<100;i++){
-        //         bullets[i].position.z-=.5
-        //     }
-        //     // 地板移動
-        //     for(let i=0;i<4;i++){
-        //         grids[i].position.z+=.3
-        //         if(grids[i].position.z>100){
-        //             grids[i].position.z=-200
-        //         }
-        //     }
-        //     // 能量石旋轉
-        //     energy.rotation.x+=.1
-        //     energy.rotation.y+=.02
-        //     energy.position.z+=.5
-        //     if(energy.position.z>20){
-        //         energy.position.set((Math.random() * 20) - 10,0,-100)
-        //     }
-            
-        //     renderer.render(scene, camera);
-        // },10)
+        
     } );
 
-            // 渲染與位移
-            setInterval(function() {
-            // 戰機移動+轉動
-            fighter.rotation.z = 0
-            if(moveLeft && fighter.position.x>-10) {
-                fighter.position.x -= .2;
-                fighter.rotation.z = Math.PI/8
-            }
-            if(moveRight&& fighter.position.x<10) {
-                fighter.position.x += .2;
-                fighter.rotation.z = -Math.PI/8
-            }
-            // 子彈飛行
-            for(let i=0;i<100;i++){
-                bullets[i].position.z-=.5
-            }
-            // 地板移動
-            for(let i=0;i<4;i++){
-                grids[i].position.z+=.3
-                if(grids[i].position.z>100){
-                    grids[i].position.z=-200
-                }
-            }
-            // 能量石旋轉
-            energy.rotation.x+=.1
-            energy.rotation.y+=.02
-            energy.position.z+=.5
-            if(energy.position.z>20){
-                energy.position.set((Math.random() * 20) - 10,0,-100)
-            }
-            
-            renderer.render(scene, camera);
-        },10)
+    // 上傳選定戰機
+    fileInput.addEventListener('change', function (event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function (event) {
+            var contents = event.target.result;
+            const loader = new VOXLoader();
+            var chunks= loader.parse(contents)
+            console.log(chunks)
+            processVoxelAnimation(chunks);
+        };
+        reader.readAsArrayBuffer(file);
+    });
+    
 
     // 加載100個子彈
     var bullets=[]
@@ -205,12 +141,22 @@
         energy.position.set(0,1,0)
     }); 
 
+    // 繪製vox動畫
+    setInterval(function() {
+        // 將前一個物件隱藏
+        meshes[currentIndex % meshes.length].visible = false;
+        currentIndex +=1
+        // 將新的物件顯示
+        meshes[currentIndex % meshes.length].visible = true;
+    },100)
+
 
     let moveLeft = false;
     let moveRight = false;
 
     let fire = false    
     let bulletIndex = 0
+    
     document.addEventListener('keydown', function(event) {
         // console.log(event.key)
         switch(event.key) {
@@ -235,52 +181,43 @@
         }
     );
 
-    // 讀取檔案後
-    // fileInput.addEventListener('change', function (event) {
-    //     var file = event.target.files[0];
-    //     var reader = new FileReader();
-
-    //     reader.onload = function (event) {
-    //         var contents = event.target.result;
-    //         const loader = new VOXLoader();
-    //         var chunks= loader.parse(contents)
-    //         console.log(chunks)
-
-    //         const meshes = [];
-    //         var fighter= new THREE.Object3D();
-    //         for ( let i = 0; i < chunks.length; i ++ ) {
-    //             // 讀入vox檔第i個子物件
-    //             const chunk = chunks[ i ];
-    //             const mesh = new VOXMesh( chunk );
-
-    //             mesh.scale.setScalar( .1 );
-    //             mesh.material.transparent=true
-    //             mesh.material.opacity=1.0
-    //             mesh.visible = false;
-
-    //             meshes.push(mesh);
-    //             anima.add( mesh );
-    //         }
-    //         // fighter.position.x=10
-    //         // fighter.position.z=7
-    //         // scene.add(fighter)
-
-    //         let currentIndex = 0;
-    //         setInterval(function() {
-    //             // 將前一個物件隱藏
-    //             if (meshes[currentIndex]) {
-    //                 meshes[currentIndex].visible = false;
-    //             }
-    //             currentIndex = (currentIndex + 1) % meshes.length;
-    //             // 將新的物件顯示
-    //             if (meshes[currentIndex]) {
-    //                 meshes[currentIndex].visible = true;
-    //             }
-    //             // fighter.rotation.y += 0.03;
-    //             renderer.render(scene, camera);
-    //         },100)
-    //     };
-
-    //     reader.readAsArrayBuffer(file);
-    // });
+    // 渲染與位移
+    var gameTime=0
+    setInterval(function() {
+        gameTime+=1
+        // 戰機移動+轉動
+        fighter.rotation.z = 0
+        if(moveLeft && fighter.position.x>-10) {
+            fighter.position.x -= .2;
+            fighter.rotation.z = Math.PI/8
+        }
+        if(moveRight&& fighter.position.x<10) {
+            fighter.position.x += .2;
+            fighter.rotation.z = -Math.PI/8
+        }
+        // 子彈發射飛行
+        if(fire && gameTime%10==0) {
+            bullets[bulletIndex%100].position.copy(fighter.position)
+            bulletIndex+=1
+        }
+        for(let i=0;i<100;i++){
+            bullets[i].position.z-=.5
+        }
+        // 地板移動
+        for(let i=0;i<4;i++){
+            grids[i].position.z+=.3
+            if(grids[i].position.z>100){
+                grids[i].position.z=-200
+            }
+        }
+        // 能量石旋轉
+        energy.rotation.x+=.1
+        energy.rotation.y+=.02
+        energy.position.z+=.5
+        if(energy.position.z>20){
+            energy.position.set((Math.random() * 20) - 10,0,-100)
+        }
+        
+        renderer.render(scene, camera);
+    },10)
 </script>
