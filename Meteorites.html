@@ -81,106 +81,13 @@
             models.push(voxelObject);
             }
             voxelAnimas[voxelName] = models;
-            console.log(voxelName,voxelAnimas,voxelAnimas[voxelName])
         });
     }
 
     // 在加载模型之后调用函数
     for (const voxelSetting of voxelSettings) {
-        // console.log(voxelSetting.name)
         loadVoxelModel(voxelSetting.name, voxelSetting);
     }
-    // console.log(voxelAnimas)
-
-    // 建置vox動畫必要物件
-    
-    // const fighter= new THREE.Object3D();
-    // scene.add( fighter );
-    const energy = new THREE.Object3D();
-    scene.add( energy );
-    
-    // scene.add( bullet ); 
-    // const meshes = [];
-    // let currentIndex = 0;
-
-    // // 建置vox動畫流程
-    // function processVoxelAnimation(chunks) {
-    //     // 清除voxel動畫物件
-    //     while (fighter.children.length > 0) { 
-    //         fighter.remove(fighter.children[0]); 
-    //     }
-    //     meshes.length = 0;
-
-    //     for (let i = 0; i < chunks.length; i++) {
-    //         const chunk = chunks[i];
-    //         const mesh = new VOXMesh(chunk);
-
-    //         mesh.scale.setScalar(.1);
-    //         mesh.visible = false;   
-
-    //         meshes.push(mesh);
-    //         fighter.add(mesh);
-    //     }
-    // }
-
-    // 載入預設戰機
-    // loader.load( 'https://cubiccode.vercel.app/vox/fighter.vox', function ( chunks ) {
-    // // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
-    //     processVoxelAnimation(chunks);
-    //     fighter.position.set(0,1,10)
-        
-    // } );
-
-    // // 上傳選定戰機
-    // fileInput.addEventListener('change', function (event) {
-    //     var file = event.target.files[0];
-    //     var reader = new FileReader();
-
-    //     reader.onload = function (event) {
-    //         var contents = event.target.result;
-    //         const loader = new VOXLoader();
-    //         var chunks= loader.parse(contents)
-    //         console.log(chunks)
-    //         processVoxelAnimation(chunks);
-    //     };
-    //     reader.readAsArrayBuffer(file);
-    // });
-    
-
-    // // 加載100個子彈
-    // var bullets=[]
-    // loader.load( 'https://cubiccode.vercel.app/vox/bullet.vox', function ( chunks ) {
-    //     for (let i=0;i<100;i++){
-    //         let bullet=new THREE.Object3D() 
-    //         for (let i = 0; i < chunks.length; i++) {
-    //             const chunk = chunks[i];
-    //             const mesh = new VOXMesh(chunk);
-
-    //             mesh.scale.setScalar(.1);
-    //             bullet.add(mesh);
-    //         }
-    //         bullet.position.set(0,0,-300)
-    //         scene.add(bullet)
-    //         bullets.push(bullet)
-    //     }
-    // } ); 
-
-    // // 加載能量石
-
-    // loader.load( 'https://cubiccode.vercel.app/vox/energy.vox', function ( chunks ) {
-    //     for (let i = 0; i < chunks.length; i++) {
-    //         const chunk = chunks[i];
-    //         const mesh = new VOXMesh(chunk);
-    //         mesh.material.transparent=true
-    //         mesh.material.opacity=0.8
-    //         mesh.material.emissive.set(0x008888);
-    //         console.log(mesh.material)
-    //         mesh.scale.setScalar(.1);
-    //         energy.add(mesh);
-    //     }
-    //     console.log(energy)
-    //     energy.position.set(0,1,0)
-    // }); 
 
     // 繪製voxel動畫
     setInterval(function () {
@@ -198,12 +105,10 @@
         }
     }, 100);
 
-
     let moveLeft = false;
     let moveRight = false;
-
     let fire = false    
-    let bulletIndex = 0
+    
     
     document.addEventListener('keydown', function(event) {
         // console.log(event.key)
@@ -229,51 +134,54 @@
         }
     );
 
-    // 渲染與位移
-    var gameTime=0
-
-    setInterval(function() {
+    // 遊戲主流程
+    setTimeout(function(){
         let fighter=voxelAnimas["fighter"][0]
         let bullets=voxelAnimas["bullet"]
         let energy =voxelAnimas["energy"]
+        let bulletIndex = 0
         
-        gameTime+=1
-        // 戰機移動+轉動
-        fighter.rotation.z = 0
-        if(moveLeft && fighter.position.x>-10) {
-            fighter.position.x -= .2;
-            fighter.rotation.z = Math.PI/8
-        }
-        if(moveRight&& fighter.position.x<10) {
-            fighter.position.x += .2;
-            fighter.rotation.z = -Math.PI/8
-        }
-        // 子彈發射飛行
-        
-        if(fire && Math.floor(Date.now() / 10)%10==0) {
-            bullets[bulletIndex%100].position.copy(fighter.position)
-            bulletIndex+=1
-        }
-        for(let i=0;i<bullets.length;i++){
-            bullets[i].position.z-=.5
-        }
-        // 地板移動
-        for(let i=0;i<4;i++){
-            grids[i].position.z+=.3
-            if(grids[i].position.z>100){
-                grids[i].position.z=-200
+        setInterval(function() {
+            // 戰機移動+轉動
+            fighter.rotation.z = 0
+            if(moveLeft && fighter.position.x>-10) {
+                fighter.position.x -= .2;
+                fighter.rotation.z = Math.PI/8
             }
-        }
-        // 能量石旋轉
-        for(let i=0;i<energy.length;i++){
-            energy[i].rotation.x+=.1
-            energy[i].rotation.y+=.02
-            energy[i].position.z+=.5
-            if(energy[i].position.z>20){
-                energy[i].position.set((Math.random() * 20) - 10,0,-100)
+            if(moveRight&& fighter.position.x<10) {
+                fighter.position.x += .2;
+                fighter.rotation.z = -Math.PI/8
             }
-        }
-        
-        renderer.render(scene, camera);
-    },10)
+
+            // 子彈發射飛行
+            if(fire && Math.floor(Date.now() / 10)%10==1) {
+                bullets[bulletIndex%100].position.copy(fighter.position)
+                bulletIndex+=1
+            }
+            for(let i=0;i<bullets.length;i++){
+                bullets[i].position.z-=.5
+            }
+
+            // 地板移動
+            for(let i=0;i<4;i++){
+                grids[i].position.z+=.3
+                if(grids[i].position.z>100){
+                    grids[i].position.z=-200
+                }
+            }
+
+            // 能量石旋轉
+            for(let i=0;i<energy.length;i++){
+                energy[i].rotation.x+=.1
+                energy[i].rotation.y+=.02
+                energy[i].position.z+=.5
+                if(energy[i].position.z>20){
+                    energy[i].position.set((Math.random() * 20) - 10,0,-100)
+                }
+            }
+            
+            renderer.render(scene, camera);
+        },10)
+
+    }, 500);
 </script>
