@@ -52,7 +52,7 @@
     const voxelSettings = [
         { name: "fighter", opacity: 1,   count: 1   },
         { name: "bullet",  opacity: 1,   count: 100 },
-        { name: "energy",  opacity: 0.8, count: 3   },
+        { name: "energy",  opacity: 0.8, count: 4   },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -76,7 +76,7 @@
                 voxelObject.add(mesh);
             }
 
-            voxelObject.position.set(Math.random() * 20 - 10, 1, 10); // 设置不同的位置
+            // voxelObject.position.set(Math.random() * 20 - 10, 1, 10); // 设置不同的位置
             scene.add(voxelObject);
             models.push(voxelObject);
             }
@@ -91,7 +91,6 @@
 
     // 繪製voxel動畫
     setInterval(function () {
-        // console.log(voxelAnimas["fighter"][0].children)
         for (const voxelName in voxelAnimas) {
             const voxelObjectsArray = voxelAnimas[voxelName];
             for (let i = 0; i < voxelObjectsArray.length; i++) {
@@ -105,34 +104,22 @@
         }
     }, 100);
 
-    let moveLeft = false;
-    let moveRight = false;
-    let fire = false    
-    
-    
+    setInterval(function() {
+        renderer.render(scene, camera);
+    },10)
+
+    let keys = {};
     document.addEventListener('keydown', function(event) {
-        // console.log(event.key)
-        switch(event.key) {
-            case 'a':case 'A':case 'ArrowLeft':
-                moveLeft = true;break;
-            case 'd':case 'D':case 'ArrowRight':
-                moveRight = true;break;
-            case ' ':
-                fire = true;break;                
-        }
+        // 將 event.key 轉換成小寫，並儲存到 keys 物件中
+        const key = event.key.toLowerCase();
+        keys[key] = true; // 設置按鍵為 true 表示按下該按鍵
     });
 
     document.addEventListener('keyup', function(event) {
-        switch(event.key) {
-            case 'a':case 'A':case 'ArrowLeft':
-                moveLeft = false;break;
-            case 'd':case 'D':case 'ArrowRight':
-                moveRight = false;break;
-            case ' ':
-                fire = false;break;                
-            }
-        }
-    );
+        // 將 event.key 轉換成小寫，並儲存到 keys 物件中
+        const key = event.key.toLowerCase();
+        keys[key] = false; // 設置按鍵為 false 表示釋放該按鍵
+    });
 
     // 遊戲主流程
     setTimeout(function(){
@@ -140,21 +127,32 @@
         let bullets=voxelAnimas["bullet"]
         let energy =voxelAnimas["energy"]
         let bulletIndex = 0
+        fighter.position.set(0,1,10)
+        for (let i = 0; i < energy.length; i++) {
+            // 設置能量石的位置
+            energy[i].position.set((Math.random() * 20) - 10, 1, -30 - i * 30);
+            // 設置能量石的角速度（隨機方向向量）
+            energy[i].angularVelocity = new THREE.Vector3().random();
+        }
+        for(let i=0;i<bullets.length;i++){
+            bullets[i].position.z=-300
+        }   
         
         setInterval(function() {
+            console.log(keys)
             // 戰機移動+轉動
             fighter.rotation.z = 0
-            if(moveLeft && fighter.position.x>-10) {
+            if((keys['a']||keys['arrowleft']) && fighter.position.x>-10) {
                 fighter.position.x -= .2;
                 fighter.rotation.z = Math.PI/8
             }
-            if(moveRight&& fighter.position.x<10) {
+            if((keys['d']||keys['arrowright']) && fighter.position.x<10) {
                 fighter.position.x += .2;
                 fighter.rotation.z = -Math.PI/8
             }
 
             // 子彈發射飛行
-            if(fire && Math.floor(Date.now() / 10)%10==1) {
+            if(keys[' '] && Math.floor(Date.now() / 10)%10==1) {
                 bullets[bulletIndex%100].position.copy(fighter.position)
                 bulletIndex+=1
             }
@@ -172,16 +170,14 @@
 
             // 能量石旋轉
             for(let i=0;i<energy.length;i++){
-                energy[i].rotation.x+=.1
-                energy[i].rotation.y+=.02
+                energy[i].rotation.x += energy[i].angularVelocity.x/10 ;
+                energy[i].rotation.y += energy[i].angularVelocity.y/10 ;
+                energy[i].rotation.z += energy[i].angularVelocity.z/10 ;
                 energy[i].position.z+=.5
                 if(energy[i].position.z>20){
                     energy[i].position.set((Math.random() * 20) - 10,0,-100)
                 }
             }
-            
-            renderer.render(scene, camera);
         },10)
-
     }, 500);
 </script>
