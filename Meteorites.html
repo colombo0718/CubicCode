@@ -50,9 +50,10 @@
     }
 
     const voxelSettings = [
-        { name: "fighter", opacity: 1,   count: 1   },
-        { name: "bullet",  opacity: 1,   count: 100 },
-        { name: "energy",  opacity: 0.8, count: 4   },
+        { name: "fighter", opacity: 1,  count: 1   },
+        { name: "bullet",  opacity: 1,  count: 100 },
+        { name: "energy",  opacity: .8, count: 4   },
+        { name: "rock1",   opacity: 1,  count: 4   },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -126,13 +127,16 @@
         let fighter=voxelAnimas["fighter"][0]
         let bullets=voxelAnimas["bullet"]
         let energy =voxelAnimas["energy"]
+        let rock1  =voxelAnimas["rock1"]
         let bulletIndex = 0
         fighter.position.set(0,1,10)
         for (let i = 0; i < energy.length; i++) {
-            // 設置能量石的位置
             energy[i].position.set((Math.random() * 20) - 10, 1, -30 - i * 30);
-            // 設置能量石的角速度（隨機方向向量）
             energy[i].angularVelocity = new THREE.Vector3().random();
+        }
+        for (let i = 0; i < rock1.length; i++) {
+            rock1[i].position.set((Math.random() * 20) - 10, 1, -15 - i * 30);
+            rock1[i].angularVelocity = new THREE.Vector3().random();
         }
         for(let i=0;i<bullets.length;i++){
             bullets[i].position.z=-300
@@ -173,9 +177,20 @@
                 energy[i].rotation.x += energy[i].angularVelocity.x/10 ;
                 energy[i].rotation.y += energy[i].angularVelocity.y/10 ;
                 energy[i].rotation.z += energy[i].angularVelocity.z/10 ;
-                energy[i].position.z+=.5
+                energy[i].position.z+=.3
                 if(energy[i].position.z>20){
                     energy[i].position.set((Math.random() * 20) - 10,0,-100)
+                }
+            }
+
+            // 隕石旋轉
+            for(let i=0;i<rock1.length;i++){
+                rock1[i].rotation.x += rock1[i].angularVelocity.x/10 ;
+                rock1[i].rotation.y += rock1[i].angularVelocity.y/10 ;
+                rock1[i].rotation.z += rock1[i].angularVelocity.z/10 ;
+                rock1[i].position.z+=.3
+                if(rock1[i].position.z>20){
+                    rock1[i].position.set((Math.random() * 20) - 10,0,-100)
                 }
             }
         },10)
