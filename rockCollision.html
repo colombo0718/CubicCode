@@ -61,70 +61,59 @@
     // 加载voxel模型
         function createModelArray(chunks,opacity,amount){
             const models = [];
-            for (let i = 0; i < settings.amount; i++) {
+            // console.log(amount)
+            for (let i = 0; i < amount; i++) {
                 const voxelObject = new THREE.Object3D();
-
+                // console.log(chunks.length)
                 for (let j = 0; j < chunks.length; j++) {
                     const chunk = chunks[j];
                     const mesh = new VOXMesh(chunk);
                     mesh.scale.setScalar(0.1);
                     mesh.material.transparent = true;
-                    mesh.material.opacity = settings.opacity;
+                    mesh.material.opacity = opacity;
                     // mesh.material.emissive.set(0x008888);
                     voxelObject.add(mesh);
                 }
-
+                // console.log(voxelObject)
                 // voxelObject.position.set(Math.random() * 20 - 10, 1, 10); // 设置不同的位置
                 scene.add(voxelObject);
                 models.push(voxelObject);
             }
+            return models
         }
 
-    // --------------
-    const loader = new VOXLoader();
-    function loadVoxelModel(voxelName, settings) {
-        loader.load(`https://cubiccode.vercel.app/vox/${voxelName}.vox`, function (chunks) {
-            const models = [];
-
-            for (let i = 0; i < settings.amount; i++) {
-                const voxelObject = new THREE.Object3D();
-
-                for (let j = 0; j < chunks.length; j++) {
-                    const chunk = chunks[j];
-                    const mesh = new VOXMesh(chunk);
-                    mesh.scale.setScalar(0.1);
-                    mesh.material.transparent = true;
-                    mesh.material.opacity = settings.opacity;
-                    // mesh.material.emissive.set(0x008888);
-                    voxelObject.add(mesh);
-                }
-
-                // voxelObject.position.set(Math.random() * 20 - 10, 1, 10); // 设置不同的位置
-                scene.add(voxelObject);
-                models.push(voxelObject);
-            }
-            voxelAnimas[voxelName] = models;
-        });
-    }
-
-    // 在加载模型之后调用函数
-    for (const voxelSetting of voxelSettings) {
-        loadVoxelModel(voxelSetting.name, voxelSetting);
-    }
+        const loader = new VOXLoader();
+        for (const voxelSetting of voxelSettings) {
+            // console.log(voxelSetting.name)
+            // loadVoxelModel(voxelSetting.name, voxelSetting);
+            loader.load('https://cubiccode.vercel.app/vox/'+voxelSetting.name+'.vox',
+            function (chunks){
+                const models=createModelArray(chunks,voxelSetting.opacity,voxelSetting.amount)
+                // console.log(models)
+                voxelAnimas[voxelSetting.name] = models;
+            })
+        }
 
     // 上傳選定戰機
     fileInput.addEventListener('change', function (event) {
+        if (!event.target.files.length) {
+            console.log('No files were selected!');
+            return; // 直接返回，不執行後面的代碼
+        }
+        scene.remove(voxelAnimas['fighter'][0])
         var file = event.target.files[0];
         var reader = new FileReader();
-
+        console.log(voxelAnimas )
         reader.onload = function (event) {
             var contents = event.target.result;
             const loader = new VOXLoader();
             var chunks= loader.parse(contents)
-            console.log(chunks)
-            processVoxelAnimation(chunks);
+            const models=createModelArray(chunks,1,1)
+            voxelAnimas['fighter'] = models;
         };
         reader.readAsArrayBuffer(file);
+        clearInterval(intervalID);
+        gameProcess()
     });
 
     // 繪製voxel動畫
@@ -160,7 +149,11 @@
     });
 
     // 遊戲主流程
+    var timeoutID,intervalID
+    function gameProcess(){
+    timeoutID=
     setTimeout(function(){
+        console.log(voxelAnimas)
         let fighter=voxelAnimas["fighter"][0]
         let bullets=voxelAnimas["bullet"]
         let energy =voxelAnimas["energy"]
@@ -179,8 +172,10 @@
             bullets[i].position.z=-300
         }   
         
+        function startLoop(){
+        intervalID=
         setInterval(function() {
-            console.log(keys)
+            // console.log(keys)
             // 戰機移動+轉動
             fighter.rotation.z = 0
             if((keys['a']||keys['arrowleft']) && fighter.position.x>-10) {
@@ -231,5 +226,7 @@
                 }
             }
         },10)
+        }startLoop()
     }, 500);
+    }gameProcess()
 </script>
