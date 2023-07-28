@@ -1,4 +1,5 @@
 <div id="canvas" style="width: 800px;height: 600px;"></div>
+<button id="startButton">開始</button>
 <input type="file" id="fileInput" accept=".vox" />
 <h3>A:向左 / D:向右 / Space:發射</h3>
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
@@ -117,12 +118,14 @@
     });
 
     // 繪製voxel動畫
+    var slowIndex=0
     setInterval(function () {
+        slowIndex+=1
         for (const voxelName in voxelAnimas) {
             const voxelObjectsArray = voxelAnimas[voxelName];
             for (let i = 0; i < voxelObjectsArray.length; i++) {
                 const voxelObject = voxelObjectsArray[i];
-                const currentIndex = Math.floor(Date.now() / 100) % voxelObject.children.length;
+                const currentIndex = slowIndex % voxelObject.children.length;
                 for (let j = 0; j < voxelObject.children.length; j++) {
                     var voxelMesh=voxelObject.children[j]
                     voxelMesh.visible = j === currentIndex;
@@ -131,7 +134,10 @@
         }
     }, 100);
 
+    // 渲染畫面
+    var fastIndex=0
     setInterval(function() {
+        fastIndex+=1
         renderer.render(scene, camera);
     },10)
 
@@ -149,10 +155,9 @@
     });
 
     // 遊戲主流程
-    var timeoutID,intervalID
+    var intervalID
+    var startLoop=function(){}
     function gameProcess(){
-    timeoutID=
-    setTimeout(function(){
         console.log(voxelAnimas)
         let fighter=voxelAnimas["fighter"][0]
         let bullets=voxelAnimas["bullet"]
@@ -188,7 +193,7 @@
             }
 
             // 子彈發射飛行
-            if(keys[' '] && Math.floor(Date.now() / 10)%10==1) {
+            if(keys[' '] && fastIndex %10==1) {
                 bullets[bulletIndex%100].position.copy(fighter.position)
                 bulletIndex+=1
             }
@@ -227,6 +232,15 @@
             }
         },10)
         }startLoop()
-    }, 500);
-    }gameProcess()
+    }
+    
+// gameProcess()
+
+    window.addEventListener("load", function() {
+        const startButton = document.getElementById("startButton");
+        startButton.addEventListener("click", function() {
+            clearInterval(intervalID);
+            gameProcess(); // 點擊按鈕後觸發遊戲流程函數
+        });
+    });
 </script>
