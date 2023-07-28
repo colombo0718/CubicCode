@@ -29,10 +29,10 @@
     camera.rotation.x=-Math.PI/4
 
     // 添加燈光
-    var ambientLight = new THREE.AmbientLight(0xffffff, .5); // 產生柔和的光
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
     scene.add(ambientLight);
 
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
     directionalLight.position.set(1, 1, 0);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
@@ -51,32 +51,28 @@
     }
 
     const voxelSettings = [
-        { name: "fighter", opacity: 1,  amount: 1   },
-        { name: "bullet",  opacity: 1,  amount: 100 },
-        { name: "energy",  opacity: .8, amount: 4   },
-        { name: "rock1",   opacity: 1,  amount: 4   },
+        { name: "fighter", opacity: 1,  amount: 1   ,radius:10},
+        { name: "bullet",  opacity: 1,  amount: 100 ,radius:0 },
+        { name: "energy",  opacity: .8, amount: 4   ,radius:5 },
+        { name: "rock1",   opacity: 1,  amount: 4   ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
 
     // 加载voxel模型
-        function createModelArray(chunks,opacity,amount){
+        function createModelArray(chunks,opacity,amount,raduis){
             const models = [];
-            // console.log(amount)
             for (let i = 0; i < amount; i++) {
                 const voxelObject = new THREE.Object3D();
-                // console.log(chunks.length)
                 for (let j = 0; j < chunks.length; j++) {
                     const chunk = chunks[j];
                     const mesh = new VOXMesh(chunk);
                     mesh.scale.setScalar(0.1);
                     mesh.material.transparent = true;
                     mesh.material.opacity = opacity;
-                    // mesh.material.emissive.set(0x008888);
                     voxelObject.add(mesh);
                 }
-                // console.log(voxelObject)
-                // voxelObject.position.set(Math.random() * 20 - 10, 1, 10); // 设置不同的位置
+                voxelObject.radius=raduis
                 scene.add(voxelObject);
                 models.push(voxelObject);
             }
@@ -84,14 +80,11 @@
         }
 
         const loader = new VOXLoader();
-        for (const voxelSetting of voxelSettings) {
-            // console.log(voxelSetting.name)
-            // loadVoxelModel(voxelSetting.name, voxelSetting);
-            loader.load('https://cubiccode.vercel.app/vox/'+voxelSetting.name+'.vox',
+        for (const voxelSet of voxelSettings) {
+            loader.load('https://cubiccode.vercel.app/vox/'+voxelSet.name+'.vox',
             function (chunks){
-                const models=createModelArray(chunks,voxelSetting.opacity,voxelSetting.amount)
-                // console.log(models)
-                voxelAnimas[voxelSetting.name] = models;
+                const models=createModelArray(chunks,voxelSet.opacity,voxelSet.amount,voxelSet.radius)
+                voxelAnimas[voxelSet.name] = models;
             })
         }
 
@@ -109,7 +102,7 @@
             var contents = event.target.result;
             const loader = new VOXLoader();
             var chunks= loader.parse(contents)
-            const models=createModelArray(chunks,1,1)
+            const models=createModelArray(chunks,1,1,10)
             voxelAnimas['fighter'] = models;
         };
         reader.readAsArrayBuffer(file);
@@ -158,7 +151,6 @@
     var intervalID
     var startLoop=function(){}
     function gameProcess(){
-        console.log(voxelAnimas)
         let fighter=voxelAnimas["fighter"][0]
         let bullets=voxelAnimas["bullet"]
         let energy =voxelAnimas["energy"]
@@ -235,7 +227,6 @@
     }
     
 // gameProcess()
-
     window.addEventListener("load", function() {
         const startButton = document.getElementById("startButton");
         startButton.addEventListener("click", function() {
