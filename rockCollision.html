@@ -69,10 +69,11 @@
                     const mesh = new VOXMesh(chunk);
                     mesh.scale.setScalar(0.1);
                     mesh.material.transparent = true;
+                    // mesh.material.emissive.set(0x008888);
                     mesh.material.opacity = opacity;
                     voxelObject.add(mesh);
                 }
-                voxelObject.radius=raduis
+                voxelObject.radius=raduis/10
                 scene.add(voxelObject);
                 models.push(voxelObject);
             }
@@ -151,6 +152,7 @@
     var intervalID
     var startLoop=function(){}
     function gameProcess(){
+        let score=0
         let fighter=voxelAnimas["fighter"][0]
         let bullets=voxelAnimas["bullet"]
         let energy =voxelAnimas["energy"]
@@ -201,6 +203,17 @@
                 }
             }
 
+            // 檢測得分
+            for(let i=0;i<energy.length;i++){
+                const distance = energy[i].position.distanceTo(fighter.position);
+                const touch=distance <= energy[i].radius + fighter.radius
+                if(touch && energy[i].visible){
+                    score+=1
+                    console.log("Score:"+score)
+                    energy[i].visible=false
+                }
+            }
+
             // 能量石旋轉
             for(let i=0;i<energy.length;i++){
                 energy[i].rotation.x += energy[i].angularVelocity.x/10 ;
@@ -209,6 +222,7 @@
                 energy[i].position.z+=.3
                 if(energy[i].position.z>20){
                     energy[i].position.set((Math.random() * 20) - 10,0,-100)
+                    energy[i].visible=true
                 }
             }
 
