@@ -25,10 +25,10 @@
     camera.position.set(0,6,6)
 
     // 添加燈光
-    var ambientLight = new THREE.AmbientLight(0xffffff, .5); // 產生柔和的光
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
     scene.add(ambientLight);
 
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
     directionalLight.position.set(1, 1, 0);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
