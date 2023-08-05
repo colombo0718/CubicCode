@@ -1,0 +1,251 @@
+<div id="canvas" style="width: 800px;height: 600px;"></div>
+<button id="startButton">開始</button>
+<input type="file" id="fileInput" accept=".vox" />
+<h3>A:向左 / D:向右 / Space:發射</h3>
+<script src="https://unpkg.com/blockly/blockly.min.js"></script>
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://threejs.org/build/three.module.js",
+            "three/addons/": "https://threejs.org/examples/jsm/"
+        }
+    }
+</script>
+<script type="module">
+    import * as THREE from 'three';
+    import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+
+    var fileInput = document.getElementById('fileInput');
+    var canvas = document.getElementById('canvas');
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    canvas.appendChild(renderer.domElement);
+
+    // 設置相機
+    camera.position.y = 18/Math.sqrt(2);
+    camera.position.z = 18/Math.sqrt(2);
+    camera.rotation.x=-Math.PI/4
+
+    // 添加燈光
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
+    directionalLight.position.set(1, 1, 0);
+    directionalLight.castShadow = true; // 讓此光能產生陰影
+    scene.add(directionalLight);
+
+    // 添加網格
+    var grids=[]
+    var gridSize = 100; // 網格大小
+    var gridDivisions = 10; // 網格分段數
+    var gridColor1 = 0x00ff00;
+    var gridColor2 = 0x009900;
+    for (var i = -200; i <= 100; i += 100) {
+        var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
+        grid.position.set(0, 0, i);
+        scene.add(grid);
+        grids.push(grid);
+    }
+
+    const voxelSettings = [
+        { name: "knight-walk",  opacity: 1,  amount: 1   ,radius:10 },
+        { name: "knight-hack",  opacity: 1,  amount: 1   ,radius:10 },
+        { name: "knight-keep",  opacity: 1,  amount: 1   ,radius:10 },
+        { name: "knight-jump",  opacity: 1,  amount: 1   ,radius:10 },
+        // 可以添加更多的voxel模型设置
+    ];
+    const voxelAnimas = {}; // 存储每个voxel模型的数组
+
+    // 加载voxel模型
+        function createModelArray(chunks,opacity,amount,raduis){
+            const models = [];
+            for (let i = 0; i < amount; i++) {
+                const voxelObject = new THREE.Object3D();
+                for (let j = 0; j < chunks.length; j++) {
+                    const chunk = chunks[j];
+                    const mesh = new VOXMesh(chunk);
+                    mesh.scale.setScalar(0.1);
+                    mesh.material.transparent = true;
+                    // mesh.material.emissive.set(0x008888);
+                    mesh.material.opacity = opacity;
+                    voxelObject.add(mesh);
+                }
+                voxelObject.radius=raduis/10
+                scene.add(voxelObject);
+                models.push(voxelObject);
+            }
+            return models
+        }
+
+        const loader = new VOXLoader();
+        for (const voxelSet of voxelSettings) {
+            loader.load('https://cubiccode.vercel.app/vox/'+voxelSet.name+'.vox',
+            function (chunks){
+                const models=createModelArray(chunks,voxelSet.opacity,voxelSet.amount,voxelSet.radius)
+                voxelAnimas[voxelSet.name] = models;
+            })
+        }
+
+    // 上傳選定戰機
+    fileInput.addEventListener('change', function (event) {
+        if (!event.target.files.length) {
+            console.log('No files were selected!');
+            return; // 直接返回，不執行後面的代碼
+        }
+        scene.remove(voxelAnimas['fighter'][0])
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        console.log(voxelAnimas )
+        reader.onload = function (event) {
+            var contents = event.target.result;
+            const loader = new VOXLoader();
+            var chunks= loader.parse(contents)
+            const models=createModelArray(chunks,1,1,10)
+            voxelAnimas['fighter'] = models;
+        };
+        reader.readAsArrayBuffer(file);
+        clearInterval(intervalID);
+        gameProcess()
+    });
+
+    // 繪製voxel動畫
+    var slowIndex=0
+    setInterval(function () {
+        slowIndex+=1
+        for (const voxelName in voxelAnimas) {
+            const voxelObjectsArray = voxelAnimas[voxelName];
+            for (let i = 0; i < voxelObjectsArray.length; i++) {
+                const voxelObject = voxelObjectsArray[i];
+                const currentIndex = slowIndex % voxelObject.children.length;
+                for (let j = 0; j < voxelObject.children.length; j++) {
+                    var voxelMesh=voxelObject.children[j]
+                    voxelMesh.visible = j === currentIndex;
+                }
+            }
+        }
+    }, 100);
+
+    // 渲染畫面
+    var fastIndex=0
+    setInterval(function() {
+        fastIndex+=1
+        renderer.render(scene, camera);
+    },10)
+
+    let keys = {};
+    document.addEventListener('keydown', function(event) {
+        // 將 event.key 轉換成小寫，並儲存到 keys 物件中
+        const key = event.key.toLowerCase();
+        keys[key] = true; // 設置按鍵為 true 表示按下該按鍵
+    });
+
+    document.addEventListener('keyup', function(event) {
+        // 將 event.key 轉換成小寫，並儲存到 keys 物件中
+        const key = event.key.toLowerCase();
+        keys[key] = false; // 設置按鍵為 false 表示釋放該按鍵
+    });
+
+    // 遊戲主流程
+    var intervalID
+    var startLoop=function(){}
+    function gameProcess(){
+        // let score=0
+        // let fighter=voxelAnimas["fighter"][0]
+        // let bullets=voxelAnimas["bullet"]
+        // let energy =voxelAnimas["energy"]
+        // let rock1  =voxelAnimas["rock1"]
+        // let bulletIndex = 0
+        // fighter.position.set(0,1,10)
+        // for (let i = 0; i < energy.length; i++) {
+        //     energy[i].position.set((Math.random() * 20) - 10, 1, -30 - i * 30);
+        //     energy[i].angularVelocity = new THREE.Vector3().random();
+        // }
+        // for (let i = 0; i < rock1.length; i++) {
+        //     rock1[i].position.set((Math.random() * 20) - 10, 1, -15 - i * 30);
+        //     rock1[i].angularVelocity = new THREE.Vector3().random();
+        // }
+        // for(let i=0;i<bullets.length;i++){
+        //     bullets[i].position.z=-300
+        // }   
+        
+        function startLoop(){
+        intervalID=
+        setInterval(function() {
+            // console.log(keys)
+            // 戰機移動+轉動
+            // fighter.rotation.z = 0
+            // if((keys['a']||keys['arrowleft']) && fighter.position.x>-10) {
+            //     fighter.position.x -= .2;
+            //     fighter.rotation.z = Math.PI/8
+            // }
+            // if((keys['d']||keys['arrowright']) && fighter.position.x<10) {
+            //     fighter.position.x += .2;
+            //     fighter.rotation.z = -Math.PI/8
+            // }
+
+            // // 子彈發射飛行
+            // if(keys[' '] && fastIndex %10==1) {
+            //     bullets[bulletIndex%100].position.copy(fighter.position)
+            //     bulletIndex+=1
+            // }
+            // for(let i=0;i<bullets.length;i++){
+            //     bullets[i].position.z-=.5
+            // }
+
+            // // 地板移動
+            // for(let i=0;i<4;i++){
+            //     grids[i].position.z+=.3
+            //     if(grids[i].position.z>100){
+            //         grids[i].position.z=-200
+            //     }
+            // }
+
+            // // 檢測得分
+            // for(let i=0;i<energy.length;i++){
+            //     const distance = energy[i].position.distanceTo(fighter.position);
+            //     const touch=distance <= energy[i].radius + fighter.radius
+            //     if(touch && energy[i].visible){
+            //         score+=1
+            //         console.log("Score:"+score)
+            //         energy[i].visible=false
+            //     }
+            // }
+
+            // // 能量石旋轉
+            // for(let i=0;i<energy.length;i++){
+            //     energy[i].rotation.x += energy[i].angularVelocity.x/10 ;
+            //     energy[i].rotation.y += energy[i].angularVelocity.y/10 ;
+            //     energy[i].rotation.z += energy[i].angularVelocity.z/10 ;
+            //     energy[i].position.z+=.3
+            //     if(energy[i].position.z>20){
+            //         energy[i].position.set((Math.random() * 20) - 10,0,-100)
+            //         energy[i].visible=true
+            //     }
+            // }
+
+            // // 隕石旋轉
+            // for(let i=0;i<rock1.length;i++){
+            //     rock1[i].rotation.x += rock1[i].angularVelocity.x/10 ;
+            //     rock1[i].rotation.y += rock1[i].angularVelocity.y/10 ;
+            //     rock1[i].rotation.z += rock1[i].angularVelocity.z/10 ;
+            //     rock1[i].position.z+=.3
+            //     if(rock1[i].position.z>20){
+            //         rock1[i].position.set((Math.random() * 20) - 10,0,-100)
+            //     }
+            // }
+        },10)
+        }startLoop()
+    }
+    
+// gameProcess()
+    window.addEventListener("load", function() {
+        const startButton = document.getElementById("startButton");
+        startButton.addEventListener("click", function() {
+            clearInterval(intervalID);
+            gameProcess(); // 點擊按鈕後觸發遊戲流程函數
+        });
+    });
+</script>
