@@ -93,26 +93,26 @@
         }
 
     // 上傳選定戰機
-    fileInput.addEventListener('change', function (event) {
-        if (!event.target.files.length) {
-            console.log('No files were selected!');
-            return; // 直接返回，不執行後面的代碼
-        }
-        scene.remove(voxelAnimas['fighter'][0])
-        var file = event.target.files[0];
-        var reader = new FileReader();
-        console.log(voxelAnimas )
-        reader.onload = function (event) {
-            var contents = event.target.result;
-            const loader = new VOXLoader();
-            var chunks= loader.parse(contents)
-            const models=createModelArray(chunks,1,1,10)
-            voxelAnimas['fighter'] = models;
-        };
-        reader.readAsArrayBuffer(file);
-        clearInterval(intervalID);
-        gameProcess()
-    });
+    // fileInput.addEventListener('change', function (event) {
+    //     if (!event.target.files.length) {
+    //         console.log('No files were selected!');
+    //         return; // 直接返回，不執行後面的代碼
+    //     }
+    //     scene.remove(voxelAnimas['fighter'][0])
+    //     var file = event.target.files[0];
+    //     var reader = new FileReader();
+    //     console.log(voxelAnimas )
+    //     reader.onload = function (event) {
+    //         var contents = event.target.result;
+    //         const loader = new VOXLoader();
+    //         var chunks= loader.parse(contents)
+    //         const models=createModelArray(chunks,1,1,10)
+    //         voxelAnimas['fighter'] = models;
+    //     };
+    //     reader.readAsArrayBuffer(file);
+    //     clearInterval(intervalID);
+    //     gameProcess()
+    // });
 
     // 繪製voxel動畫
     var slowIndex=0
@@ -144,8 +144,10 @@
     document.addEventListener('keydown', function(event) {
         // 將 event.key 轉換成小寫，並儲存到 keys 物件中
         const key = event.key.toLowerCase();
+        if(key === "alt"){return;}
         keys[key] = true; // 設置按鍵為 true 表示按下該按鍵
         keys.none=!Object.values(keys).includes(true)
+
         if (key === " ") {
             // 阻止預設行為，即阻止點擊按鈕
             event.preventDefault();
@@ -191,6 +193,7 @@
         function startLoop(){
         intervalID=
         setInterval(function() {
+            console.log(keys)
             if((keys['w']||keys['arrowup']) && knight.position.z>-10) {
                 walk.visible=true
                 hack.visible=false
