@@ -1,6 +1,7 @@
 <div id="canvas" style="width: 800px;height: 600px;"></div>
-<button id="startButton">開始</button>
+<button id="startButton">play</button>
 <input type="file" id="fileInput" accept=".vox" />
+<h3>按下[Play]後遊戲開始</h3> 
 <h3>WSAD:前後左右 / E:攻擊 / Q:防禦</h3>
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <script type="importmap">
@@ -145,6 +146,10 @@
         const key = event.key.toLowerCase();
         keys[key] = true; // 設置按鍵為 true 表示按下該按鍵
         keys.none=!Object.values(keys).includes(true)
+        if (key === " ") {
+            // 阻止預設行為，即阻止點擊按鈕
+            event.preventDefault();
+        }
     });
     document.addEventListener('keyup', function(event) {
         // 將 event.key 轉換成小寫，並儲存到 keys 物件中
@@ -186,7 +191,6 @@
         function startLoop(){
         intervalID=
         setInterval(function() {
-            console.log(keys.none,keys)
             if((keys['w']||keys['arrowup']) && knight.position.z>-10) {
                 walk.visible=true
                 hack.visible=false
@@ -231,7 +235,6 @@
                 walk.visible=false
             }
             if(keys.none){
-                console.log('stop')
                 walk.visible=false
                 hack.visible=false
                 keep.visible=false
