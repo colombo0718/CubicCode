@@ -1,7 +1,7 @@
 <div id="canvas" style="width: 800px;height: 600px;"></div>
 <button id="startButton">開始</button>
 <input type="file" id="fileInput" accept=".vox" />
-<h3>A:向左 / D:向右 / Space:發射</h3>
+<h3>WSAD:前後左右 / E:攻擊 / Q:防禦</h3>
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <script type="importmap">
     {
@@ -74,8 +74,9 @@
                     mesh.material.opacity = opacity;
                     voxelObject.add(mesh);
                 }
-                voxelObject.radius=raduis/10
-                // scene.add(voxelObject);
+                // voxelObject.radius=raduis/10
+                // voxelObject.position.x=Math.random()*20-10
+                scene.add(voxelObject);
                 models.push(voxelObject);
             }
             return models
@@ -137,18 +138,22 @@
     },10)
 
     let keys = {};
+    keys.none=true
+
     document.addEventListener('keydown', function(event) {
         // 將 event.key 轉換成小寫，並儲存到 keys 物件中
         const key = event.key.toLowerCase();
         keys[key] = true; // 設置按鍵為 true 表示按下該按鍵
+        keys.none=!Object.values(keys).includes(true)
     });
-
     document.addEventListener('keyup', function(event) {
         // 將 event.key 轉換成小寫，並儲存到 keys 物件中
         const key = event.key.toLowerCase();
         keys[key] = false; // 設置按鍵為 false 表示釋放該按鍵
+        keys.none=!Object.values(keys).includes(true)
     });
 
+    // scene.add(voxelAnimas["knight-stay"][0])
     // 遊戲主流程
     var intervalID
     var startLoop=function(){}
@@ -181,24 +186,57 @@
         function startLoop(){
         intervalID=
         setInterval(function() {
-
+            console.log(keys.none,keys)
             if((keys['w']||keys['arrowup']) && knight.position.z>-10) {
-                knight.position.z -= .1;
+                walk.visible=true
+                hack.visible=false
+                stay.visible=false
+                knight.position.z -= .05;
                 knight.rotation.y = 0
             }
             if((keys['s']||keys['arrowdown']) && knight.position.z<10) {
-                knight.position.z += .1;
+                walk.visible=true
+                hack.visible=false
+                stay.visible=false
+                keep.visible=false
+                knight.position.z += .05;
                 knight.rotation.y = -Math.PI 
             }
             if((keys['a']||keys['arrowright']) && knight.position.x>-10) {
-                knight.position.x -= .1;
+                walk.visible=true
+                hack.visible=false
+                stay.visible=false
+                keep.visible=false
+                knight.position.x -= .05;
                 knight.rotation.y = Math.PI/2
             }
             if((keys['d']||keys['arrowright']) && knight.position.x<10) {
-                knight.position.x += .1;
+                walk.visible=true
+                hack.visible=false
+                stay.visible=false
+                keep.visible=false
+                knight.position.x += .05;
                 knight.rotation.y = -Math.PI/2
             }
-
+            if(keys['e']) {
+                hack.visible=true
+                stay.visible=false
+                walk.visible=false
+                keep.visible=false
+            }
+            if(keys['q']) {
+                keep.visible=true
+                hack.visible=false
+                stay.visible=false
+                walk.visible=false
+            }
+            if(keys.none){
+                console.log('stop')
+                walk.visible=false
+                hack.visible=false
+                keep.visible=false
+                stay.visible=true
+            }
         },10)
         }startLoop()
     }
