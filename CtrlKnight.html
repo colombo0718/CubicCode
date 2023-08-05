@@ -51,6 +51,7 @@
     }
 
     const voxelSettings = [
+        { name: "knight-stay",  opacity: 1,  amount: 1   ,radius:10 },
         { name: "knight-walk",  opacity: 1,  amount: 1   ,radius:10 },
         { name: "knight-hack",  opacity: 1,  amount: 1   ,radius:10 },
         { name: "knight-keep",  opacity: 1,  amount: 1   ,radius:10 },
@@ -153,89 +154,26 @@
     var startLoop=function(){}
     function gameProcess(){
         // let score=0
-        let fighter=voxelAnimas["fighter"][0]
-        let bullets=voxelAnimas["bullet"]
-        let energy =voxelAnimas["energy"]
-        let rock1  =voxelAnimas["rock1"]
-        // let bulletIndex = 0
-        // fighter.position.set(0,1,10)
-        // for (let i = 0; i < energy.length; i++) {
-        //     energy[i].position.set((Math.random() * 20) - 10, 1, -30 - i * 30);
-        //     energy[i].angularVelocity = new THREE.Vector3().random();
-        // }
-        // for (let i = 0; i < rock1.length; i++) {
-        //     rock1[i].position.set((Math.random() * 20) - 10, 1, -15 - i * 30);
-        //     rock1[i].angularVelocity = new THREE.Vector3().random();
-        // }
-        // for(let i=0;i<bullets.length;i++){
-        //     bullets[i].position.z=-300
-        // }   
+        let stay=voxelAnimas["knight-stay"][0]
+        let walk=voxelAnimas["knight-walk"][0]
+        let hack=voxelAnimas["knight-hack"][0]
+        let keep=voxelAnimas["knight-keep"][0]
+        let jump=voxelAnimas["knight-jump"][0]
+
+        console.log(stay.visible)
+        walk.visible=false
+        hack.visible=false
+        keep.visible=false
+        jump.visible=false
+        
+
+        // let knight=new THREE.Object3D()
+
         
         function startLoop(){
         intervalID=
         setInterval(function() {
-            // console.log(keys)
-            // 戰機移動+轉動
-            // fighter.rotation.z = 0
-            // if((keys['a']||keys['arrowleft']) && fighter.position.x>-10) {
-            //     fighter.position.x -= .2;
-            //     fighter.rotation.z = Math.PI/8
-            // }
-            // if((keys['d']||keys['arrowright']) && fighter.position.x<10) {
-            //     fighter.position.x += .2;
-            //     fighter.rotation.z = -Math.PI/8
-            // }
 
-            // // 子彈發射飛行
-            // if(keys[' '] && fastIndex %10==1) {
-            //     bullets[bulletIndex%100].position.copy(fighter.position)
-            //     bulletIndex+=1
-            // }
-            // for(let i=0;i<bullets.length;i++){
-            //     bullets[i].position.z-=.5
-            // }
-
-            // // 地板移動
-            // for(let i=0;i<4;i++){
-            //     grids[i].position.z+=.3
-            //     if(grids[i].position.z>100){
-            //         grids[i].position.z=-200
-            //     }
-            // }
-
-            // // 檢測得分
-            // for(let i=0;i<energy.length;i++){
-            //     const distance = energy[i].position.distanceTo(fighter.position);
-            //     const touch=distance <= energy[i].radius + fighter.radius
-            //     if(touch && energy[i].visible){
-            //         score+=1
-            //         console.log("Score:"+score)
-            //         energy[i].visible=false
-            //     }
-            // }
-
-            // // 能量石旋轉
-            // for(let i=0;i<energy.length;i++){
-            //     energy[i].rotation.x += energy[i].angularVelocity.x/10 ;
-            //     energy[i].rotation.y += energy[i].angularVelocity.y/10 ;
-            //     energy[i].rotation.z += energy[i].angularVelocity.z/10 ;
-            //     energy[i].position.z+=.3
-            //     if(energy[i].position.z>20){
-            //         energy[i].position.set((Math.random() * 20) - 10,0,-100)
-            //         energy[i].visible=true
-            //     }
-            // }
-
-            // // 隕石旋轉
-            // for(let i=0;i<rock1.length;i++){
-            //     rock1[i].rotation.x += rock1[i].angularVelocity.x/10 ;
-            //     rock1[i].rotation.y += rock1[i].angularVelocity.y/10 ;
-            //     rock1[i].rotation.z += rock1[i].angularVelocity.z/10 ;
-            //     rock1[i].position.z+=.3
-            //     if(rock1[i].position.z>20){
-            //         rock1[i].position.set((Math.random() * 20) - 10,0,-100)
-            //     }
-            // }
         },10)
         }startLoop()
     }
