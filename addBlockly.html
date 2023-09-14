@@ -37,7 +37,7 @@ Blockly.Blocks['console_log'] = {
 javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
   var value_inp = generator.valueToCode(block, 'inp', javascript.Order.ATOMIC);
   // TODO: Assemble javascript into code variable.
-  var code = 'console.log('+value_inp+')';
+  var code = 'console.log('+value_inp+');';
   return code;
 };
 
