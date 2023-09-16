@@ -1,0 +1,154 @@
+<script src="https://unpkg.com/blockly"></script>
+<script src="https://unpkg.com/blockly/javascript_compressed"></script>
+<script src="./d4Toolbox.js"></script>
+<style>
+  		body {
+			margin: 0px;
+			overflow: hidden;
+		}
+  .container {
+  display: flex;
+  justify-content: space-between; /* 左右對齊 */
+  align-items: stretch; /* 垂直拉伸 */
+  width: 100%;
+  height: calc(100vh - 20px); /* 使用視窗高度作為容器高度 */
+}
+
+.blockly-panel {
+  flex: 2; /* 自動填充剩餘寬度 */
+  height: 100%; /* 充滿容器的高度 */
+}
+
+.canvas-panel {
+  flex: 3; /* 自動填充剩餘寬度 */
+
+  height: 100%; /* 充滿容器的高度 */
+}
+
+/* 隱藏垃圾桶圖標 */
+.blocklyTrashIcon {
+  display: none !important;
+}
+</style>
+<div class="container">
+<div id="canvas" class="canvas-panel" ></div>
+<div id="blocklyDiv" class="blockly-panel" ></div>
+</div>
+
+<button id="myButton1">printJsCode</button>
+<button id="myButton2">runJsCode</button>
+<script type="importmap">
+  {
+      "imports": {
+          "three": "https://threejs.org/build/three.module.js",
+          "three/addons/": "https://threejs.org/examples/jsm/"
+      }
+  }
+</script>
+<script type="module">
+
+    import * as THREE from 'three';
+    import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    var fileInput = document.getElementById('fileInput');
+    var canvas = document.getElementById('canvas');
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    canvas.appendChild(renderer.domElement);
+
+    // 設置相機
+    camera.position.set(0,6,6)
+
+    // 添加燈光
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
+    directionalLight.position.set(1, 1, 0);
+    directionalLight.castShadow = true; // 讓此光能產生陰影
+    scene.add(directionalLight);
+
+    // 添加網格
+    var gridSize = 10; // 網格大小
+    var gridDivisions = 10; // 網格分段數
+    var gridSpace = new THREE.GridHelper(gridSize, gridDivisions, 0xffffff, 0x888888);
+    gridSpace.position.y = 0; // 放置在y=0的面上
+    scene.add(gridSpace);
+
+    // 添加OrbitControls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    // controls.enablePan=false
+    console.log(controls)
+
+        // 開始動畫
+        setInterval(function() {
+            controls.update(); // 需要加入這行才能讓OrbitControls工作
+            renderer.render(scene, camera);
+        },100)
+
+
+const addBlockTool=
+    {
+      'kind': 'category',
+      'name': 'Console',
+      'categorystyle': 'logic_category',
+      'contents': [
+        {
+          'type': 'console_log',
+          'kind': 'block',
+        },
+      ],
+    }
+    toolbox.contents.push(addBlockTool)
+
+Blockly.Blocks['console_log'] = {
+  init: function() {
+    this.appendValueInput("inp")
+        .setCheck(null)
+        .appendField("console.log");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(290);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
+  var value_inp = generator.valueToCode(block, 'inp', javascript.Order.ATOMIC);
+  // TODO: Assemble javascript into code variable.
+  var code = 'console.log('+value_inp+');';
+  return code;
+};
+
+console.log(toolbox)
+
+var workspace = Blockly.inject('blocklyDiv', {
+  toolbox: toolbox,
+  grid:{
+    spacing: 50,
+    length: 2,
+    colour: '#ccc',
+    snap: true},
+});
+
+function printJsCode(){
+  const code = Blockly.JavaScript.workspaceToCode(workspace);
+  console.log(code)
+}
+
+function runJsCode(){
+  const code = Blockly.JavaScript.workspaceToCode(workspace);
+  eval(code)
+}
+
+const button1 = document.querySelector('#myButton1');
+button1.addEventListener('click', printJsCode);
+
+const button2 = document.querySelector('#myButton2');
+button2.addEventListener('click', runJsCode);
+
+</script>
