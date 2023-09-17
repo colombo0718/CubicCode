@@ -853,9 +853,6 @@ const toolbox = {
       'name': 'Functions',
       'custom': 'PROCEDURE',
       'categorystyle': 'procedure_category',
-    },
-    {
-        'kind': 'sep',
-    },
+    }
   ]
 };
