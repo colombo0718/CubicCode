@@ -25,10 +25,6 @@
   height: 100%; /* 充滿容器的高度 */
 }
 
-/* 隱藏垃圾桶圖標 */
-.blocklyTrashIcon {
-  display: none !important;
-}
 </style>
 <div class="container">
 <div id="canvas" class="canvas-panel" ></div>
@@ -225,7 +221,8 @@ javascript.javascriptGenerator.forBlock['create_line'] = function(block, generat
   var value_points = generator.valueToCode(block, 'points', javascript.Order.ATOMIC);
   var value_colour = generator.valueToCode(block, 'colour', javascript.Order.ATOMIC);
   // TODO: Assemble javascript into code variable.
-  var code = 'var geometry = new THREE.BufferGeometry().setFromPoints('+value_points+');\n\
+  var code = 
+  'var geometry = new THREE.BufferGeometry().setFromPoints('+value_points+');\n\
   var material = new THREE.LineBasicMaterial({ color: '+value_colour+' });\n\
   var line = new THREE.Line(geometry, material);\n\
   linesGroup.add(line);';
@@ -276,7 +273,7 @@ var xmlDoc = parser.parseFromString(defaultXml, "text/xml");
 Blockly.Xml.domToWorkspace(xmlDoc.documentElement,workspace);
 
 
-// 创建一个组来容纳线段
+// 创建一个Group来容纳线段
 var linesGroup = new THREE.Group();
 scene.add(linesGroup);
 
