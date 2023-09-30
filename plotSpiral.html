@@ -29,6 +29,7 @@
 .blocklyTrashIcon {
   display: none !important;
 }
+
 </style>
 <div class="container">
 <div id="canvas" class="canvas-panel" ></div>
@@ -100,12 +101,17 @@ const addBlockTool=
     {
       'kind': 'category',
       'name': 'Console',
-      'categorystyle': 'logic_category',
+      "colour": "#FF0000",
+    //   'categorystyle': 'logic_category',
       'contents': [
         {
           'type': 'console_log',
           'kind': 'block',
         },
+        {
+            "kind": "block",
+            "type": "array_push"
+        }
       ],
     },
     {
@@ -159,7 +165,7 @@ Blockly.Blocks['console_log'] = {
         .appendField("console.log");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(290);
+    this.setColour("#ff0000");
  this.setTooltip("");
  this.setHelpUrl("");
   }
@@ -228,7 +234,30 @@ javascript.javascriptGenerator.forBlock['create_line'] = function(block, generat
   var code = 'var geometry = new THREE.BufferGeometry().setFromPoints('+value_points+');\n\
   var material = new THREE.LineBasicMaterial({ color: '+value_colour+' });\n\
   var line = new THREE.Line(geometry, material);\n\
-  linesGroup.add(line);';
+  linesGroup.add(line);\n';
+  return code;
+};
+
+
+Blockly.Blocks['array_push'] = {
+  init: function () {
+    this.appendValueInput('ARRAY')
+      .setCheck('Array')
+      .appendField('Array');
+    this.appendValueInput('VALUE')
+      .appendField('.push');
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['array_push'] = function (block) {
+  const array = Blockly.JavaScript.valueToCode(block, 'ARRAY', Blockly.JavaScript.ORDER_ATOMIC);
+  const value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
+  var code=array+'.push('+value+');\n'
   return code;
 };
 
@@ -288,6 +317,15 @@ function clearLines() {
 }
 clearLines()
 runJsCode()
+
+var points;
+
+points = [ new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 3, 0)];
+points.push(new THREE.Vector3(2, 0, 0));
+var geometry = new THREE.BufferGeometry().setFromPoints(points);
+var material = new THREE.LineBasicMaterial({ color: '#ffff00' });
+var line = new THREE.Line(geometry, material);
+linesGroup.add(line);
 
 
 
