@@ -110,6 +110,10 @@ const addBlockTool=
         },
         {
             "kind": "block",
+            "type": "empty_array"
+        },
+        {
+            "kind": "block",
             "type": "array_push"
         }
       ],
@@ -117,7 +121,7 @@ const addBlockTool=
     {
       'kind': 'category',
       'name': 'Three.js',
-      'categorystyle': 'logic_category',
+      "colour": "#bbbb00",
       'contents': [
         {
           'type': 'vector3',
@@ -192,7 +196,7 @@ Blockly.Blocks['vector3'] = {
         .appendField("z:");
     this.setInputsInline(true);
     this.setOutput(true, null);
-    this.setColour(230);
+    this.setColour('#bbbb00');
  this.setTooltip("");
  this.setHelpUrl("");
   }
@@ -221,7 +225,7 @@ Blockly.Blocks['create_line'] = {
     this.setInputsInline(true);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(230);
+    this.setColour('#bbbb00');
  this.setTooltip("");
  this.setHelpUrl("");
   }
@@ -232,7 +236,7 @@ javascript.javascriptGenerator.forBlock['create_line'] = function(block, generat
   var value_colour = generator.valueToCode(block, 'colour', javascript.Order.ATOMIC);
   // TODO: Assemble javascript into code variable.
   var code = 'var geometry = new THREE.BufferGeometry().setFromPoints('+value_points+');\n\
-  var material = new THREE.LineBasicMaterial({ color: '+value_colour+' });\n\
+  var material = new THREE.LineBasicMaterial({ color: '+value_colour+',linewidth: 5});\n\
   var line = new THREE.Line(geometry, material);\n\
   linesGroup.add(line);\n';
   return code;
@@ -249,7 +253,7 @@ Blockly.Blocks['array_push'] = {
     this.setInputsInline(true);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(230);
+    this.setColour('#aa00aa');
     this.setHelpUrl('');
   }
 };
@@ -259,6 +263,23 @@ Blockly.JavaScript['array_push'] = function (block) {
   const value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
   var code=array+'.push('+value+');\n'
   return code;
+};
+
+Blockly.Blocks['empty_array'] = {
+  init: function () {
+    this.appendDummyInput()
+      .appendField("[ ]");
+    this.setOutput(true, 'Array');
+    this.setColour('#aa00aa');
+    this.setTooltip("empry array");
+    this.setHelpUrl("");
+  }
+};
+
+Blockly.JavaScript['empty_array'] = function (block) {
+  // 在这里生成一个空白数组
+  var code = '[]';
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 var workspace = Blockly.inject('blocklyDiv', {
@@ -299,7 +320,7 @@ const button3 = document.querySelector('#myButton3');
 button3.addEventListener('click', printXML);
 
 
-var defaultXml ='<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="!b0wCO8_z;3f+/d8mt:6">points</variable></variables><block type="variables_set" id="n:0QDq{a{VKYHLaj,Dz9" x="25" y="75"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field><value name="VALUE"><block type="lists_create_with" id="5oi@xa9Hk89g|_ggp!H!"><mutation items="5"></mutation><value name="ADD0"><block type="vector3" id="AU(u$dJ]q5#Ubv*uUG$$"><value name="x"><shadow type="math_number" id="Lc]S5QuIcZS^vMj^)6+W"><field name="NUM">-2</field></shadow></value><value name="y"><shadow type="math_number" id=":HGIPgNrL[IhAX[D.FsZ"><field name="NUM">0</field></shadow></value><value name="z"><shadow type="math_number" id="Pq1U{sx$l1lm-UYj0V1H"><field name="NUM">0</field></shadow></value></block></value><value name="ADD1"><block type="vector3" id="7PcZl;B{FzY_r|V.Z`n9"><value name="x"><shadow type="math_number" id="`r#64E)/~Lfn^ttQl!oX"><field name="NUM">-1</field></shadow></value><value name="y"><shadow type="math_number" id="09q?}m4a*B?0q7(=jiXo"><field name="NUM">1</field></shadow></value><value name="z"><shadow type="math_number" id="q_24Mu]NdVLRh,[E|fr/"><field name="NUM">0</field></shadow></value></block></value><value name="ADD2"><block type="vector3" id="-,,m6+,tL`4dj4[=B+e7"><value name="x"><shadow type="math_number" id="!Zdz+6v0X6-zeo+[`^{o"><field name="NUM">0</field></shadow></value><value name="y"><shadow type="math_number" id="-C|.X{Fpk|mjn8a~vS$I"><field name="NUM">0</field></shadow></value><value name="z"><shadow type="math_number" id="#@;DZdJ!ij(YVJVMv_}["><field name="NUM">0</field></shadow></value></block></value><value name="ADD3"><block type="vector3" id="8}GTf[b8HM{ve`{]kt?,"><value name="x"><shadow type="math_number" id="k{}y+pAwX$gY.#mbeujT"><field name="NUM">1</field></shadow></value><value name="y"><shadow type="math_number" id=",@G[!l{BML)oG_`gJYhg"><field name="NUM">2</field></shadow></value><value name="z"><shadow type="math_number" id="_=e^x!vf%~(6tAR:_PwK"><field name="NUM">0</field></shadow></value></block></value><value name="ADD4"><block type="vector3" id="yi8_X*2,;:l%3=uCAnhL"><value name="x"><shadow type="math_number" id="[tV@iiv]`Lq?yVOE${tK"><field name="NUM">2</field></shadow></value><value name="y"><shadow type="math_number" id="D[37tiX1k%hFadvgq:X9"><field name="NUM">0</field></shadow></value><value name="z"><shadow type="math_number" id="qA~?yoyJW5iEjI-!~;h/"><field name="NUM">0</field></shadow></value></block></value></block></value><next><block type="create_line" id="8_pcs)O1l%,:nUM$oa)U"><value name="points"><block type="variables_get" id="bZ(H5AWyevf;e-nOt:+Y"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field></block></value><value name="colour"><block type="colour_picker" id="Pz^L)11!1HwY$/M/LC0~"><field name="COLOUR">#ff0000</field></block></value></block></next></block></xml>'
+var defaultXml ='<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="!b0wCO8_z;3f+/d8mt:6">points</variable><variable id="d2`N#|X4xQD6^a^2}*[~">i</variable><variable id="k4mD0rM%0/VP0mvAishO">t</variable></variables><block type="variables_set" id="n:0QDq{a{VKYHLaj,Dz9" x="25" y="75"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field><value name="VALUE"><block type="empty_array" id="W9Y[:xxot#U3LT3^7RqY"></block></value><next><block type="controls_for" id="?./z^7*[+Q_)^/2*:GU;"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field><value name="FROM"><shadow type="math_number" id="4lFI*S8KJ@RAh*4q1H)-"><field name="NUM">-50</field></shadow></value><value name="TO"><shadow type="math_number" id="c-~eR1R7K$Tf~Jt0v:iy"><field name="NUM">50</field></shadow></value><value name="BY"><shadow type="math_number" id="]/gLVyLi%]$WT`NXn2NL"><field name="NUM">1</field></shadow></value><statement name="DO"><block type="variables_set" id="~~kgRpmgyI5Bwjj)8px7"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field><value name="VALUE"><block type="math_arithmetic" id="s:^]KWj/kBRW6nPUO+V;"><field name="OP">MULTIPLY</field><value name="A"><shadow type="math_number" id="JkWe%.71T;3Dk]uX@*Bf"><field name="NUM">1</field></shadow><block type="variables_get" id="#67keagctg][Mv${wpSB"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field></block></value><value name="B"><shadow type="math_number" id="$U{.%pg7/*6e6Ik?98?m"><field name="NUM">18</field></shadow></value></block></value><next><block type="array_push" id="6F#I1~pp;Ub*~YH`02oU"><value name="ARRAY"><block type="variables_get" id="YbN/;jHjf=T}wE!CKLxa"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field></block></value><value name="VALUE"><block type="vector3" id="O8C`_{@x~,Y^mt0pPSPP"><value name="x"><shadow type="math_number" id="MEicS6UIE`zo0Bu^qWeH"><field name="NUM">0</field></shadow><block type="math_trig" id="=OQ^lT{O.z:}q(Y-10TM"><field name="OP">COS</field><value name="NUM"><shadow type="math_number" id="65gH=m|!TES1np)gRp?q"><field name="NUM">45</field></shadow><block type="variables_get" id="M~co7p,RKA?;#iMxu~;Z"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value></block></value><value name="y"><shadow type="math_number" id="*01fDk%43IF$*rm*SURL"><field name="NUM">0</field></shadow><block type="math_arithmetic" id="2.=:`bMzR^};Jo7pTox("><field name="OP">DIVIDE</field><value name="A"><shadow type="math_number" id="A%dXPT8//BKdaWf)i02h"><field name="NUM">1</field></shadow><block type="variables_get" id="2t|]KlM#Y:~}[6}re(6+"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field></block></value><value name="B"><shadow type="math_number" id="Cm|d#4bh(=(6cl:u3Ok|"><field name="NUM">20</field></shadow></value></block></value><value name="z"><shadow type="math_number" id="1Q7}k,^Hy}LZ17LViu17"><field name="NUM">0</field></shadow><block type="math_trig" id="-1YRPIJilQUamYJQsXCw"><field name="OP">SIN</field><value name="NUM"><shadow type="math_number" id="65gH=m|!TES1np)gRp?q"><field name="NUM">45</field></shadow><block type="variables_get" id="ma+Q(#89c-/YTCAUHn;2"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value></block></value></block></value></block></next></block></statement><next><block type="create_line" id="8_pcs)O1l%,:nUM$oa)U"><value name="points"><block type="variables_get" id="bZ(H5AWyevf;e-nOt:+Y"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field></block></value><value name="colour"><block type="colour_picker" id="Pz^L)11!1HwY$/M/LC0~"><field name="COLOUR">#ff0000</field></block></value></block></next></block></next></block></xml>'
 var parser = new DOMParser();
 var xmlDoc = parser.parseFromString(defaultXml, "text/xml");
 Blockly.Xml.domToWorkspace(xmlDoc.documentElement,workspace);
@@ -317,17 +338,4 @@ function clearLines() {
 }
 clearLines()
 runJsCode()
-
-var points;
-
-points = [ new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 3, 0)];
-points.push(new THREE.Vector3(2, 0, 0));
-var geometry = new THREE.BufferGeometry().setFromPoints(points);
-var material = new THREE.LineBasicMaterial({ color: '#ffff00' });
-var line = new THREE.Line(geometry, material);
-linesGroup.add(line);
-
-
-
-
 </script>
