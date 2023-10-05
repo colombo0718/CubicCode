@@ -35,7 +35,7 @@
     // scene.add(directionalLight);
 
     const pointLight = new THREE.PointLight(0xffffff,10);
-    pointLight.position.set(0, 2, -1);
+    pointLight.position.set(2, 2, 2);
     scene.add(pointLight);
 
     // 添加網格
@@ -69,11 +69,13 @@
             console.log(chunk)
             const mesh = new VOXMesh(chunk);
 
-
-        // 创建一个新的 Mesh，使用 MeshPhysicalMaterial
-        // const mesh = new THREE.Mesh(chunk.geometry, physicalMaterial);
             mesh.material.metalness=true
             mesh.material.roughness=.5
+            mesh.material.transparent=true
+            mesh.material.opacity=0.8
+            mesh.material.transmission=1.5
+            mesh.material.emissive.set(0x333333);
+            console.log(mesh.material)
             mesh.scale.setScalar(.1);
             mesh.visible = false;
 
