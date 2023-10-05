@@ -7,7 +7,7 @@ import {
 	Loader,
 	LinearFilter,
 	Mesh,
-	MeshStandardMaterial,
+	MeshPhysicalMaterial,
 	NearestFilter,
 	RedFormat,
 	SRGBColorSpace
@@ -257,7 +257,7 @@ class VOXMesh extends Mesh {
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		geometry.computeVertexNormals();
 
-		const material = new MeshStandardMaterial();
+		const material = new MeshPhysicalMaterial();
 
 		if ( hasColors ) {
 
