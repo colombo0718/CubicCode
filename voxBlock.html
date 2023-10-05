@@ -19,6 +19,8 @@
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     canvas.appendChild(renderer.domElement);
 
@@ -34,18 +36,26 @@
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
 
-    const pointLight1 = new THREE.PointLight(0xffffff,10);
-    pointLight1.position.set(2, 2, 2);
-    scene.add(pointLight1);
-    const pointLight2 = new THREE.PointLight(0xffffff,10);
-    pointLight2.position.set(-2, 2, 2);
-    scene.add(pointLight2);
-    const pointLight3 = new THREE.PointLight(0xffffff,10);
-    pointLight3.position.set(2, 2, -2);
-    scene.add(pointLight3);
-    const pointLight4 = new THREE.PointLight(0xffffff,10);
-    pointLight4.position.set(-2, 2, -2);
-    scene.add(pointLight4);
+
+    //Set up shadow properties for the light
+    directionalLight.shadow.mapSize.width = 512; // default
+    directionalLight.shadow.mapSize.height = 512; // default
+    directionalLight.shadow.camera.near = 0.5; // default
+    directionalLight.shadow.camera.far = 500; // default
+
+    // const pointLight1 = new THREE.PointLight(0xffffff,1);
+    // pointLight1.position.set(2, 2, 2);
+    // pointLight1.castShadow = true; // 讓此光能產生陰影
+    // scene.add(pointLight1);
+    // const pointLight2 = new THREE.PointLight(0xffffff,10);
+    // pointLight2.position.set(-2, 2, 2);
+    // scene.add(pointLight2);
+    // const pointLight3 = new THREE.PointLight(0xffffff,10);
+    // pointLight3.position.set(2, 2, -2);
+    // scene.add(pointLight3);
+    // const pointLight4 = new THREE.PointLight(0xffffff,10);
+    // pointLight4.position.set(-2, 2, -2);
+    // scene.add(pointLight4);
 
     // 添加網格
     var gridSize = 10; // 網格大小
@@ -78,13 +88,18 @@
             console.log(chunk)
             const mesh = new VOXMesh(chunk);
 
-            mesh.material.metalness=true
-            mesh.material.roughness=.5
+            // mesh.material.metalness=true
+            mesh.material.roughness=1
             // mesh.material.transparent=true
             // mesh.material.opacity=0.8
             // mesh.material.transmission=1.5
             // mesh.material.emissive.set(0x333333);
-            console.log(mesh.material)
+            
+            mesh.material.receiveShadow = true
+            mesh.material.castShadow = true;
+            mesh.material.clipShadows = true;
+            // mesh.material.reflectivity=.0
+            // console.log(mesh.material)
             mesh.scale.setScalar(.1);
             mesh.visible = false;
 
@@ -99,9 +114,11 @@
             const chunk = chunks[i];
             console.log(chunk)
             const mesh = new VOXMesh(chunk);
-            console.log(mesh.position)
-
+            mesh.material.receiveShadow = true
+            mesh.material.castShadow = true;
+            mesh.material.clipShadows = true;
             mesh.scale.setScalar(.1);
+            console.log(mesh.material)
             scene.add(mesh);
         }
     } );
