@@ -29,14 +29,23 @@
     var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
     scene.add(ambientLight);
 
-    // var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
-    // directionalLight.position.set(1, 1, 0);
-    // directionalLight.castShadow = true; // 讓此光能產生陰影
-    // scene.add(directionalLight);
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
+    directionalLight.position.set(1, 1, 0);
+    directionalLight.castShadow = true; // 讓此光能產生陰影
+    scene.add(directionalLight);
 
-    const pointLight = new THREE.PointLight(0xffffff,10);
-    pointLight.position.set(2, 2, 2);
-    scene.add(pointLight);
+    const pointLight1 = new THREE.PointLight(0xffffff,10);
+    pointLight1.position.set(2, 2, 2);
+    scene.add(pointLight1);
+    const pointLight2 = new THREE.PointLight(0xffffff,10);
+    pointLight2.position.set(-2, 2, 2);
+    scene.add(pointLight2);
+    const pointLight3 = new THREE.PointLight(0xffffff,10);
+    pointLight3.position.set(2, 2, -2);
+    scene.add(pointLight3);
+    const pointLight4 = new THREE.PointLight(0xffffff,10);
+    pointLight4.position.set(-2, 2, -2);
+    scene.add(pointLight4);
 
     // 添加網格
     var gridSize = 10; // 網格大小
@@ -71,10 +80,10 @@
 
             mesh.material.metalness=true
             mesh.material.roughness=.5
-            mesh.material.transparent=true
-            mesh.material.opacity=0.8
-            mesh.material.transmission=1.5
-            mesh.material.emissive.set(0x333333);
+            // mesh.material.transparent=true
+            // mesh.material.opacity=0.8
+            // mesh.material.transmission=1.5
+            // mesh.material.emissive.set(0x333333);
             console.log(mesh.material)
             mesh.scale.setScalar(.1);
             mesh.visible = false;
@@ -85,11 +94,20 @@
     }
 
     // 加載一小片地面
+    loader.load( 'https://cubiccode.vercel.app/vox/ground.vox', function ( chunks ) {
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            console.log(chunk)
+            const mesh = new VOXMesh(chunk);
+            console.log(mesh.position)
 
-
+            mesh.scale.setScalar(.1);
+            scene.add(mesh);
+        }
+    } );
 
     // 載入預設檔案
-    loader.load( 'https://cubiccode.vercel.app/vox/ground.vox', function ( chunks ) {
+    loader.load( 'https://cubiccode.vercel.app/vox/knight-hack.vox', function ( chunks ) {
     // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
         processVoxelAnimation(chunks);
           
