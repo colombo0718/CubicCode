@@ -132,7 +132,7 @@ class VOXLoader extends Loader {
 
 				i += chunkSize - ( 3 * 4 );
 
-			}else if (id === 'MAIN') {
+			}else if (id === 'nTRN') {
 				// 如果匹配，則讀取 childChunks 的值
 				const childChunks = data.getUint32(i, true);
 
@@ -154,6 +154,9 @@ class VOXLoader extends Loader {
 				chunk.data = new Uint8Array( buffer, i, numVoxels * 4 );
 
 				i += numVoxels * 4;
+				for(var z=0;z<chunk.data.length;z++){
+					if(i%4==2){chunk.data[z]+=1}
+				}
 
 			} else if ( id === 'RGBA' ) {
 
