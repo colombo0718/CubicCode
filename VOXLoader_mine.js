@@ -210,7 +210,7 @@ class VOXMesh extends Mesh {
 
 			x -= size.x / 2;
 			y -= size.z / 2;
-			z += size.y / 2 +1;
+			z += size.y / 2 -1;
 
 			for ( let i = 0; i < 18; i += 3 ) {
 
