@@ -28,7 +28,7 @@
     camera.position.set(0,6,6)
 
     // 添加燈光
-    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
+    var ambientLight = new THREE.AmbientLight(0xffffff, .5); // 產生柔和的光
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
@@ -38,15 +38,15 @@
 
 
     //Set up shadow properties for the light
-    directionalLight.shadow.mapSize.width = 512; // default
-    directionalLight.shadow.mapSize.height = 512; // default
-    directionalLight.shadow.camera.near = 0.5; // default
-    directionalLight.shadow.camera.far = 500; // default
+    // directionalLight.shadow.mapSize.width = 512; // default
+    // directionalLight.shadow.mapSize.height = 512; // default
+    // directionalLight.shadow.camera.near = 0.5; // default
+    // directionalLight.shadow.camera.far = 500; // default
 
-    // const pointLight1 = new THREE.PointLight(0xffffff,1);
-    // pointLight1.position.set(2, 2, 2);
-    // pointLight1.castShadow = true; // 讓此光能產生陰影
-    // scene.add(pointLight1);
+    const pointLight1 = new THREE.PointLight(0xffffff,10);
+    pointLight1.position.set(1, 1, -1);
+    pointLight1.castShadow = true; // 讓此光能產生陰影
+    scene.add(pointLight1);
     // const pointLight2 = new THREE.PointLight(0xffffff,10);
     // pointLight2.position.set(-2, 2, 2);
     // scene.add(pointLight2);
@@ -89,15 +89,15 @@
             const mesh = new VOXMesh(chunk);
 
             // mesh.material.metalness=true
-            mesh.material.roughness=1
+            mesh.material.roughness=.5
             // mesh.material.transparent=true
             // mesh.material.opacity=0.8
             // mesh.material.transmission=1.5
             // mesh.material.emissive.set(0x333333);
             
-            mesh.material.receiveShadow = true
-            mesh.material.castShadow = true;
-            mesh.material.clipShadows = true;
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+            mesh.clipShadows = true;
             // mesh.material.reflectivity=.0
             // console.log(mesh.material)
             mesh.scale.setScalar(.1);
@@ -114,9 +114,9 @@
             const chunk = chunks[i];
             console.log(chunk)
             const mesh = new VOXMesh(chunk);
-            mesh.material.receiveShadow = true
-            mesh.material.castShadow = true;
-            mesh.material.clipShadows = true;
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+            mesh.clipShadows = true;
             mesh.scale.setScalar(.1);
             console.log(mesh.material)
             scene.add(mesh);
