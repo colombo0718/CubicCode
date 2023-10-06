@@ -154,6 +154,7 @@ class VOXLoader extends Loader {
 				chunk.data = new Uint8Array( buffer, i, numVoxels * 4 );
 
 				i += numVoxels * 4;
+				console.log(chunk.data)
 				for(var z=0;z<chunk.data.length;z++){
 					if(i%4==2){console.log(chunk.data[z]+=1)}
 				}
