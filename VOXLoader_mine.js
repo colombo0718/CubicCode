@@ -155,7 +155,7 @@ class VOXLoader extends Loader {
 
 				i += numVoxels * 4;
 				for(var z=0;z<chunk.data.length;z++){
-					if(i%4==2){chunk.data[z]+=1}
+					if(i%4==2){console.log(chunk.data[z]+=1)}
 				}
 
 			} else if ( id === 'RGBA' ) {
