@@ -116,10 +116,6 @@ class VOXLoader extends Loader {
 			const chunkSize = data.getUint32( i, true ); i += 4;
 			i += 4; // childChunks
 
-			const childChunks = data.getUint32(i, true);
-			i += 4;
-			console.log(childChunks)
-
 			if ( id === 'SIZE' ) {
 
 				const x = data.getUint32( i, true ); i += 4;
@@ -157,7 +153,7 @@ class VOXLoader extends Loader {
 			} else {
 
 				// console.log( id, chunkSize, childChunks );
-				// console.log( id, chunkSize);
+				console.log( id, chunkSize);
 
 				i += chunkSize;
 
