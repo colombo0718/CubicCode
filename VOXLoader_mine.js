@@ -154,10 +154,6 @@ class VOXLoader extends Loader {
 				chunk.data = new Uint8Array( buffer, i, numVoxels * 4 );
 
 				i += numVoxels * 4;
-				console.log(chunk.data)
-				for(var z=0;z<chunk.data.length;z++){
-					if(i%4==2){console.log(chunk.data[z]+=1)}
-				}
 
 			} else if ( id === 'RGBA' ) {
 
@@ -254,7 +250,7 @@ class VOXMesh extends Mesh {
 
 			const x = data[ j + 0 ];
 			const y = data[ j + 1 ];
-			const z = data[ j + 2 ];
+			const z = data[ j + 2 ]+1;
 			const c = data[ j + 3 ];
 
 			const hex = palette[ c ];
