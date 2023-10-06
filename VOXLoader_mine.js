@@ -210,7 +210,7 @@ class VOXMesh extends Mesh {
 
 			x -= size.x / 2;
 			y -= size.z / 2;
-			z += size.y / 2;
+			z += size.y / 2 +1;
 
 			for ( let i = 0; i < 18; i += 3 ) {
 
@@ -233,7 +233,7 @@ class VOXMesh extends Mesh {
 		for ( let j = 0; j < data.length; j += 4 ) {
 
 			const x = data[ j + 0 ];
-			const y = data[ j + 1 ]+1;
+			const y = data[ j + 1 ];
 			const z = data[ j + 2 ];
 
 			const index = x + ( y * offsety ) + ( z * offsetz );
@@ -249,7 +249,7 @@ class VOXMesh extends Mesh {
 		for ( let j = 0; j < data.length; j += 4 ) {
 
 			const x = data[ j + 0 ];
-			const y = data[ j + 1 ]+1;
+			const y = data[ j + 1 ];
 			const z = data[ j + 2 ];
 			const c = data[ j + 3 ];
 
