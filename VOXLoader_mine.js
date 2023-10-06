@@ -131,7 +131,12 @@ class VOXLoader extends Loader {
 
 				i += chunkSize - ( 3 * 4 );
 
-			} else if ( id === 'XYZI' ) {
+			}else if (id === 'MAIN') {
+				// 如果匹配，則讀取 childChunks 的值
+				const childChunks = data.getUint32(i, true);
+				i += 4;
+				console.log(childChunks)
+			  } else if ( id === 'XYZI' ) {
 
 				const numVoxels = data.getUint32( i, true ); i += 4;
 				chunk.data = new Uint8Array( buffer, i, numVoxels * 4 );
