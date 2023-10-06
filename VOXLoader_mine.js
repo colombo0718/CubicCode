@@ -134,11 +134,19 @@ class VOXLoader extends Loader {
 			}else if (id === 'MAIN') {
 				// 如果匹配，則讀取 childChunks 的值
 				const childChunks = data.getUint32(i, true);
-				
+
+				// 讀取塊名稱（如果存在）
+				let chunkName = '';
+				if (childChunks > 0) {
+				for (let j = 0; j < childChunks; j++) {
+					chunkName += String.fromCharCode(data.getUint8(i++));
+				}
+				}
+				console.log(chunkName)
 
 				i += chunkSize;
 				console.log(childChunks)
-			  } else if ( id === 'XYZI' ) {
+			} else if ( id === 'XYZI' ) {
 
 				const numVoxels = data.getUint32( i, true ); i += 4;
 				chunk.data = new Uint8Array( buffer, i, numVoxels * 4 );
