@@ -249,8 +249,8 @@ class VOXMesh extends Mesh {
 		for ( let j = 0; j < data.length; j += 4 ) {
 
 			const x = data[ j + 0 ];
-			const y = data[ j + 1 ];
-			const z = data[ j + 2 ]+1;
+			const y = data[ j + 1 ]+1;
+			const z = data[ j + 2 ];
 			const c = data[ j + 3 ];
 
 			const hex = palette[ c ];
