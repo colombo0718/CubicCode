@@ -134,7 +134,9 @@ class VOXLoader extends Loader {
 			}else if (id === 'MAIN') {
 				// 如果匹配，則讀取 childChunks 的值
 				const childChunks = data.getUint32(i, true);
-				i += 4;
+				
+
+				i += chunkSize;
 				console.log(childChunks)
 			  } else if ( id === 'XYZI' ) {
 
