@@ -147,7 +147,7 @@ class VOXLoader extends Loader {
 				// console.log(chunkName)
 
 				i += chunkSize;
-				// console.log(childChunks)
+				console.log(childChunks)
 			} else if ( id === 'XYZI' ) {
 
 				const numVoxels = data.getUint32( i, true ); i += 4;
