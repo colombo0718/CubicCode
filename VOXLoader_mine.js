@@ -208,7 +208,7 @@ class VOXMesh extends Mesh {
 		function add( tile, x, y, z, r, g, b ) {
 
 			x -= size.x / 2;
-			y -= size.z / 2;
+			// y -= size.z / 2;
 			z += size.y / 2 -1;
 
 			for ( let i = 0; i < 18; i += 3 ) {
