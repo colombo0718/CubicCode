@@ -152,7 +152,8 @@ class VOXLoader extends Loader {
 
 			} else {
 
-				console.log( id, chunkSize, childChunks );
+				// console.log( id, chunkSize, childChunks );
+				console.log( id, chunkSize);
 
 				i += chunkSize;
 
