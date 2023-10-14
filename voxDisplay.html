@@ -29,7 +29,7 @@
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
-    directionalLight.position.set(1, 1, 0);
+    directionalLight.position.set(1, 1, 1);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
 
@@ -62,8 +62,8 @@
         for (let i = 0; i < chunks.length; i++) {
             const chunk = chunks[i];
             const mesh = new VOXMesh(chunk);
-            mesh.material.metalness=true
-            mesh.material.roughness=1
+            // mesh.material.metalness=true
+            // mesh.material.roughness=1
             mesh.scale.setScalar(.1);
             mesh.visible = false;
 

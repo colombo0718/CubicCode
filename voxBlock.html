@@ -36,26 +36,10 @@
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
 
-
-    //Set up shadow properties for the light
-    // directionalLight.shadow.mapSize.width = 512; // default
-    // directionalLight.shadow.mapSize.height = 512; // default
-    // directionalLight.shadow.camera.near = 0.5; // default
-    // directionalLight.shadow.camera.far = 500; // default
-
     const pointLight1 = new THREE.PointLight(0xffffff,10);
     pointLight1.position.set(1, 1, -1);
     pointLight1.castShadow = true; // 讓此光能產生陰影
     scene.add(pointLight1);
-    // const pointLight2 = new THREE.PointLight(0xffffff,10);
-    // pointLight2.position.set(-2, 2, 2);
-    // scene.add(pointLight2);
-    // const pointLight3 = new THREE.PointLight(0xffffff,10);
-    // pointLight3.position.set(2, 2, -2);
-    // scene.add(pointLight3);
-    // const pointLight4 = new THREE.PointLight(0xffffff,10);
-    // pointLight4.position.set(-2, 2, -2);
-    // scene.add(pointLight4);
 
     // 添加網格
     var gridSize = 10; // 網格大小
