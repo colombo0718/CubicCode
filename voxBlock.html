@@ -1,17 +1,56 @@
-<div id="canvas" style="width: 1200px;height: 800px;text-align:center;"></div>
-<input type="file" id="fileInput" accept=".vox" />
+<script src="https://unpkg.com/blockly"></script>
+<script src="https://unpkg.com/blockly/javascript_compressed"></script>
+<script src="./d4Toolbox.js"></script>
+<style>
+  		body {
+			margin: 0px;
+			/* overflow: hidden; */
+		}
+  .container {
+  display: flex;
+  justify-content: space-between; /* 左右對齊 */
+  align-items: stretch; /* 垂直拉伸 */
+  width: 100%;
+  height: calc(100vh - 20px); /* 使用視窗高度作為容器高度 */
+}
+
+.blockly-panel {
+  flex: 2; /* 自動填充剩餘寬度 */
+  height: 100%; /* 充滿容器的高度 */
+}
+
+.canvas-panel {
+  flex: 3; /* 自動填充剩餘寬度 */
+
+  height: 100%; /* 充滿容器的高度 */
+}
+
+/* 隱藏垃圾桶圖標 */
+.blocklyTrashIcon {
+  display: none !important;
+}
+
+</style>
+<div class="container">
+<div id="canvas" class="canvas-panel" ></div>
+<div id="blocklyDiv" class="blockly-panel" ></div>
+</div>
+
+<button id="myButton1">printJsCode</button>
+<button id="myButton2">runJsCode</button>
+<button id="myButton3">printXML</button>
 <script type="importmap">
-    {
-        "imports": {
-            "three": "https://threejs.org/build/three.module.js",
-            "three/addons/": "https://threejs.org/examples/jsm/"
-        }
-    }
+  {
+      "imports": {
+          "three": "https://threejs.org/build/three.module.js",
+          "three/addons/": "https://threejs.org/examples/jsm/"
+      }
+  }
 </script>
 <script type="module">
+
     import * as THREE from 'three';
-    // import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
-    import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine.js';
+    import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
     var fileInput = document.getElementById('fileInput');
@@ -19,8 +58,6 @@
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     canvas.appendChild(renderer.domElement);
 
@@ -28,18 +65,13 @@
     camera.position.set(0,6,6)
 
     // 添加燈光
-    var ambientLight = new THREE.AmbientLight(0xffffff, .5); // 產生柔和的光
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
     directionalLight.position.set(1, 1, 0);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
-
-    const pointLight1 = new THREE.PointLight(0xffffff,10);
-    pointLight1.position.set(1, 1, -1);
-    pointLight1.castShadow = true; // 讓此光能產生陰影
-    scene.add(pointLight1);
 
     // 添加網格
     var gridSize = 10; // 網格大小
@@ -50,93 +82,260 @@
 
     // 添加OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enablePan=false
+    // controls.enablePan=false
+    console.log(controls)
 
-    // 建置vox動畫必要物件
-    const loader = new VOXLoader();
-    var anima= new THREE.Object3D();
-    scene.add( anima );  
-    const meshes = [];
-    let currentIndex = 0;
-
-    // 建置vox動畫流程
-    function processVoxelAnimation(chunks) {
-        // 清除voxel動畫物件
-        while (anima.children.length > 0) { 
-            anima.remove(anima.children[0]); 
-        }
-        meshes.length = 0;
-
-        for (let i = 0; i < chunks.length; i++) {
-            const chunk = chunks[i];
-            console.log(chunk)
-            const mesh = new VOXMesh(chunk);
-
-            // mesh.material.metalness=true
-            mesh.material.roughness=.5
-            // mesh.material.transparent=true
-            // mesh.material.opacity=0.8
-            // mesh.material.transmission=1.5
-            // mesh.material.emissive.set(0x333333);
-            
-            mesh.receiveShadow = true
-            mesh.castShadow = true;
-            mesh.clipShadows = true;
-            // mesh.material.reflectivity=.0
-            // console.log(mesh.material)
-            mesh.scale.setScalar(.1);
-            mesh.visible = false;
-
-            meshes.push(mesh);
-            anima.add(mesh);
-        }
-    }
-
-    // 加載一小片地面
-    loader.load( 'https://cubiccode.vercel.app/vox/ground.vox', function ( chunks ) {
-        for (let i = 0; i < chunks.length; i++) {
-            const chunk = chunks[i];
-            console.log(chunk)
-            const mesh = new VOXMesh(chunk);
-            mesh.receiveShadow = true
-            mesh.castShadow = true;
-            mesh.clipShadows = true;
-            mesh.scale.setScalar(.1);
-            console.log(mesh)
-            scene.add(mesh);
-        }
-    } );
-
-    // 載入預設檔案
-    loader.load( 'https://cubiccode.vercel.app/vox/knight-hack.vox', function ( chunks ) {
-        processVoxelAnimation(chunks);
-          
         // 開始動畫
         setInterval(function() {
-            // 將前一個物件隱藏
-            meshes[currentIndex % meshes.length].visible = false;
-            currentIndex +=1
-            // 將新的物件顯示
-            meshes[currentIndex % meshes.length].visible = true;
-
             controls.update(); // 需要加入這行才能讓OrbitControls工作
             renderer.render(scene, camera);
         },100)
-    } );
 
-    // 用戶點選檔案後
-    fileInput.addEventListener('change', function (event) { 
-        var file = event.target.files[0];
-        var reader = new FileReader();
+        
 
-        reader.onload = function (event) {
-            var contents = event.target.result;
-            var chunks= loader.parse(contents)
-            console.log(chunks)
+const addBlockTool=
+  [    
+    {
+        'kind': 'sep',
+    },
+    {
+      'kind': 'category',
+      'name': 'Console',
+      "colour": "#FF0000",
+    //   'categorystyle': 'logic_category',
+      'contents': [
+        {
+          'type': 'console_log',
+          'kind': 'block',
+        },
+        {
+            "kind": "block",
+            "type": "empty_array"
+        },
+        {
+            "kind": "block",
+            "type": "array_push"
+        }
+      ],
+    },
+    {
+      'kind': 'category',
+      'name': 'Three.js',
+      "colour": "#bbbb00",
+      'contents': [
+        {
+          'type': 'vector3',
+          'kind': 'block',
+          'inputs': {
+            'x': {
+              'shadow': {
+                'type': 'math_number',
+                'fields': {
+                  'NUM': 0,
+                },
+              },
+            },
+            'y': {
+              'shadow': {
+                'type': 'math_number',
+                'fields': {
+                  'NUM': 0,
+                },
+              },
+            },
+            'z': {
+              'shadow': {
+                'type': 'math_number',
+                'fields': {
+                  'NUM': 0,
+                },
+              },
+            },
+          }
+        },
+        {
+          'type': 'create_line',
+          'kind': 'block',
+        },
+      ],
+    }
+  ]
+  toolbox.contents=toolbox.contents.concat(addBlockTool)
 
-            processVoxelAnimation(chunks);
-        };
-        reader.readAsArrayBuffer(file);
-    });
+Blockly.Blocks['console_log'] = {
+  init: function() {
+    this.appendValueInput("inp")
+        .setCheck(null)
+        .appendField("console.log");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour("#ff0000");
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
 
+javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
+  var value_inp = generator.valueToCode(block, 'inp', javascript.Order.ATOMIC);
+  // TODO: Assemble javascript into code variable.
+  var code = 'console.log('+value_inp+');\n';
+  return code;
+};
+
+Blockly.Blocks['vector3'] = {
+  init: function() {
+    this.appendValueInput("x")
+        .setCheck("Number")
+        .appendField("Vector3")
+        .appendField("x:");
+    this.appendValueInput("y")
+        .setCheck("Number")
+        .appendField("y:");
+    this.appendValueInput("z")
+        .setCheck("Number")
+        .appendField("z:");
+    this.setInputsInline(true);
+    this.setOutput(true, null);
+    this.setColour('#bbbb00');
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+
+// };
+javascript.javascriptGenerator.forBlock['vector3'] = function(block, generator) {
+  var value_x = generator.valueToCode(block, 'x', javascript.Order.ATOMIC);
+  var value_y = generator.valueToCode(block, 'y', javascript.Order.ATOMIC);
+  var value_z = generator.valueToCode(block, 'z', javascript.Order.ATOMIC);
+  // TODO: Assemble javascript into code variable.
+  var code =  'new THREE.Vector3('+value_x+', '+value_y+', '+value_z+')';
+  // TODO: Change ORDER_NONE to the correct strength.
+  return [code, 99];
+};
+
+Blockly.Blocks['create_line'] = {
+  init: function() {
+    this.appendValueInput("points")
+        .setCheck(null)
+        .appendField("create line in points:");
+    this.appendValueInput("colour")
+        .setCheck(null)
+        .appendField("with color:");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour('#bbbb00');
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+javascript.javascriptGenerator.forBlock['create_line'] = function(block, generator) {
+  var value_points = generator.valueToCode(block, 'points', javascript.Order.ATOMIC);
+  var value_colour = generator.valueToCode(block, 'colour', javascript.Order.ATOMIC);
+  // TODO: Assemble javascript into code variable.
+  var code = 'var geometry = new THREE.BufferGeometry().setFromPoints('+value_points+');\n\
+  var material = new THREE.LineBasicMaterial({ color: '+value_colour+',linewidth: 5});\n\
+  var line = new THREE.Line(geometry, material);\n\
+  linesGroup.add(line);\n';
+  return code;
+};
+
+
+Blockly.Blocks['array_push'] = {
+  init: function () {
+    this.appendValueInput('ARRAY')
+      .setCheck('Array')
+      .appendField('Array');
+    this.appendValueInput('VALUE')
+      .appendField('.push');
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour('#aa00aa');
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['array_push'] = function (block) {
+  const array = Blockly.JavaScript.valueToCode(block, 'ARRAY', Blockly.JavaScript.ORDER_ATOMIC);
+  const value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
+  var code=array+'.push('+value+');\n'
+  return code;
+};
+
+Blockly.Blocks['empty_array'] = {
+  init: function () {
+    this.appendDummyInput()
+      .appendField("[ ]");
+    this.setOutput(true, 'Array');
+    this.setColour('#aa00aa');
+    this.setTooltip("empry array");
+    this.setHelpUrl("");
+  }
+};
+
+Blockly.JavaScript['empty_array'] = function (block) {
+  // 在这里生成一个空白数组
+  var code = '[]';
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+var workspace = Blockly.inject('blocklyDiv', {
+  toolbox: toolbox,
+  zoom:{startScale: 0.7},
+  grid:{
+    spacing: 50,
+    length: 2,
+    colour: '#ccc',
+    snap: true},
+});
+
+function printJsCode(){
+  const code = Blockly.JavaScript.workspaceToCode(workspace);
+  console.log(code)
+}
+
+function runJsCode(){
+  const code = Blockly.JavaScript.workspaceToCode(workspace);
+  eval(code)
+}
+
+function printXML(){
+  // 获取 Blockly 的 XML 数据
+  var workspaceXML = Blockly.Xml.workspaceToDom(workspace);
+  var xmlText = Blockly.Xml.domToText(workspaceXML);
+  console.log(workspaceXML)
+  console.log(xmlText)
+}
+
+const button1 = document.querySelector('#myButton1');
+button1.addEventListener('click', printJsCode);
+
+const button2 = document.querySelector('#myButton2');
+button2.addEventListener('click', runJsCode);
+
+const button3 = document.querySelector('#myButton3');
+button3.addEventListener('click', printXML);
+
+
+var defaultXml ='<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="!b0wCO8_z;3f+/d8mt:6">points</variable><variable id="d2`N#|X4xQD6^a^2}*[~">i</variable><variable id="k4mD0rM%0/VP0mvAishO">t</variable></variables><block type="variables_set" id="n:0QDq{a{VKYHLaj,Dz9" x="25" y="75"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field><value name="VALUE"><block type="empty_array" id="W9Y[:xxot#U3LT3^7RqY"></block></value><next><block type="controls_for" id="?./z^7*[+Q_)^/2*:GU;"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field><value name="FROM"><shadow type="math_number" id="4lFI*S8KJ@RAh*4q1H)-"><field name="NUM">-50</field></shadow></value><value name="TO"><shadow type="math_number" id="c-~eR1R7K$Tf~Jt0v:iy"><field name="NUM">50</field></shadow></value><value name="BY"><shadow type="math_number" id="]/gLVyLi%]$WT`NXn2NL"><field name="NUM">1</field></shadow></value><statement name="DO"><block type="variables_set" id="~~kgRpmgyI5Bwjj)8px7"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field><value name="VALUE"><block type="math_arithmetic" id="s:^]KWj/kBRW6nPUO+V;"><field name="OP">MULTIPLY</field><value name="A"><shadow type="math_number" id="JkWe%.71T;3Dk]uX@*Bf"><field name="NUM">1</field></shadow><block type="variables_get" id="#67keagctg][Mv${wpSB"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field></block></value><value name="B"><shadow type="math_number" id="$U{.%pg7/*6e6Ik?98?m"><field name="NUM">18</field></shadow></value></block></value><next><block type="array_push" id="6F#I1~pp;Ub*~YH`02oU"><value name="ARRAY"><block type="variables_get" id="YbN/;jHjf=T}wE!CKLxa"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field></block></value><value name="VALUE"><block type="vector3" id="O8C`_{@x~,Y^mt0pPSPP"><value name="x"><shadow type="math_number" id="MEicS6UIE`zo0Bu^qWeH"><field name="NUM">0</field></shadow><block type="math_trig" id="=OQ^lT{O.z:}q(Y-10TM"><field name="OP">COS</field><value name="NUM"><shadow type="math_number" id="65gH=m|!TES1np)gRp?q"><field name="NUM">45</field></shadow><block type="variables_get" id="M~co7p,RKA?;#iMxu~;Z"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value></block></value><value name="y"><shadow type="math_number" id="*01fDk%43IF$*rm*SURL"><field name="NUM">0</field></shadow><block type="math_arithmetic" id="2.=:`bMzR^};Jo7pTox("><field name="OP">DIVIDE</field><value name="A"><shadow type="math_number" id="A%dXPT8//BKdaWf)i02h"><field name="NUM">1</field></shadow><block type="variables_get" id="2t|]KlM#Y:~}[6}re(6+"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field></block></value><value name="B"><shadow type="math_number" id="Cm|d#4bh(=(6cl:u3Ok|"><field name="NUM">20</field></shadow></value></block></value><value name="z"><shadow type="math_number" id="1Q7}k,^Hy}LZ17LViu17"><field name="NUM">0</field></shadow><block type="math_trig" id="-1YRPIJilQUamYJQsXCw"><field name="OP">SIN</field><value name="NUM"><shadow type="math_number" id="65gH=m|!TES1np)gRp?q"><field name="NUM">45</field></shadow><block type="variables_get" id="ma+Q(#89c-/YTCAUHn;2"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value></block></value></block></value></block></next></block></statement><next><block type="create_line" id="8_pcs)O1l%,:nUM$oa)U"><value name="points"><block type="variables_get" id="bZ(H5AWyevf;e-nOt:+Y"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field></block></value><value name="colour"><block type="colour_picker" id="Pz^L)11!1HwY$/M/LC0~"><field name="COLOUR">#ff0000</field></block></value></block></next></block></next></block></xml>'
+var parser = new DOMParser();
+var xmlDoc = parser.parseFromString(defaultXml, "text/xml");
+Blockly.Xml.domToWorkspace(xmlDoc.documentElement,workspace);
+
+
+// 创建一个组来容纳线段
+var linesGroup = new THREE.Group();
+scene.add(linesGroup);
+
+function clearLines() {
+    while (linesGroup.children.length > 0) {
+        var line = linesGroup.children[0];
+        linesGroup.remove(line);
+    }
+}
+clearLines()
+runJsCode()
 </script>
