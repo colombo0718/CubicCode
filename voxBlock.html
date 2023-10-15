@@ -34,11 +34,13 @@
 <div class="container">
 <div id="canvas" class="canvas-panel" ></div>
 <div id="blocklyDiv" class="blockly-panel" ></div>
+
 </div>
 
 <button id="myButton1">printJsCode</button>
 <button id="myButton2">runJsCode</button>
 <button id="myButton3">printXML</button>
+<input type="file" id="fileInput" accept=".vox" />
 <script type="importmap">
   {
       "imports": {
@@ -58,6 +60,9 @@
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
+    
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     canvas.appendChild(renderer.domElement);
 
@@ -65,13 +70,18 @@
     camera.position.set(0,6,6)
 
     // 添加燈光
-    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
+    var ambientLight = new THREE.AmbientLight(0xffffff, .5); // 產生柔和的光
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
-    directionalLight.position.set(1, 1, 0);
+    directionalLight.position.set(-1, 1, 0);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
+
+    const pointLight1 = new THREE.PointLight(0xffffff,10);
+    pointLight1.position.set(1, 1, 1);
+    pointLight1.castShadow = true; // 讓此光能產生陰影
+    scene.add(pointLight1);
 
     // 添加網格
     var gridSize = 10; // 網格大小
@@ -85,12 +95,99 @@
     // controls.enablePan=false
     console.log(controls)
 
+        // 建置vox動畫必要物件
+        const loader = new VOXLoader();
+    var anima= new THREE.Object3D();
+    scene.add( anima );  
+    const meshes = [];
+    let currentIndex = 0;
+
         // 開始動畫
         setInterval(function() {
             controls.update(); // 需要加入這行才能讓OrbitControls工作
             renderer.render(scene, camera);
         },100)
 
+
+            // 建置vox動畫流程
+    function processVoxelAnimation(chunks) {
+        // 清除voxel動畫物件
+        while (anima.children.length > 0) { 
+            anima.remove(anima.children[0]); 
+        }
+        meshes.length = 0;
+
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            console.log(chunk)
+            const mesh = new VOXMesh(chunk);
+
+            // mesh.material.metalness=true
+            mesh.material.roughness=.5
+            // mesh.material.transparent=true
+            // mesh.material.opacity=0.8
+            // mesh.material.transmission=1.5
+            // mesh.material.emissive.set(0x333333);
+            
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+            mesh.clipShadows = true;
+            // mesh.material.reflectivity=.0
+            // console.log(mesh.material)
+            mesh.scale.setScalar(.1);
+            mesh.visible = false;
+
+            meshes.push(mesh);
+            anima.add(mesh);
+        }
+    }
+
+    // 加載一小片地面
+    loader.load( 'https://cubiccode.vercel.app/vox/ground.vox', function ( chunks ) {
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            console.log(chunk)
+            const mesh = new VOXMesh(chunk);
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+            mesh.clipShadows = true;
+            mesh.scale.setScalar(.1);
+            console.log(mesh)
+            scene.add(mesh);
+        }
+    } );
+
+    // 載入預設檔案
+    loader.load( 'https://cubiccode.vercel.app/vox/knight-hack.vox', function ( chunks ) {
+        processVoxelAnimation(chunks);
+          
+        // 開始動畫
+        setInterval(function() {
+            // 將前一個物件隱藏
+            meshes[currentIndex % meshes.length].visible = false;
+            currentIndex +=1
+            // 將新的物件顯示
+            meshes[currentIndex % meshes.length].visible = true;
+
+            // controls.update(); // 需要加入這行才能讓OrbitControls工作
+            // renderer.render(scene, camera);
+        },100)
+    } );
+
+    // 用戶點選檔案後
+    fileInput.addEventListener('change', function (event) { 
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function (event) {
+            var contents = event.target.result;
+            var chunks= loader.parse(contents)
+            console.log(chunks)
+
+            processVoxelAnimation(chunks);
+        };
+        reader.readAsArrayBuffer(file);
+    });
         
 
 const addBlockTool=
