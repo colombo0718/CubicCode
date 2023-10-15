@@ -1,46 +1,50 @@
 <script src="https://unpkg.com/blockly"></script>
 <script src="https://unpkg.com/blockly/javascript_compressed"></script>
 <script src="./d4Toolbox.js"></script>
+<script src="./mineBlock.js"></script>
 <style>
-  		body {
-			margin: 0px;
-			/* overflow: hidden; */
-		}
-  .container {
-  display: flex;
-  justify-content: space-between; /* 左右對齊 */
-  align-items: stretch; /* 垂直拉伸 */
-  width: 100%;
-  height: calc(100vh - 20px); /* 使用視窗高度作為容器高度 */
-}
+    body {
+        margin: 0px;
+        /* overflow: hidden; */
+    }
 
-.blockly-panel {
-  flex: 2; /* 自動填充剩餘寬度 */
-  height: 100%; /* 充滿容器的高度 */
-}
+    .container {
+    display: flex;
+    justify-content: space-between; /* 左右對齊 */
+    align-items: stretch; /* 垂直拉伸 */
+    width: 100%;
+    height: calc(100vh ); /* 使用視窗高度作為容器高度 */
+    }
 
-.canvas-panel {
-  flex: 3; /* 自動填充剩餘寬度 */
+    .blockly-panel {
+    flex: 3; /* 自動填充剩餘寬度 */
+    height: 100%; /* 充滿容器的高度 */
+    }
 
-  height: 100%; /* 充滿容器的高度 */
-}
+    .canvas-panel {
+    flex: 2; /* 自動填充剩餘寬度 */ 
 
-/* 隱藏垃圾桶圖標 */
-.blocklyTrashIcon {
-  display: none !important;
-}
+    height: 100%; /* 充滿容器的高度 */
+    }
+
+    /* 隱藏垃圾桶圖標 */
+    .blocklyTrashIcon {
+    display: none !important;
+    }
 
 </style>
 <div class="container">
-<div id="canvas" class="canvas-panel" ></div>
+<div class="canvas-panel" >
+    <div id="canvas" style="width: 1000px;height: 800px;text-align:center;" ></div>
+    <button id="myButton1">printJsCode</button>
+    <button id="myButton2">runJsCode</button>
+    <button id="myButton3">printXML</button>
+    <input type="file" id="fileInput" accept=".vox" />
+</div>
 <div id="blocklyDiv" class="blockly-panel" ></div>
 
 </div>
 
-<button id="myButton1">printJsCode</button>
-<button id="myButton2">runJsCode</button>
-<button id="myButton3">printXML</button>
-<input type="file" id="fileInput" accept=".vox" />
 <script type="importmap">
   {
       "imports": {
@@ -95,21 +99,21 @@
     // controls.enablePan=false
     console.log(controls)
 
-        // 建置vox動畫必要物件
-        const loader = new VOXLoader();
+    // 建置vox動畫必要物件
+    const loader = new VOXLoader();
     var anima= new THREE.Object3D();
     scene.add( anima );  
     const meshes = [];
     let currentIndex = 0;
 
-        // 開始動畫
-        setInterval(function() {
-            controls.update(); // 需要加入這行才能讓OrbitControls工作
-            renderer.render(scene, camera);
-        },100)
+    // 開始動畫
+    setInterval(function() {
+        controls.update(); // 需要加入這行才能讓OrbitControls工作
+        renderer.render(scene, camera);
+    },100)
 
 
-            // 建置vox動畫流程
+    // 建置vox動畫流程
     function processVoxelAnimation(chunks) {
         // 清除voxel動畫物件
         while (anima.children.length > 0) { 
@@ -142,20 +146,20 @@
         }
     }
 
-    // 加載一小片地面
-    loader.load( 'https://cubiccode.vercel.app/vox/ground.vox', function ( chunks ) {
-        for (let i = 0; i < chunks.length; i++) {
-            const chunk = chunks[i];
-            console.log(chunk)
-            const mesh = new VOXMesh(chunk);
-            mesh.receiveShadow = true
-            mesh.castShadow = true;
-            mesh.clipShadows = true;
-            mesh.scale.setScalar(.1);
-            console.log(mesh)
-            scene.add(mesh);
-        }
-    } );
+        // // 加載一小片地面
+        // loader.load( 'https://cubiccode.vercel.app/vox/ground.vox', function ( chunks ) {
+        //     for (let i = 0; i < chunks.length; i++) {
+        //         const chunk = chunks[i];
+        //         console.log(chunk)
+        //         const mesh = new VOXMesh(chunk);
+        //         mesh.receiveShadow = true
+        //         mesh.castShadow = true;
+        //         mesh.clipShadows = true;
+        //         mesh.scale.setScalar(.1);
+        //         console.log(mesh)
+        //         scene.add(mesh);
+        //     }
+        // } );
 
     // 載入預設檔案
     loader.load( 'https://cubiccode.vercel.app/vox/knight-hack.vox', function ( chunks ) {
@@ -259,125 +263,7 @@ const addBlockTool=
   ]
   toolbox.contents=toolbox.contents.concat(addBlockTool)
 
-Blockly.Blocks['console_log'] = {
-  init: function() {
-    this.appendValueInput("inp")
-        .setCheck(null)
-        .appendField("console.log");
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour("#ff0000");
- this.setTooltip("");
- this.setHelpUrl("");
-  }
-};
 
-javascript.javascriptGenerator.forBlock['console_log'] = function(block, generator) {
-  var value_inp = generator.valueToCode(block, 'inp', javascript.Order.ATOMIC);
-  // TODO: Assemble javascript into code variable.
-  var code = 'console.log('+value_inp+');\n';
-  return code;
-};
-
-Blockly.Blocks['vector3'] = {
-  init: function() {
-    this.appendValueInput("x")
-        .setCheck("Number")
-        .appendField("Vector3")
-        .appendField("x:");
-    this.appendValueInput("y")
-        .setCheck("Number")
-        .appendField("y:");
-    this.appendValueInput("z")
-        .setCheck("Number")
-        .appendField("z:");
-    this.setInputsInline(true);
-    this.setOutput(true, null);
-    this.setColour('#bbbb00');
- this.setTooltip("");
- this.setHelpUrl("");
-  }
-};
-
-
-// };
-javascript.javascriptGenerator.forBlock['vector3'] = function(block, generator) {
-  var value_x = generator.valueToCode(block, 'x', javascript.Order.ATOMIC);
-  var value_y = generator.valueToCode(block, 'y', javascript.Order.ATOMIC);
-  var value_z = generator.valueToCode(block, 'z', javascript.Order.ATOMIC);
-  // TODO: Assemble javascript into code variable.
-  var code =  'new THREE.Vector3('+value_x+', '+value_y+', '+value_z+')';
-  // TODO: Change ORDER_NONE to the correct strength.
-  return [code, 99];
-};
-
-Blockly.Blocks['create_line'] = {
-  init: function() {
-    this.appendValueInput("points")
-        .setCheck(null)
-        .appendField("create line in points:");
-    this.appendValueInput("colour")
-        .setCheck(null)
-        .appendField("with color:");
-    this.setInputsInline(true);
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour('#bbbb00');
- this.setTooltip("");
- this.setHelpUrl("");
-  }
-};
-
-javascript.javascriptGenerator.forBlock['create_line'] = function(block, generator) {
-  var value_points = generator.valueToCode(block, 'points', javascript.Order.ATOMIC);
-  var value_colour = generator.valueToCode(block, 'colour', javascript.Order.ATOMIC);
-  // TODO: Assemble javascript into code variable.
-  var code = 'var geometry = new THREE.BufferGeometry().setFromPoints('+value_points+');\n\
-  var material = new THREE.LineBasicMaterial({ color: '+value_colour+',linewidth: 5});\n\
-  var line = new THREE.Line(geometry, material);\n\
-  linesGroup.add(line);\n';
-  return code;
-};
-
-
-Blockly.Blocks['array_push'] = {
-  init: function () {
-    this.appendValueInput('ARRAY')
-      .setCheck('Array')
-      .appendField('Array');
-    this.appendValueInput('VALUE')
-      .appendField('.push');
-    this.setInputsInline(true);
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour('#aa00aa');
-    this.setHelpUrl('');
-  }
-};
-
-Blockly.JavaScript['array_push'] = function (block) {
-  const array = Blockly.JavaScript.valueToCode(block, 'ARRAY', Blockly.JavaScript.ORDER_ATOMIC);
-  const value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
-  var code=array+'.push('+value+');\n'
-  return code;
-};
-
-Blockly.Blocks['empty_array'] = {
-  init: function () {
-    this.appendDummyInput()
-      .appendField("[ ]");
-    this.setOutput(true, 'Array');
-    this.setColour('#aa00aa');
-    this.setTooltip("empry array");
-    this.setHelpUrl("");
-  }
-};
-
-Blockly.JavaScript['empty_array'] = function (block) {
-  // 在这里生成一个空白数组
-  var code = '[]';
-  return [code, Blockly.JavaScript.ORDER_ATOMIC];
-};
 
 var workspace = Blockly.inject('blocklyDiv', {
   toolbox: toolbox,
