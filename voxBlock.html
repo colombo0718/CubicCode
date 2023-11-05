@@ -110,7 +110,7 @@
     setInterval(function() {
         controls.update(); // 需要加入這行才能讓OrbitControls工作
         renderer.render(scene, camera);
-    },100)
+    },10)
 
 
     // 建置vox動畫流程
@@ -162,7 +162,7 @@
         // } );
 
     // 載入預設檔案
-    loader.load( 'https://cubiccode.vercel.app/vox/knight-hack.vox', function ( chunks ) {
+    loader.load( 'https://cubiccode.vercel.app/vox/fighter.vox', function ( chunks ) {
         processVoxelAnimation(chunks);
           
         // 開始動畫
@@ -201,7 +201,7 @@ const addBlockTool=
     },
     {
       'kind': 'category',
-      'name': 'Console',
+      'name': 'Javascript ',
       "colour": "#FF0000",
     //   'categorystyle': 'logic_category',
       'contents': [
@@ -216,7 +216,25 @@ const addBlockTool=
         {
             "kind": "block",
             "type": "array_push"
-        }
+        },
+        {
+            "kind": "block",
+            "type": "remainder"
+        },
+        {
+          'type': 'setinterval',
+          'kind': 'block',
+          'inputs': {
+            "time_interval":{
+              'shadow': {
+                'type': 'math_number',
+                'fields': {
+                  'NUM': 10,
+                },
+              },
+            },
+          }
+        },
       ],
     },
     {
@@ -258,6 +276,25 @@ const addBlockTool=
           'type': 'create_line',
           'kind': 'block',
         },
+        {
+          'type': 'voxel_char',
+          'kind': 'block',
+        },
+        {
+          'type': 'change_three_obj',
+          'kind': 'block',
+          'inputs': {
+            "variation":{
+              'shadow': {
+                'type': 'math_number',
+                'fields': {
+                  'NUM': 0.01,
+                },
+              },
+            },
+          }
+        },
+        
       ],
     }
   ]
@@ -289,8 +326,32 @@ function printXML(){
   // 获取 Blockly 的 XML 数据
   var workspaceXML = Blockly.Xml.workspaceToDom(workspace);
   var xmlText = Blockly.Xml.domToText(workspaceXML);
-  console.log(workspaceXML)
+  // console.log(workspaceXML)
   console.log(xmlText)
+  copyToClipboard(xmlText);
+}
+
+function copyToClipboard(text) {
+  // 创建一个新的文本区域
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+
+  // 将文本区域添加到DOM中
+  document.body.appendChild(textArea);
+
+  // 创建一个选区以选中文本
+  const range = document.createRange();
+  range.selectNode(textArea);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  // 将文本复制到剪贴板
+  document.execCommand('copy');
+
+  // 清除选区和删除文本区域
+  selection.removeAllRanges();
+  document.body.removeChild(textArea);
 }
 
 const button1 = document.querySelector('#myButton1');
@@ -303,7 +364,7 @@ const button3 = document.querySelector('#myButton3');
 button3.addEventListener('click', printXML);
 
 
-var defaultXml ='<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="!b0wCO8_z;3f+/d8mt:6">points</variable><variable id="d2`N#|X4xQD6^a^2}*[~">i</variable><variable id="k4mD0rM%0/VP0mvAishO">t</variable></variables><block type="variables_set" id="n:0QDq{a{VKYHLaj,Dz9" x="25" y="75"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field><value name="VALUE"><block type="empty_array" id="W9Y[:xxot#U3LT3^7RqY"></block></value><next><block type="controls_for" id="?./z^7*[+Q_)^/2*:GU;"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field><value name="FROM"><shadow type="math_number" id="4lFI*S8KJ@RAh*4q1H)-"><field name="NUM">-50</field></shadow></value><value name="TO"><shadow type="math_number" id="c-~eR1R7K$Tf~Jt0v:iy"><field name="NUM">50</field></shadow></value><value name="BY"><shadow type="math_number" id="]/gLVyLi%]$WT`NXn2NL"><field name="NUM">1</field></shadow></value><statement name="DO"><block type="variables_set" id="~~kgRpmgyI5Bwjj)8px7"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field><value name="VALUE"><block type="math_arithmetic" id="s:^]KWj/kBRW6nPUO+V;"><field name="OP">MULTIPLY</field><value name="A"><shadow type="math_number" id="JkWe%.71T;3Dk]uX@*Bf"><field name="NUM">1</field></shadow><block type="variables_get" id="#67keagctg][Mv${wpSB"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field></block></value><value name="B"><shadow type="math_number" id="$U{.%pg7/*6e6Ik?98?m"><field name="NUM">18</field></shadow></value></block></value><next><block type="array_push" id="6F#I1~pp;Ub*~YH`02oU"><value name="ARRAY"><block type="variables_get" id="YbN/;jHjf=T}wE!CKLxa"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field></block></value><value name="VALUE"><block type="vector3" id="O8C`_{@x~,Y^mt0pPSPP"><value name="x"><shadow type="math_number" id="MEicS6UIE`zo0Bu^qWeH"><field name="NUM">0</field></shadow><block type="math_trig" id="=OQ^lT{O.z:}q(Y-10TM"><field name="OP">COS</field><value name="NUM"><shadow type="math_number" id="65gH=m|!TES1np)gRp?q"><field name="NUM">45</field></shadow><block type="variables_get" id="M~co7p,RKA?;#iMxu~;Z"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value></block></value><value name="y"><shadow type="math_number" id="*01fDk%43IF$*rm*SURL"><field name="NUM">0</field></shadow><block type="math_arithmetic" id="2.=:`bMzR^};Jo7pTox("><field name="OP">DIVIDE</field><value name="A"><shadow type="math_number" id="A%dXPT8//BKdaWf)i02h"><field name="NUM">1</field></shadow><block type="variables_get" id="2t|]KlM#Y:~}[6}re(6+"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field></block></value><value name="B"><shadow type="math_number" id="Cm|d#4bh(=(6cl:u3Ok|"><field name="NUM">20</field></shadow></value></block></value><value name="z"><shadow type="math_number" id="1Q7}k,^Hy}LZ17LViu17"><field name="NUM">0</field></shadow><block type="math_trig" id="-1YRPIJilQUamYJQsXCw"><field name="OP">SIN</field><value name="NUM"><shadow type="math_number" id="65gH=m|!TES1np)gRp?q"><field name="NUM">45</field></shadow><block type="variables_get" id="ma+Q(#89c-/YTCAUHn;2"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value></block></value></block></value></block></next></block></statement><next><block type="create_line" id="8_pcs)O1l%,:nUM$oa)U"><value name="points"><block type="variables_get" id="bZ(H5AWyevf;e-nOt:+Y"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field></block></value><value name="colour"><block type="colour_picker" id="Pz^L)11!1HwY$/M/LC0~"><field name="COLOUR">#ff0000</field></block></value></block></next></block></next></block></xml>'
+var defaultXml ='<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="!b0wCO8_z;3f+/d8mt:6">points</variable><variable id="d2`N#|X4xQD6^a^2}*[~">i</variable><variable id="k4mD0rM%0/VP0mvAishO">t</variable></variables><block type="variables_set" id="n:0QDq{a{VKYHLaj,Dz9" x="25" y="75"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field><value name="VALUE"><block type="empty_array" id="W9Y[:xxot#U3LT3^7RqY"></block></value><next><block type="controls_for" id="?./z^7*[+Q_)^/2*:GU;"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field><value name="FROM"><shadow type="math_number" id="4lFI*S8KJ@RAh*4q1H)-"><field name="NUM">-50</field></shadow></value><value name="TO"><shadow type="math_number" id="c-~eR1R7K$Tf~Jt0v:iy"><field name="NUM">50</field></shadow></value><value name="BY"><shadow type="math_number" id="]/gLVyLi%]$WT`NXn2NL"><field name="NUM">1</field></shadow></value><statement name="DO"><block type="variables_set" id="~~kgRpmgyI5Bwjj)8px7"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field><value name="VALUE"><block type="math_arithmetic" id="s:^]KWj/kBRW6nPUO+V;"><field name="OP">MULTIPLY</field><value name="A"><shadow type="math_number" id="JkWe%.71T;3Dk]uX@*Bf"><field name="NUM">1</field></shadow><block type="variables_get" id="#67keagctg][Mv${wpSB"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field></block></value><value name="B"><shadow type="math_number" id="$U{.%pg7/*6e6Ik?98?m"><field name="NUM">18</field></shadow></value></block></value><next><block type="array_push" id="6F#I1~pp;Ub*~YH`02oU"><value name="ARRAY"><block type="variables_get" id="YbN/;jHjf=T}wE!CKLxa"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field></block></value><value name="VALUE"><block type="vector3" id="O8C`_{@x~,Y^mt0pPSPP"><value name="x"><shadow type="math_number" id="MEicS6UIE`zo0Bu^qWeH"><field name="NUM">0</field></shadow><block type="math_trig" id="=OQ^lT{O.z:}q(Y-10TM"><field name="OP">COS</field><value name="NUM"><shadow type="math_number" id="65gH=m|!TES1np)gRp?q"><field name="NUM">45</field></shadow><block type="variables_get" id="M~co7p,RKA?;#iMxu~;Z"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value></block></value><value name="y"><shadow type="math_number" id="*01fDk%43IF$*rm*SURL"><field name="NUM">0</field></shadow><block type="math_arithmetic" id="2.=:`bMzR^};Jo7pTox("><field name="OP">DIVIDE</field><value name="A"><shadow type="math_number" id="A%dXPT8//BKdaWf)i02h"><field name="NUM">1</field></shadow><block type="variables_get" id="2t|]KlM#Y:~}[6}re(6+"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field></block></value><value name="B"><shadow type="math_number" id="Cm|d#4bh(=(6cl:u3Ok|"><field name="NUM">20</field></shadow></value></block></value><value name="z"><shadow type="math_number" id="1Q7}k,^Hy}LZ17LViu17"><field name="NUM">0</field></shadow><block type="math_trig" id="-1YRPIJilQUamYJQsXCw"><field name="OP">SIN</field><value name="NUM"><shadow type="math_number" id="65gH=m|!TES1np)gRp?q"><field name="NUM">45</field></shadow><block type="variables_get" id="ma+Q(#89c-/YTCAUHn;2"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value></block></value></block></value></block></next></block></statement><next><block type="create_line" id="8_pcs)O1l%,:nUM$oa)U"><value name="points"><block type="variables_get" id="bZ(H5AWyevf;e-nOt:+Y"><field name="VAR" id="!b0wCO8_z;3f+/d8mt:6">points</field></block></value><value name="colour"><block type="colour_picker" id="Pz^L)11!1HwY$/M/LC0~"><field name="COLOUR">#ff0000</field></block></value><next><block type="variables_set" id="5;7LWN[gZ#93G[texFN~"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field><value name="VALUE"><block type="math_number" id="uzlw1Z6?]rx}YHe{Q!U_"><field name="NUM">0</field></block></value><next><block type="setinterval" id="5viUJIpt{L)p.U=_6i3H"><statement name="code"><block type="math_change" id="#v:H.Pxe+}xL%Jg=ZF$R"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field><value name="DELTA"><shadow type="math_number" id=";[]w,w^XH]0?V;|O?#mv"><field name="NUM">1</field></shadow></value><next><block type="variables_set" id=".JBV4Ei`v[P#O_{mFcWy"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field><value name="VALUE"><block type="remainder" id="1l3`Me:jJ9j!T/L1Z^`9"><value name="a"><block type="math_round" id="7aUx=zoGg8wOS|A93o:W"><field name="OP">ROUNDDOWN</field><value name="NUM"><shadow type="math_number" id="do[*mB%C`rj6]Sk)8S?E"><field name="NUM">3.1</field></shadow><block type="math_arithmetic" id="Lu-iSoIdpWYRklsT}pm6"><field name="OP">DIVIDE</field><value name="A"><shadow type="math_number" id="[~HWszPK6lHV#ulP^eYK"><field name="NUM">1</field></shadow><block type="variables_get" id="UoH1||H/9Jwee@.`Yy0B"><field name="VAR" id="d2`N#|X4xQD6^a^2}*[~">i</field></block></value><value name="B"><shadow type="math_number" id="[yxsa3F@8S#In+UEmU26"><field name="NUM">100</field></shadow></value></block></value></block></value><value name="b"><block type="math_number" id="ri)F%~xOj1FE)W[]?),3"><field name="NUM">4</field></block></value></block></value><next><block type="controls_if" id="%[Ho,l)7)CNE?acdNZu="><value name="IF0"><block type="logic_compare" id="qMDgN9ooP+KpUj,fH+EM"><field name="OP">EQ</field><value name="A"><block type="variables_get" id="YXRO.yr;flKF]2Y}J#@d"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value><value name="B"><block type="math_number" id="`{cSV_?%r9Dm3Q-$Vm.+"><field name="NUM">0</field></block></value></block></value><statement name="DO0"><block type="change_three_obj" id="fcQy!`mG$offd|u*9`31"><field name="transform">position</field><field name="axis">z</field><value name="three_obj"><block type="voxel_char" id="2fCW%+9oUv+`Hb1d(Y_r"></block></value><value name="variation"><shadow type="math_number" id="dOQqy?3z1:cb~wa2,aH{"><field name="NUM">-0.1</field></shadow></value></block></statement><next><block type="controls_if" id="cZ2Il}F^I2sxxh/RKj=K"><value name="IF0"><block type="logic_compare" id="ZU)*]}#5;nkK(L2)Nl+~"><field name="OP">EQ</field><value name="A"><block type="variables_get" id="e_;DYI:DXNDg[o}Le=_|"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value><value name="B"><block type="math_number" id="OADOE6O(=Rzh+;IV2Q8d"><field name="NUM">1</field></block></value></block></value><statement name="DO0"><block type="change_three_obj" id="4voe|aqu}a:^;VSKKx12"><field name="transform">rotation</field><field name="axis">y</field><value name="three_obj"><block type="voxel_char" id="oL;s[.y1%)#uiMyrB~0O"></block></value><value name="variation"><shadow type="math_number" id="9**Z^ozpPU|/-9Lu?!@_"><field name="NUM">0.01</field></shadow><block type="math_arithmetic" id=")xRMC$}2)kj!*N!rYTN`"><field name="OP">DIVIDE</field><value name="A"><shadow type="math_number" id="MS%qK0TZ!z6qwWgQ{=1g"><field name="NUM">1</field></shadow><block type="math_constant" id="QpHkAHlw+d?_-bwt(.Dt"><field name="CONSTANT">PI</field></block></value><value name="B"><shadow type="math_number" id="]I=^OQ|rSJ-{D**Tq=-4"><field name="NUM">100</field></shadow></value></block></value></block></statement><next><block type="controls_if" id="J`m3hR(ks}hAkAHAnAu/"><value name="IF0"><block type="logic_compare" id="?`:TBLS~$#|p/7QjoTO$"><field name="OP">EQ</field><value name="A"><block type="variables_get" id="$A*k7Nu?G}7zrd)F6Lh$"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value><value name="B"><block type="math_number" id="PD89!Z5IZ1G+_rY]-j},"><field name="NUM">2</field></block></value></block></value><statement name="DO0"><block type="change_three_obj" id="VvA_Ihv:h_^Ry6,+Ori;"><field name="transform">position</field><field name="axis">z</field><value name="three_obj"><block type="voxel_char" id="fI.`B?VXQbh+.~0ms)YP"></block></value><value name="variation"><shadow type="math_number" id="{=dF6-!9b%K4ND3@fER2"><field name="NUM">0.1</field></shadow></value></block></statement><next><block type="controls_if" id="*e,U9hh4dGc=EULM?1Jt"><value name="IF0"><block type="logic_compare" id="j#KtKRZjdd-/u7`eqiV}"><field name="OP">EQ</field><value name="A"><block type="variables_get" id="SNcKE**c8SiMRrWNA_M!"><field name="VAR" id="k4mD0rM%0/VP0mvAishO">t</field></block></value><value name="B"><block type="math_number" id="Q$BiKF*CC=`/dgKRv,jo"><field name="NUM">3</field></block></value></block></value><statement name="DO0"><block type="change_three_obj" id="y-dHNA;fMN`wEM4;=8N?"><field name="transform">rotation</field><field name="axis">y</field><value name="three_obj"><block type="voxel_char" id="YLYxbIJ$`s[cnx_24!Pe"></block></value><value name="variation"><shadow type="math_number" id="$5$5m=g9VhbP@^!+4kzB"><field name="NUM">0.01</field></shadow><block type="math_arithmetic" id="dd+Zj@P|:-XpnpA(-pTh"><field name="OP">DIVIDE</field><value name="A"><shadow type="math_number" id="MS%qK0TZ!z6qwWgQ{=1g"><field name="NUM">1</field></shadow><block type="math_constant" id=")U$sy1[I~lLfAs~lSZd1"><field name="CONSTANT">PI</field></block></value><value name="B"><shadow type="math_number" id="[WkWy9X4:JEBHoo]1Hk0"><field name="NUM">100</field></shadow></value></block></value></block></statement></block></next></block></next></block></next></block></next></block></next></block></statement><value name="time_interval"><shadow type="math_number" id="AY4$zsd%=o~/fK|Sy[lV"><field name="NUM">10</field></shadow></value></block></next></block></next></block></next></block></next></block></xml>'
 var parser = new DOMParser();
 var xmlDoc = parser.parseFromString(defaultXml, "text/xml");
 Blockly.Xml.domToWorkspace(xmlDoc.documentElement,workspace);
@@ -321,4 +382,9 @@ function clearLines() {
 }
 clearLines()
 runJsCode()
+
+console.log(anima,anima.rotation.y)
+
+
+
 </script>
