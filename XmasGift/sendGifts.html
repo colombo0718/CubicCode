@@ -154,11 +154,15 @@
     function gameProcess(){
         let score=0
         let fighter=voxelAnimas["runDeer"][0]
+        let ground=voxelAnimas["snowGnd"][0]
         // let bullets=voxelAnimas["bullet"]
         // let energy =voxelAnimas["energy"]
         // let rock1  =voxelAnimas["rock1"]
         // let bulletIndex = 0
         fighter.position.set(-20,10,0)
+        fighter.position.set(0,10,10)
+        ground.position.set(0,.00,0)
+        ground.scale.set(5,1,5)
         // for (let i = 0; i < energy.length; i++) {
         //     energy[i].position.set((Math.random() * 20) - 10, 1, -30 - i * 30);
         //     energy[i].angularVelocity = new THREE.Vector3().random();
