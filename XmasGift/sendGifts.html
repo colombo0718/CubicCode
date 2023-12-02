@@ -154,15 +154,19 @@
     function gameProcess(){
         let score=0
         let fighter=voxelAnimas["runDeer"][0]
-        let ground=voxelAnimas["snowGnd"][0]
+        let ground=voxelAnimas["snowGnd"]
         // let bullets=voxelAnimas["bullet"]
         // let energy =voxelAnimas["energy"]
         // let rock1  =voxelAnimas["rock1"]
         // let bulletIndex = 0
         fighter.position.set(-20,10,0)
-        fighter.position.set(0,10,10)
-        ground.position.set(0,.00,0)
-        ground.scale.set(5,1,5)
+        // fighter.position.set(0,10,10)
+        ground[0].position.set(-40,0,0)
+        ground[1].position.set(-20,0,0)
+        ground[2].position.set(  0,0,0)
+        ground[3].position.set( 20,0,0)
+        ground[4].position.set( 40,0,0)
+        // ground.scale.set(5,1,5)
         // for (let i = 0; i < energy.length; i++) {
         //     energy[i].position.set((Math.random() * 20) - 10, 1, -30 - i * 30);
         //     energy[i].angularVelocity = new THREE.Vector3().random();
@@ -181,15 +185,18 @@
             // console.log(keys)
             // 戰機移動+轉動
             fighter.rotation.z = 0
-            if((keys['w']||keys['arrowup']) && fighter.position.y<15) {
+            if((keys['w']||keys['arrowup']) && fighter.position.y<=15) {
                 fighter.position.y += .2;
                 fighter.rotation.z = Math.PI/8
             }
-            if((keys['s']||keys['arrowdown']) && fighter.position.y>0) {
-                fighter.position.y -= .2;
-                fighter.rotation.z = -Math.PI/8
+            if((keys['w']||keys['arrowup'])) {
+                fighter.rotation.z = Math.PI/8
             }
-
+            if(fighter.position.y>0) {
+                fighter.position.y -= .1;
+                // fighter.rotation.z = -Math.PI/8
+            }
+            
             // 子彈發射飛行
             // if(keys[' '] && fastIndex %10==1) {
             //     bullets[bulletIndex%100].position.copy(fighter.position)
