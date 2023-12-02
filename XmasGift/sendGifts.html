@@ -1,4 +1,4 @@
-<div id="canvas" style="width: 800px;height: 600px;"></div>
+<div id="canvas" style="width: 1600px;height: 800px;"></div>
 <button id="startButton">開始</button>
 <input type="file" id="fileInput" accept=".vox" />
 <h3>A:向左 / D:向右 / Space:發射</h3>
@@ -51,10 +51,10 @@
     }
 
     const voxelSettings = [
-        { name: "fighter", opacity: 1,  amount: 1   ,radius:10},
-        { name: "bullet",  opacity: 1,  amount: 100 ,radius:2 },
-        { name: "energy",  opacity: .8, amount: 4   ,radius:5 },
-        { name: "rock1",   opacity: 1,  amount: 4   ,radius:5 },
+        { name: "runDeer", opacity: 1,  amount: 1   ,radius:10},
+        // { name: "bullet",  opacity: 1,  amount: 100 ,radius:2 },
+        // { name: "energy",  opacity: .8, amount: 4   ,radius:5 },
+        // { name: "rock1",   opacity: 1,  amount: 4   ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -196,12 +196,12 @@
             }
 
             // 地板移動
-            for(let i=0;i<4;i++){
-                grids[i].position.z+=.3
-                if(grids[i].position.z>100){
-                    grids[i].position.z=-200
-                }
-            }
+            // for(let i=0;i<4;i++){
+            //     grids[i].position.z+=.3
+            //     if(grids[i].position.z>100){
+            //         grids[i].position.z=-200
+            //     }
+            // }
 
             // 檢測得分
             for(let i=0;i<energy.length;i++){
