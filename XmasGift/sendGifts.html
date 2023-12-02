@@ -26,7 +26,7 @@
     // 設置相機
     camera.position.y = 10/Math.sqrt(2);
     camera.position.z = 30/Math.sqrt(2);
-    camera.rotation.x=-Math.PI/8
+    camera.rotation.x=-Math.PI/16
 
     // 添加燈光
     var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
@@ -54,7 +54,7 @@
         { name: "runDeer", opacity: 1,  amount: 1   ,radius:10},
         // { name: "bullet",  opacity: 1,  amount: 100 ,radius:2 },
         // { name: "energy",  opacity: .8, amount: 4   ,radius:5 },
-        { name: "snowGnd",   opacity: 1,  amount: 4   ,radius:5 },
+        { name: "snowGnd",   opacity: 1,  amount: 5   ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
