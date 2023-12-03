@@ -38,7 +38,7 @@
     scene.add(directionalLight);
 
     // 添加網格
-    var grids=[]
+    var grids=[]   
     var gridSize = 100; // 網格大小
     var gridDivisions = 10; // 網格分段數
     var gridColor1 = 0x00ff00;
@@ -185,14 +185,14 @@
             // console.log(keys)
             // 戰機移動+轉動
             fighter.rotation.z = 0
-            if((keys['w']||keys['arrowup']) && fighter.position.y<=15) {
+            if((keys[' ']||keys['arrowup']) && fighter.position.y<=15) {
                 fighter.position.y += .2;
                 fighter.rotation.z = Math.PI/8
             }
-            if((keys['w']||keys['arrowup'])) {
+            else if((keys[' ']||keys['arrowup'])) {
                 fighter.rotation.z = Math.PI/8
             }
-            if(fighter.position.y>0) {
+            else if(fighter.position.y>0) {
                 fighter.position.y -= .1;
                 // fighter.rotation.z = -Math.PI/8
             }

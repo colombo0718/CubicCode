@@ -24,9 +24,9 @@
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
-    camera.position.y = 18/Math.sqrt(2);
-    camera.position.z = 18/Math.sqrt(2);
-    camera.rotation.x=-Math.PI/4
+    camera.position.y = 10/Math.sqrt(2);
+    camera.position.z = 30/Math.sqrt(2);
+    camera.rotation.x=-Math.PI/16
 
     // 添加燈光
     var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
@@ -38,7 +38,7 @@
     scene.add(directionalLight);
 
     // 添加網格
-    var grids=[]
+    var grids=[]   
     var gridSize = 100; // 網格大小
     var gridDivisions = 10; // 網格分段數
     var gridColor1 = 0x00ff00;
@@ -54,7 +54,7 @@
         { name: "runDeer", opacity: 1,  amount: 1   ,radius:10},
         // { name: "bullet",  opacity: 1,  amount: 100 ,radius:2 },
         // { name: "energy",  opacity: .8, amount: 4   ,radius:5 },
-        // { name: "rock1",   opacity: 1,  amount: 4   ,radius:5 },
+        { name: "snowGnd",   opacity: 1,  amount: 5   ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -82,7 +82,7 @@
 
         const loader = new VOXLoader();
         for (const voxelSet of voxelSettings) {
-            loader.load('https://cubiccode.vercel.app/vox/'+voxelSet.name+'.vox',
+            loader.load('https://cubiccode.vercel.app/Xmas/'+voxelSet.name+'.vox',
             function (chunks){
                 const models=createModelArray(chunks,voxelSet.opacity,voxelSet.amount,voxelSet.radius)
                 voxelAnimas[voxelSet.name] = models;
@@ -153,23 +153,31 @@
     var startLoop=function(){}
     function gameProcess(){
         let score=0
-        let fighter=voxelAnimas["fighter"][0]
-        let bullets=voxelAnimas["bullet"]
-        let energy =voxelAnimas["energy"]
-        let rock1  =voxelAnimas["rock1"]
-        let bulletIndex = 0
-        fighter.position.set(0,1,10)
-        for (let i = 0; i < energy.length; i++) {
-            energy[i].position.set((Math.random() * 20) - 10, 1, -30 - i * 30);
-            energy[i].angularVelocity = new THREE.Vector3().random();
-        }
-        for (let i = 0; i < rock1.length; i++) {
-            rock1[i].position.set((Math.random() * 20) - 10, 1, -15 - i * 30);
-            rock1[i].angularVelocity = new THREE.Vector3().random();
-        }
-        for(let i=0;i<bullets.length;i++){
-            bullets[i].position.z=-300
-        }   
+        let fighter=voxelAnimas["runDeer"][0]
+        let ground=voxelAnimas["snowGnd"]
+        // let bullets=voxelAnimas["bullet"]
+        // let energy =voxelAnimas["energy"]
+        // let rock1  =voxelAnimas["rock1"]
+        // let bulletIndex = 0
+        fighter.position.set(-20,10,0)
+        // fighter.position.set(0,10,10)
+        ground[0].position.set(-40,0,0)
+        ground[1].position.set(-20,0,0)
+        ground[2].position.set(  0,0,0)
+        ground[3].position.set( 20,0,0)
+        ground[4].position.set( 40,0,0)
+        // ground.scale.set(5,1,5)
+        // for (let i = 0; i < energy.length; i++) {
+        //     energy[i].position.set((Math.random() * 20) - 10, 1, -30 - i * 30);
+        //     energy[i].angularVelocity = new THREE.Vector3().random();
+        // }
+        // for (let i = 0; i < rock1.length; i++) {
+        //     rock1[i].position.set((Math.random() * 20) - 10, 1, -15 - i * 30);
+        //     rock1[i].angularVelocity = new THREE.Vector3().random();
+        // }
+        // for(let i=0;i<bullets.length;i++){
+        //     bullets[i].position.z=-300
+        // }   
         
         function startLoop(){
         intervalID=
@@ -177,23 +185,26 @@
             // console.log(keys)
             // 戰機移動+轉動
             fighter.rotation.z = 0
-            if((keys['a']||keys['arrowleft']) && fighter.position.x>-10) {
-                fighter.position.x -= .2;
+            if((keys[' ']||keys['arrowup']) && fighter.position.y<=15) {
+                fighter.position.y += .2;
                 fighter.rotation.z = Math.PI/8
             }
-            if((keys['d']||keys['arrowright']) && fighter.position.x<10) {
-                fighter.position.x += .2;
-                fighter.rotation.z = -Math.PI/8
+            else if((keys[' ']||keys['arrowup'])) {
+                fighter.rotation.z = Math.PI/8
             }
-
+            else if(fighter.position.y>0) {
+                fighter.position.y -= .1;
+                // fighter.rotation.z = -Math.PI/8
+            }
+            
             // 子彈發射飛行
-            if(keys[' '] && fastIndex %10==1) {
-                bullets[bulletIndex%100].position.copy(fighter.position)
-                bulletIndex+=1
-            }
-            for(let i=0;i<bullets.length;i++){
-                bullets[i].position.z-=.5
-            }
+            // if(keys[' '] && fastIndex %10==1) {
+            //     bullets[bulletIndex%100].position.copy(fighter.position)
+            //     bulletIndex+=1
+            // }
+            // for(let i=0;i<bullets.length;i++){
+            //     bullets[i].position.z-=.5
+            // }
 
             // 地板移動
             // for(let i=0;i<4;i++){
@@ -204,38 +215,38 @@
             // }
 
             // 檢測得分
-            for(let i=0;i<energy.length;i++){
-                const distance = energy[i].position.distanceTo(fighter.position);
-                const touch=distance <= energy[i].radius + fighter.radius
-                if(touch && energy[i].visible){
-                    score+=1
-                    console.log("Score:"+score)
-                    energy[i].visible=false
-                }
-            }
+            // for(let i=0;i<energy.length;i++){
+            //     const distance = energy[i].position.distanceTo(fighter.position);
+            //     const touch=distance <= energy[i].radius + fighter.radius
+            //     if(touch && energy[i].visible){
+            //         score+=1
+            //         console.log("Score:"+score)
+            //         energy[i].visible=false
+            //     }
+            // }
 
             // 能量石旋轉
-            for(let i=0;i<energy.length;i++){
-                energy[i].rotation.x += energy[i].angularVelocity.x/10 ;
-                energy[i].rotation.y += energy[i].angularVelocity.y/10 ;
-                energy[i].rotation.z += energy[i].angularVelocity.z/10 ;
-                energy[i].position.z+=.3
-                if(energy[i].position.z>20){
-                    energy[i].position.set((Math.random() * 20) - 10,0,-100)
-                    energy[i].visible=true
-                }
-            }
+            // for(let i=0;i<energy.length;i++){
+            //     energy[i].rotation.x += energy[i].angularVelocity.x/10 ;
+            //     energy[i].rotation.y += energy[i].angularVelocity.y/10 ;
+            //     energy[i].rotation.z += energy[i].angularVelocity.z/10 ;
+            //     energy[i].position.z+=.3
+            //     if(energy[i].position.z>20){
+            //         energy[i].position.set((Math.random() * 20) - 10,0,-100)
+            //         energy[i].visible=true
+            //     }
+            // }
 
             // 隕石旋轉
-            for(let i=0;i<rock1.length;i++){
-                rock1[i].rotation.x += rock1[i].angularVelocity.x/10 ;
-                rock1[i].rotation.y += rock1[i].angularVelocity.y/10 ;
-                rock1[i].rotation.z += rock1[i].angularVelocity.z/10 ;
-                rock1[i].position.z+=.3
-                if(rock1[i].position.z>20){
-                    rock1[i].position.set((Math.random() * 20) - 10,0,-100)
-                }
-            }
+            // for(let i=0;i<rock1.length;i++){
+            //     rock1[i].rotation.x += rock1[i].angularVelocity.x/10 ;
+            //     rock1[i].rotation.y += rock1[i].angularVelocity.y/10 ;
+            //     rock1[i].rotation.z += rock1[i].angularVelocity.z/10 ;
+            //     rock1[i].position.z+=.3
+            //     if(rock1[i].position.z>20){
+            //         rock1[i].position.set((Math.random() * 20) - 10,0,-100)
+            //     }
+            // }
         },10)
         }startLoop()
     }
