@@ -185,11 +185,11 @@
             // console.log(keys)
             // 戰機移動+轉動
             fighter.rotation.z = 0
-            if((keys[' ']||keys['arrowup']) && fighter.position.y<=15) {
+            if((keys['w']||keys['arrowup']) && fighter.position.y<=15) {
                 fighter.position.y += .2;
                 fighter.rotation.z = Math.PI/8
             }
-            else if((keys[' ']||keys['arrowup'])) {
+            else if((keys['w']||keys['arrowup'])) {
                 fighter.rotation.z = Math.PI/8
             }
             else if(fighter.position.y>0) {
