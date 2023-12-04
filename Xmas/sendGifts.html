@@ -53,7 +53,7 @@
     const voxelSettings = [
         { name: "runDeer", opacity: 1,  amount: 1   ,radius:10},
         { name: "gift1",  opacity: 1,  amount: 1 ,radius:2 },
-        // { name: "energy",  opacity: .8, amount: 4   ,radius:5 },
+        { name: "house",  opacity: .8, amount: 1   ,radius:5 },
         { name: "snowGnd",   opacity: 1,  amount: 5   ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
@@ -155,9 +155,10 @@
         let score=0
         let runDeer=voxelAnimas["runDeer"][0]
         let ground=voxelAnimas["snowGnd"]
+        let house=voxelAnimas["house"][0]
         let gift1=voxelAnimas["gift1"][0]
         let Ay=-.01
-        gift1.Vy=0 
+        gift1.Vy=.1
         // let bullets=voxelAnimas["bullet"]
         // let energy =voxelAnimas["energy"]
         // let rock1  =voxelAnimas["rock1"]
@@ -211,7 +212,7 @@
                 gift1.position.copy(Santa.position);
             }
             if (gift1.parent === scene) {
-                gift1.position.x+=.5
+                gift1.position.x+=.3
                 gift1.position.y+= gift1.Vy
                 gift1.Vy+=Ay
             }
@@ -219,7 +220,7 @@
                 gift1.position.set(0,0,0)
                 scene.remove(gift1)
                 Santa.add(gift1)
-                gift1.Vy=0
+                gift1.Vy=.1
             }
 
             
