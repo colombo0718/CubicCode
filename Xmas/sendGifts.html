@@ -56,6 +56,7 @@
         { name: "house",  opacity: 1, amount: 1   ,radius:5 },
         { name: "snowGnd",   opacity: 1,  amount: 5   ,radius:5 },
         { name: "building",   opacity: 1,  amount:1   ,radius:5 }
+        { name: "helicopter",   opacity: 1,  amount:1   ,radius:5 }
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -134,7 +135,7 @@
     setInterval(function() {
         fastIndex+=1
         renderer.render(scene, camera);
-    },50)
+    },30)
 
     let keys = {};
     document.addEventListener('keydown', function(event) {
@@ -159,6 +160,7 @@
         let house=voxelAnimas["house"][0]
         let gift1=voxelAnimas["gift1"][0]
         let building=voxelAnimas["building"][0]
+        let helicopter=voxelAnimas["helicopter"][0]
         let Ay=-.01
         gift1.Vy=.1
         // let bullets=voxelAnimas["bullet"]
@@ -234,6 +236,8 @@
             if(house.position.x<-50){house.position.x=50}
             building.position.x-=.2
             if(building.position.x<-50){building.position.x=50}
+            helicopter.position.x-=.2
+            if(helicopter.position.x<-50){helicopter.position.x=50}
             // 子彈發射飛行
             // if(keys[' '] && fastIndex %10==1) {
             //     bullets[bulletIndex%100].position.copy(fighter.position)
