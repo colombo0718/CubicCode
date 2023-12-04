@@ -55,6 +55,7 @@
         { name: "gift1",  opacity: 1,  amount: 1 ,radius:2 },
         { name: "house",  opacity: 1, amount: 1   ,radius:5 },
         { name: "snowGnd",   opacity: 1,  amount: 5   ,radius:5 },
+        { name: "building",   opacity: 1,  amount: 5   ,radius:5 }
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -157,6 +158,7 @@
         let ground=voxelAnimas["snowGnd"]
         let house=voxelAnimas["house"][0]
         let gift1=voxelAnimas["gift1"][0]
+        let building=voxelAnimas["building"][0]
         let Ay=-.01
         gift1.Vy=.1
         // let bullets=voxelAnimas["bullet"]
@@ -167,6 +169,7 @@
         Santa.add(runDeer)
         Santa.add(gift1)
         Santa.position.set(-20,10,0)
+        building.position.set(0,0,0)
         scene.add(Santa)
         // fighter.position.set(0,10,10)
         ground[0].position.set(-40,0,0)
@@ -217,15 +220,18 @@
                 gift1.position.x+=.3
                 gift1.position.y+= gift1.Vy
                 gift1.Vy+=Ay
+                gift1.rotation.z+=.1
             }
             if (gift1.position.y<-1){
                 gift1.position.set(0,0,0)
                 scene.remove(gift1)
                 Santa.add(gift1)
                 gift1.Vy=.1
+                gift1.rotation.z=0
             }
 
-            
+            house.position.x-=.2
+            if(house.position.x<-50){house.position.x=50}
             // 子彈發射飛行
             // if(keys[' '] && fastIndex %10==1) {
             //     bullets[bulletIndex%100].position.copy(fighter.position)
