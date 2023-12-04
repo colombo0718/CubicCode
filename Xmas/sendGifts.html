@@ -18,14 +18,18 @@
     var fileInput = document.getElementById('fileInput');
     var canvas = document.getElementById('canvas');
     var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    var camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
-    camera.position.y = 10/Math.sqrt(2);
-    camera.position.z = 30/Math.sqrt(2);
+    camera.position.y = 15/Math.sqrt(2);
+    camera.position.z = 45/Math.sqrt(2);
     camera.rotation.x=-Math.PI/16
 
     // 添加燈光
@@ -33,22 +37,32 @@
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
-    directionalLight.position.set(0, 1, 0);
+    directionalLight.position.set(1, 20, -6);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
+
+    directionalLight.shadow.camera.left = -50;
+    directionalLight.shadow.camera.right = 50;
+    directionalLight.shadow.camera.top = 50;
+    directionalLight.shadow.camera.bottom = -50;
+    directionalLight.shadow.camera.near = 1;
+    directionalLight.shadow.camera.far = 200;
+    console.log(directionalLight)
 
     // 添加網格
-    // var grids=[]   
-    // var gridSize = 100; // 網格大小
-    // var gridDivisions = 10; // 網格分段數
-    // var gridColor1 = 0x00ff00;
-    // var gridColor2 = 0x009900;
-    // for (var i = -200; i <= 100; i += 100) {
-    //     var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
-    //     grid.position.set(0, 0, i);
-    //     scene.add(grid);
-    //     grids.push(grid);
-    // }
+    var grids=[]   
+    var gridSize = 100; // 網格大小
+    var gridDivisions = 10; // 網格分段數
+    var gridColor1 = 0x00ff00;
+    var gridColor2 = 0x009900;
+    for (var i = -200; i <= 100; i += 100) {
+        var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
+        grid.position.set(0, 0, i);
+        scene.add(grid);
+        grids.push(grid);
+    }
 
     const voxelSettings = [
         { name: "runDeer", opacity: 1,  amount: 1   ,radius:10},
@@ -70,9 +84,12 @@
                     const chunk = chunks[j];
                     const mesh = new VOXMesh(chunk);
                     mesh.scale.setScalar(0.1);
-                    mesh.material.transparent = true;
+                    // mesh.material.transparent = true;
                     // mesh.material.emissive.set(0x008888);
-                    mesh.material.opacity = opacity;
+                    // mesh.material.opacity = opacity;
+                    mesh.receiveShadow = true
+                    mesh.castShadow = true;
+                    // mesh.clipShadows = true;
                     voxelObject.add(mesh);
                 }
                 voxelObject.radius=raduis/10
@@ -176,12 +193,13 @@
         // fighter.position.set(0,10,10)
         ground[0].position.set(-40,0,0)
         ground[1].position.set(-20,0,0)
-        ground[2].position.set(  0,0,0)
+        ground[2].position.set( 0,0,0)
         ground[3].position.set( 20,0,0)
         ground[4].position.set( 40,0,0)
+        console.log(ground)
 
         house.position.set(0,0,0)
-        helicopter.position.set(0,15,0)
+        helicopter.position.set(-20,15,0)
         // console.log(Santa.add(gift1))
         // ground.scale.set(5,1,5)
         // for (let i = 0; i < energy.length; i++) {
@@ -239,56 +257,7 @@
             if(building.position.x<-50){building.position.x=50}
             helicopter.position.x-=.2
             if(helicopter.position.x<-50){helicopter.position.x=50}
-            // 子彈發射飛行
-            // if(keys[' '] && fastIndex %10==1) {
-            //     bullets[bulletIndex%100].position.copy(fighter.position)
-            //     bulletIndex+=1
-            // }
-            // for(let i=0;i<bullets.length;i++){
-            //     bullets[i].position.z-=.5
-            // }
 
-            // 地板移動
-            // for(let i=0;i<4;i++){
-            //     grids[i].position.z+=.3
-            //     if(grids[i].position.z>100){
-            //         grids[i].position.z=-200
-            //     }
-            // }
-
-            // 檢測得分
-            // for(let i=0;i<energy.length;i++){
-            //     const distance = energy[i].position.distanceTo(fighter.position);
-            //     const touch=distance <= energy[i].radius + fighter.radius
-            //     if(touch && energy[i].visible){
-            //         score+=1
-            //         console.log("Score:"+score)
-            //         energy[i].visible=false
-            //     }
-            // }
-
-            // 能量石旋轉
-            // for(let i=0;i<energy.length;i++){
-            //     energy[i].rotation.x += energy[i].angularVelocity.x/10 ;
-            //     energy[i].rotation.y += energy[i].angularVelocity.y/10 ;
-            //     energy[i].rotation.z += energy[i].angularVelocity.z/10 ;
-            //     energy[i].position.z+=.3
-            //     if(energy[i].position.z>20){
-            //         energy[i].position.set((Math.random() * 20) - 10,0,-100)
-            //         energy[i].visible=true
-            //     }
-            // }
-
-            // 隕石旋轉
-            // for(let i=0;i<rock1.length;i++){
-            //     rock1[i].rotation.x += rock1[i].angularVelocity.x/10 ;
-            //     rock1[i].rotation.y += rock1[i].angularVelocity.y/10 ;
-            //     rock1[i].rotation.z += rock1[i].angularVelocity.z/10 ;
-            //     rock1[i].position.z+=.3
-            //     if(rock1[i].position.z>20){
-            //         rock1[i].position.set((Math.random() * 20) - 10,0,-100)
-            //     }
-            // }
         },10)
         }startLoop()
     }
