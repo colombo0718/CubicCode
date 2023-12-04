@@ -153,22 +153,27 @@
     var startLoop=function(){}
     function gameProcess(){
         let score=0
-        let fighter=voxelAnimas["runDeer"][0]
+        let runDeer=voxelAnimas["runDeer"][0]
         let ground=voxelAnimas["snowGnd"]
-        let gift1=voxelAnimas["snowGnd"][0]
+        let gift1=voxelAnimas["gift1"][0]
+        let Ay=-.01
+        gift1.Vy=0 
         // let bullets=voxelAnimas["bullet"]
         // let energy =voxelAnimas["energy"]
         // let rock1  =voxelAnimas["rock1"]
         // let bulletIndex = 0
-        fighter.position.set(-20,10,0)
-        gift1.position.set(0,10,0)
+        var Santa=new THREE.Object3D();
+        Santa.add(runDeer)
+        Santa.add(gift1)
+        Santa.position.set(-20,10,0)
+        scene.add(Santa)
         // fighter.position.set(0,10,10)
         ground[0].position.set(-40,0,0)
         ground[1].position.set(-20,0,0)
         ground[2].position.set(  0,0,0)
         ground[3].position.set( 20,0,0)
         ground[4].position.set( 40,0,0)
-        // fighter.add(gift1)
+        // console.log(Santa.add(gift1))
         // ground.scale.set(5,1,5)
         // for (let i = 0; i < energy.length; i++) {
         //     energy[i].position.set((Math.random() * 20) - 10, 1, -30 - i * 30);
@@ -187,18 +192,36 @@
         setInterval(function() {
             // console.log(keys)
             // 戰機移動+轉動
-            fighter.rotation.z = 0
-            if((keys['w']||keys['arrowup']) && fighter.position.y<=15) {
-                fighter.position.y += .2;
-                fighter.rotation.z = Math.PI/8
+            Santa.rotation.z = 0
+            if((keys['w']||keys['arrowup']) && Santa.position.y<=15) {
+                Santa.position.y += .2;
+                // Santa.rotation.z = Math.PI/8
             }
             else if((keys['w']||keys['arrowup'])) {
-                fighter.rotation.z = Math.PI/8
+                // Santa.rotation.z = Math.PI/8
             }
-            else if(fighter.position.y>1.2) {
-                fighter.position.y -= .1;
+            else if(Santa.position.y>1.2) {
+                Santa.position.y -= .1;
                 // fighter.rotation.z = -Math.PI/8
             }
+
+            if((keys['e']||keys['arrowup']) && gift1.parent === Santa){
+                Santa.remove(gift1)
+                scene.add(gift1)
+                gift1.position.copy(Santa.position);
+            }
+            if (gift1.parent === scene) {
+                gift1.position.x+=.5
+                gift1.position.y+= gift1.Vy
+                gift1.Vy+=Ay
+            }
+            if (gift1.position.y<-1){
+                gift1.position.set(0,0,0)
+                scene.remove(gift1)
+                Santa.add(gift1)
+                gift1.Vy=0
+            }
+
             
             // 子彈發射飛行
             // if(keys[' '] && fastIndex %10==1) {
