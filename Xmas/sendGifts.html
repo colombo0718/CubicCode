@@ -38,22 +38,22 @@
     scene.add(directionalLight);
 
     // 添加網格
-    var grids=[]   
-    var gridSize = 100; // 網格大小
-    var gridDivisions = 10; // 網格分段數
-    var gridColor1 = 0x00ff00;
-    var gridColor2 = 0x009900;
-    for (var i = -200; i <= 100; i += 100) {
-        var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
-        grid.position.set(0, 0, i);
-        scene.add(grid);
-        grids.push(grid);
-    }
+    // var grids=[]   
+    // var gridSize = 100; // 網格大小
+    // var gridDivisions = 10; // 網格分段數
+    // var gridColor1 = 0x00ff00;
+    // var gridColor2 = 0x009900;
+    // for (var i = -200; i <= 100; i += 100) {
+    //     var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
+    //     grid.position.set(0, 0, i);
+    //     scene.add(grid);
+    //     grids.push(grid);
+    // }
 
     const voxelSettings = [
         { name: "runDeer", opacity: 1,  amount: 1   ,radius:10},
         { name: "gift1",  opacity: 1,  amount: 1 ,radius:2 },
-        { name: "house",  opacity: .8, amount: 1   ,radius:5 },
+        { name: "house",  opacity: 1, amount: 1   ,radius:5 },
         { name: "snowGnd",   opacity: 1,  amount: 5   ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
