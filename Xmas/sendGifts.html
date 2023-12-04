@@ -36,8 +36,8 @@
     var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
     scene.add(ambientLight);
 
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
-    directionalLight.position.set(1, 20, -6);
+    var directionalLight = new THREE.DirectionalLight(0xffffcc, 1); // 產生方向光
+    directionalLight.position.set(1, 30, -6);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
     directionalLight.shadow.mapSize.width = 1024;
@@ -52,17 +52,17 @@
     console.log(directionalLight)
 
     // 添加網格
-    var grids=[]   
-    var gridSize = 100; // 網格大小
-    var gridDivisions = 10; // 網格分段數
-    var gridColor1 = 0x00ff00;
-    var gridColor2 = 0x009900;
-    for (var i = -200; i <= 100; i += 100) {
-        var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
-        grid.position.set(0, 0, i);
-        scene.add(grid);
-        grids.push(grid);
-    }
+    // var grids=[]   
+    // var gridSize = 100; // 網格大小
+    // var gridDivisions = 10; // 網格分段數
+    // var gridColor1 = 0x00ff00;
+    // var gridColor2 = 0x009900;
+    // for (var i = -200; i <= 100; i += 100) {
+    //     var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
+    //     grid.position.set(0, 0, i);
+    //     scene.add(grid);
+    //     grids.push(grid);
+    // }
 
     const voxelSettings = [
         { name: "runDeer", opacity: 1,  amount: 1   ,radius:10},
@@ -199,7 +199,7 @@
         console.log(ground)
 
         house.position.set(0,0,0)
-        helicopter.position.set(-20,15,0)
+        helicopter.position.set(-20,20,0)
         // console.log(Santa.add(gift1))
         // ground.scale.set(5,1,5)
         // for (let i = 0; i < energy.length; i++) {
@@ -220,7 +220,7 @@
             // console.log(keys)
             // 戰機移動+轉動
             Santa.rotation.z = 0
-            if((keys['w']||keys['arrowup']) && Santa.position.y<=15) {
+            if((keys['w']||keys['arrowup']) && Santa.position.y<=20) {
                 Santa.position.y += .2;
                 // Santa.rotation.z = Math.PI/8
             }
