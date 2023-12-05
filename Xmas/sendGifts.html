@@ -70,7 +70,8 @@
         { name: "house",  opacity: 1, amount: 1   ,radius:5 },
         { name: "snowGnd",   opacity: 1,  amount: 5   ,radius:5 },
         { name: "building",   opacity: 1,  amount:1   ,radius:5 },
-        { name: "ball",   opacity: 1,  amount:100   ,radius:5 },
+        { name: "ball",   opacity: 1,  amount:50   ,radius:5 },
+        { name: "trees",   opacity: 1,  amount:1   ,radius:5 },
         { name: "helicopter",   opacity: 1,  amount:1   ,radius:5 }
         // 可以添加更多的voxel模型设置
     ];
@@ -180,12 +181,10 @@
         let building=voxelAnimas["building"][0]
         let helicopter=voxelAnimas["helicopter"][0]
         let snow=voxelAnimas["ball"]
+        let trees= voxelAnimas["trees"][0]
         let Ay=-.01
         gift1.Vy=.1
-        // let bullets=voxelAnimas["bullet"]
-        // let energy =voxelAnimas["energy"]
-        // let rock1  =voxelAnimas["rock1"]
-        // let bulletIndex = 0
+
         var Santa=new THREE.Object3D();
         Santa.add(runDeer)
         Santa.add(gift1)
@@ -201,6 +200,7 @@
         console.log(ground)
 
         house.position.set(0,0,0)
+        trees.position.set(0,0,0)
         helicopter.position.set(-20,20,0)
  
         snow.forEach(function(item, index, array) {
