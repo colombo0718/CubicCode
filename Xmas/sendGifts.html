@@ -37,7 +37,7 @@
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffcc, 1); // 產生方向光
-    directionalLight.position.set(1, 30, -6);
+    directionalLight.position.set(1, 30, -30);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
     directionalLight.shadow.mapSize.width = 1024;
@@ -204,7 +204,8 @@
         house.position.set(0,0,0)
         // trees.position.set(0,0,0)
         helicopter.position.set(-20,20,0)
-        moon.position.set(0,15,0)
+        moon.position.set(0,25,-30)
+        moon.scale.set(3,3,3)
  
         snow.forEach(function(item, index, array) {
             item.position.set(Math.random()*100-50,Math.random()*20,Math.random()*10-5)
