@@ -52,21 +52,22 @@
     directionalLight.shadow.mapSize.width = 1024;
     directionalLight.shadow.mapSize.height = 1024;
 
-    // 添加網格
-    var grids=[]   
-    var gridSize = 100; // 網格大小
-    var gridDivisions = 10; // 網格分段數
-    var gridColor1 = 0x00ff00;
-    var gridColor2 = 0x009900;
-    for (var i = -200; i <= 100; i += 100) {
-        var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
-        grid.position.set(0, 0, i);
-        scene.add(grid);
-        grids.push(grid);
-    }
+    // // 添加網格
+    // var grids=[]   
+    // var gridSize = 100; // 網格大小
+    // var gridDivisions = 10; // 網格分段數
+    // var gridColor1 = 0x00ff00;
+    // var gridColor2 = 0x009900;
+    // for (var i = -200; i <= 100; i += 100) {
+    //     var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
+    //     grid.position.set(0, 0, i);
+    //     scene.add(grid);
+    //     grids.push(grid);
+    // }
 
     const voxelSettings = [
         { name: "runDeer",      opacity: 1,  amount: 1   ,radius:10},
+        { name: "stopDeer",      opacity: 1,  amount: 1   ,radius:10},
         { name: "gift1",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
         { name: "snowGnd",      opacity: 1,  amount: 1   ,radius:5 },
@@ -127,7 +128,7 @@
             const loader = new VOXLoader();
             var chunks= loader.parse(contents)
             const models=createModelArray(chunks,1,1,10)
-            voxelAnimas['fighter'] = models;
+            voxelAnimas['gift1'] = models;
         };
         reader.readAsArrayBuffer(file);
         clearInterval(intervalID);
@@ -177,6 +178,7 @@
     function gameProcess(){
         let score=0
         let runDeer=voxelAnimas["runDeer"][0]
+        let stopDeer=voxelAnimas["stopDeer"][0]
         let ground=voxelAnimas["snowGnd"][0]
         let houses=voxelAnimas["house"]
         let gifts=voxelAnimas["gift1"]
@@ -192,7 +194,11 @@
 
         var Santa=new THREE.Object3D();
         Santa.add(runDeer)
-        // Santa.add(gift1)
+        Santa.add(stopDeer)
+        runDeer.visible=true
+        stopDeer.visible=false
+        Santa.Vy=.3
+         
         Santa.position.set(-20,10,0)
         building.position.set(10,0,0)
         scene.add(Santa)
@@ -213,6 +219,7 @@
 
         gifts.forEach(function(item, index, array) {
             Santa.add(item)
+            item.visible=true
             item.Vy=.1
         })
         var giftNum=10,giftCD=0
@@ -229,60 +236,82 @@
         function startLoop(){
         intervalID=
         setInterval(function() {
-            // console.log(keys)
-            // 戰機移動+轉動
-            Santa.rotation.z = 0
-            if((keys['w']||keys['arrowup']) && Santa.position.y<=20) {
-                Santa.position.y += .2;
-                // Santa.rotation.z = Math.PI/8
-            }
-            else if((keys['w']||keys['arrowup'])) {
-                // Santa.rotation.z = Math.PI/8
-            }
-            else if(Santa.position.y>1.2) {
-                Santa.position.y -= .1;
-                // fighter.rotation.z = -Math.PI/8
+            if(Vx>0){
+            // 控制聖誕老人，按W向上飛
+                if((keys['w']||keys['arrowup']) && Santa.position.y<=20) {
+                    Santa.position.y += .2;
+                }
+                else if((keys['w']||keys['arrowup'])) {
+                    // 按住時靠在頂端不會震動
+                }
+                // 放開時往下降
+                else if(Santa.position.y>1.2) {
+                    Santa.position.y -= .1;
+                }
+            }else{ // 撞到東西，遊戲停止的行為
+                Santa.position.y+= Santa.Vy
+                Santa.Vy+=Ay
             }
 
+            function collision(){
+                Vx=0
+                runDeer.visible=false
+                stopDeer.visible=true
+                gifts.forEach(function(gift, index, array) {
+                    gift.visible=false
+                })
+            }
+
+            // 控制禮物行為
             giftCD+=1
-            gifts.forEach(function(item, index, array) {
-                // console.log(item.Vy)
-                if((keys['e']||keys['arrowright']) && index==giftNum-1 && giftCD>50){
-                    Santa.remove(item)
-                    scene.add(item)
-                    item.position.copy(Santa.position);
+            gifts.forEach(function(gift, index, array) {
+                // 按E觸發禮物拋出
+                if(Vx>0 && (keys['e']||keys['arrowright']) && index==giftNum-1 && giftCD>50){
+                    Santa.remove(gift)
+                    scene.add(gift)
+                    gift.position.copy(Santa.position);
                     giftNum-=1,giftCD=0
                 }
-                if (item.parent === scene && item.position.y>0) {
-                    item.position.x+=.3
-                    item.position.y+= item.Vy
-                    item.Vy+=Ay
-                    item.rotation.z+=.1
+                // 禮物飛行中
+                if (gift.parent === scene && gift.position.y>0) {
+                    gift.position.x+=.3
+                    gift.position.y+= gift.Vy
+                    gift.Vy+=Ay
+                    gift.rotation.z+=.1
                 }
-                if (item.parent === scene && item.position.y<=0) {
-                    item.position.x-=Vx
-                    item.position.y=0
+                // 禮物掉地上
+                if (gift.parent === scene && gift.position.y<=0) {
+                    gift.position.x-=Vx
+                    gift.position.y=0
                 }
             })
 
-            houses.forEach(function(item, index, array) {
-                item.position.x-=Vx
-                if(item.position.x<-50){ item.position.x=Math.random()*100+50 }
+
+            houses.forEach(function(house, index, array) {
+                house.position.x-=Vx
+                if(house.position.x<-50){ house.position.x=Math.random()*100+50 }
+                if(Santa.position.distanceTo(house.position)<2){
+                    collision()
+                }
             });
 
-
-
-            building.position.x-=Vx
-            if(building.position.x<-50){building.position.x=Math.random()*100+50}
-
-            helicopter.position.x-=Vx+0.2
+            helicopter.position.x-=Vx*2
             if(helicopter.position.x<-50){
                 helicopter.position.set(Math.random()*100+50,Math.random()*10+10,0)
             }
+            if(Santa.position.distanceTo(helicopter.position)<2){
+                collision()
+            }
 
+            building.position.x-=Vx
+            if(building.position.x<-50){building.position.x=Math.random()*100+50}
+            if(Math.abs(Santa.position.x-building.position.x)<2 && Santa.position.y<12){
+                collision()
+            }
+
+
+            // 榭寄生移動，碰到補充禮物
             mistletoe.position.x-=Vx
-            var dis=Santa.position.distanceTo(mistletoe.position)
-            // console.log(runDeer.position.x,mistletoe.position.x)
             if(Santa.position.distanceTo(mistletoe.position)<1){
                 mistletoe.position.set(Math.random()*100+250,20,0)
                 giftNum=10
@@ -295,10 +324,10 @@
                 })
             }
             if(mistletoe.position.x<-50){
-                // mistletoe.position.set(Math.random()*100+50,Math.random()*10+10,0)
                 mistletoe.position.set(Math.random()*100+50,20,0)
             }
 
+            // 隨機雪花
             snow.forEach(function(item, index, array) {
                 item.position.x-=Vx
                 item.position.y-=0.03
@@ -306,7 +335,7 @@
                     item.position.set(Math.random()*100+50,Math.random()*20+20,Math.random()*10-5)
                 }
             });
-
+            // 隨機小樹林
             trees.forEach(function(item, index, array) {
                 item.position.x-=Vx
                 if(item.position.x<-50){
