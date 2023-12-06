@@ -75,7 +75,7 @@
         { name: "trees",        opacity: 1,  amount: 10   ,radius:5 },
         { name: "helicopter",   opacity: 1,  amount: 1    ,radius:5 },
         { name: "moon",         opacity: 1,  amount: 1    ,radius:5 },
-        { name: "mistletoe",    opacity: 1,  amount: 1    ,radius:5 },
+        { name: "Mistletoe",    opacity: 1,  amount: 1    ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -185,7 +185,7 @@
         let moon=voxelAnimas["moon"][0]
         let snow=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
-        let mistletoe= voxelAnimas["mistletoe"][0]
+        let mistletoe= voxelAnimas["Mistletoe"][0]
         let Vx=0.2,Ay=-.01
 
         // gift1.Vy=.1
@@ -198,7 +198,7 @@
         scene.add(Santa)
         // fighter.position.set(0,10,10)
         ground.position.set(0,0,0)
-        mistletoe.position.set(0,0,0)
+        mistletoe.position.set(100,10,0)
         ground.scale.set(40,1,10)
 
         // house.position.set(0,0,0)
@@ -244,24 +244,6 @@
                 // fighter.rotation.z = -Math.PI/8
             }
 
-            // if((keys['e']||keys['arrowup']) && gift1.parent === Santa){
-            //     Santa.remove(gift1)
-            //     scene.add(gift1)
-            //     gift1.position.copy(Santa.position);
-            // }
-            // if (gift1.parent === scene) {
-            //     gift1.position.x+=.3
-            //     gift1.position.y+= gift1.Vy
-            //     gift1.Vy+=Ay
-            //     gift1.rotation.z+=.1
-            // }
-            // if (gift1.position.y<-1){
-            //     gift1.position.set(0,0,0)
-            //     scene.remove(gift1)
-            //     Santa.add(gift1)
-            //     gift1.Vy=.1
-            //     gift1.rotation.z=0
-            // }
             giftCD+=1
             gifts.forEach(function(item, index, array) {
                 // console.log(item.Vy)
@@ -292,9 +274,29 @@
 
             building.position.x-=Vx
             if(building.position.x<-50){building.position.x=Math.random()*100+50}
+
             helicopter.position.x-=Vx+0.2
             if(helicopter.position.x<-50){
                 helicopter.position.set(Math.random()*100+50,Math.random()*10+10,0)
+            }
+
+            mistletoe.position.x-=Vx
+            var dis=Santa.position.distanceTo(mistletoe.position)
+            // console.log(runDeer.position.x,mistletoe.position.x)
+            if(Santa.position.distanceTo(mistletoe.position)<1){
+                mistletoe.position.set(Math.random()*100+250,20,0)
+                giftNum=10
+                gifts.forEach(function(item, index, array) {
+                    item.position.set(0,0,0)
+                    item.Vy=.1
+                    item.rotation.z=0
+                    scene.remove(item)
+                    Santa.add(item)
+                })
+            }
+            if(mistletoe.position.x<-50){
+                // mistletoe.position.set(Math.random()*100+50,Math.random()*10+10,0)
+                mistletoe.position.set(Math.random()*100+50,20,0)
             }
 
             snow.forEach(function(item, index, array) {
@@ -312,6 +314,8 @@
                     item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
                 }
             });
+
+
 
 
         },10)
