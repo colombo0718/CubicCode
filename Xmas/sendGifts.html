@@ -1,7 +1,7 @@
-<div id="canvas" style="width: 1600px;height: 800px;"></div>
+<div id="canvas" style="width: 1600px;height: 900px;"></div>
 <button id="startButton">開始</button>
 <input type="file" id="fileInput" accept=".vox" />
-<h3>W:向上飛 / E:丟禮物 </h3>
+<!-- <h3>W:向上飛 / E:丟禮物 </h3> -->
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <script type="importmap">
     {
@@ -40,40 +40,41 @@
     directionalLight.position.set(1, 30, -30);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
 
+    // 設定光源可產生影子的範圍與精細度
     directionalLight.shadow.camera.left = -50;
     directionalLight.shadow.camera.right = 50;
     directionalLight.shadow.camera.top = 50;
     directionalLight.shadow.camera.bottom = -50;
     directionalLight.shadow.camera.near = 1;
     directionalLight.shadow.camera.far = 200;
-    console.log(directionalLight)
+
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
 
     // 添加網格
-    // var grids=[]   
-    // var gridSize = 100; // 網格大小
-    // var gridDivisions = 10; // 網格分段數
-    // var gridColor1 = 0x00ff00;
-    // var gridColor2 = 0x009900;
-    // for (var i = -200; i <= 100; i += 100) {
-    //     var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
-    //     grid.position.set(0, 0, i);
-    //     scene.add(grid);
-    //     grids.push(grid);
-    // }
+    var grids=[]   
+    var gridSize = 100; // 網格大小
+    var gridDivisions = 10; // 網格分段數
+    var gridColor1 = 0x00ff00;
+    var gridColor2 = 0x009900;
+    for (var i = -200; i <= 100; i += 100) {
+        var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
+        grid.position.set(0, 0, i);
+        scene.add(grid);
+        grids.push(grid);
+    }
 
     const voxelSettings = [
         { name: "runDeer",      opacity: 1,  amount: 1   ,radius:10},
-        { name: "gift1",        opacity: 1,  amount: 1 ,radius:2 },
+        { name: "gift1",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
-        { name: "snowGnd",      opacity: 1,  amount: 1  ,radius:5 },
-        { name: "building",     opacity: 1,  amount:1   ,radius:5 },
-        { name: "ball",         opacity: 1,  amount:50   ,radius:5 },
-        { name: "trees",        opacity: 1,  amount:10   ,radius:5 },
-        { name: "helicopter",   opacity: 1,  amount:1   ,radius:5 },
-        { name: "moon",         opacity: 1,  amount:1   ,radius:5 },
+        { name: "snowGnd",      opacity: 1,  amount: 1   ,radius:5 },
+        { name: "building",     opacity: 1,  amount: 1    ,radius:5 },
+        { name: "ball",         opacity: 1,  amount: 50   ,radius:5 },
+        { name: "trees",        opacity: 1,  amount: 10   ,radius:5 },
+        { name: "helicopter",   opacity: 1,  amount: 1    ,radius:5 },
+        { name: "moon",         opacity: 1,  amount: 1    ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -92,7 +93,6 @@
                     // mesh.material.opacity = opacity;
                     mesh.receiveShadow = true
                     mesh.castShadow = true;
-                    // mesh.clipShadows = true;
                     voxelObject.add(mesh);
                 }
                 voxelObject.radius=raduis/10
@@ -178,37 +178,44 @@
         let runDeer=voxelAnimas["runDeer"][0]
         let ground=voxelAnimas["snowGnd"][0]
         let houses=voxelAnimas["house"]
-        let gift1=voxelAnimas["gift1"][0]
+        let gifts=voxelAnimas["gift1"]
         let building=voxelAnimas["building"][0]
         let helicopter=voxelAnimas["helicopter"][0]
         let moon=voxelAnimas["moon"][0]
         let snow=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
-        let Ay=-.01
-        gift1.Vy=.1
+        let Vx=0.2,Ay=-.01
+
+        // gift1.Vy=.1
 
         var Santa=new THREE.Object3D();
         Santa.add(runDeer)
-        Santa.add(gift1)
+        // Santa.add(gift1)
         Santa.position.set(-20,10,0)
         building.position.set(10,0,0)
         scene.add(Santa)
         // fighter.position.set(0,10,10)
         ground.position.set(0,0,0)
-        console.log(ground)
+        ground.scale.set(40,1,10)
 
         // house.position.set(0,0,0)
         // trees.position.set(0,0,0)
         helicopter.position.set(-20,20,0)
-        moon.position.set(0,25,-30)
+        moon.position.set(0,25,-40)
         moon.scale.set(3,3,3)
  
         houses.forEach(function(item, index, array) {
             item.position.set(Math.random()*100+50,0,0)
         });
 
+        gifts.forEach(function(item, index, array) {
+            Santa.add(item)
+            item.Vy=.1
+        })
+        var giftNum=10,giftCD=0
+
         snow.forEach(function(item, index, array) {
-            item.position.set(Math.random()*100-50,Math.random()*20,Math.random()*10-5)
+            item.position.set(Math.random()*100-50,Math.random()*20,Math.random()*40-20)
         });
 
         trees.forEach(function(item, index, array) {
@@ -234,39 +241,61 @@
                 // fighter.rotation.z = -Math.PI/8
             }
 
-            if((keys['e']||keys['arrowup']) && gift1.parent === Santa){
-                Santa.remove(gift1)
-                scene.add(gift1)
-                gift1.position.copy(Santa.position);
-            }
-            if (gift1.parent === scene) {
-                gift1.position.x+=.3
-                gift1.position.y+= gift1.Vy
-                gift1.Vy+=Ay
-                gift1.rotation.z+=.1
-            }
-            if (gift1.position.y<-1){
-                gift1.position.set(0,0,0)
-                scene.remove(gift1)
-                Santa.add(gift1)
-                gift1.Vy=.1
-                gift1.rotation.z=0
-            }
+            // if((keys['e']||keys['arrowup']) && gift1.parent === Santa){
+            //     Santa.remove(gift1)
+            //     scene.add(gift1)
+            //     gift1.position.copy(Santa.position);
+            // }
+            // if (gift1.parent === scene) {
+            //     gift1.position.x+=.3
+            //     gift1.position.y+= gift1.Vy
+            //     gift1.Vy+=Ay
+            //     gift1.rotation.z+=.1
+            // }
+            // if (gift1.position.y<-1){
+            //     gift1.position.set(0,0,0)
+            //     scene.remove(gift1)
+            //     Santa.add(gift1)
+            //     gift1.Vy=.1
+            //     gift1.rotation.z=0
+            // }
+            giftCD+=1
+            gifts.forEach(function(item, index, array) {
+                // console.log(item.Vy)
+                if((keys['e']||keys['arrowright']) && index==giftNum-1 && giftCD>50){
+                    Santa.remove(item)
+                    scene.add(item)
+                    item.position.copy(Santa.position);
+                    giftNum-=1,giftCD=0
+                }
+                if (item.parent === scene && item.position.y>0) {
+                    item.position.x+=.3
+                    item.position.y+= item.Vy
+                    item.Vy+=Ay
+                    item.rotation.z+=.1
+                }
+                if (item.parent === scene && item.position.y<=0) {
+                    item.position.x-=Vx
+                    item.position.y=0
+                }
+            })
 
             houses.forEach(function(item, index, array) {
-                item.position.x-=.2
+                item.position.x-=Vx
                 if(item.position.x<-50){ item.position.x=Math.random()*100+50 }
             });
 
 
 
-            building.position.x-=.2
+            building.position.x-=Vx
             if(building.position.x<-50){building.position.x=Math.random()*100+50}
-            helicopter.position.x-=.2
-            if(helicopter.position.x<-50){helicopter.position.x=Math.random()*100+50}
+            helicopter.position.x-=Vx+0.2
+            if(helicopter.position.x<-50){
+                helicopter.position.set(Math.random()*100+50,Math.random()*10+10,0)
+            }
 
             snow.forEach(function(item, index, array) {
-                item.position.x-=.2
+                item.position.x-=Vx
                 item.position.y-=0.03
                 if(item.position.x<-50){
                     item.position.set(Math.random()*100+50,Math.random()*20+20,Math.random()*10-5)
@@ -274,9 +303,9 @@
             });
 
             trees.forEach(function(item, index, array) {
-                item.position.x-=.2
+                item.position.x-=Vx
                 if(item.position.x<-50){
-                    item.position.set(Math.random()*100+50,0,Math.random()*10-5)
+                    item.position.set(Math.random()*100+50,0,Math.random()*40-20)
                     item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
                 }
             });
