@@ -75,6 +75,7 @@
         { name: "trees",        opacity: 1,  amount: 10   ,radius:5 },
         { name: "helicopter",   opacity: 1,  amount: 1    ,radius:5 },
         { name: "moon",         opacity: 1,  amount: 1    ,radius:5 },
+        { name: "mistletoe",    opacity: 1,  amount: 1    ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -184,6 +185,7 @@
         let moon=voxelAnimas["moon"][0]
         let snow=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
+        let mistletoe= voxelAnimas["mistletoe"][0]
         let Vx=0.2,Ay=-.01
 
         // gift1.Vy=.1
@@ -196,6 +198,7 @@
         scene.add(Santa)
         // fighter.position.set(0,10,10)
         ground.position.set(0,0,0)
+        mistletoe.position.set(0,0,0)
         ground.scale.set(40,1,10)
 
         // house.position.set(0,0,0)
