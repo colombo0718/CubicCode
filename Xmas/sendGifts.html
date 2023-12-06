@@ -65,15 +65,15 @@
     // }
 
     const voxelSettings = [
-        { name: "runDeer", opacity: 1,  amount: 1   ,radius:10},
-        { name: "gift1",  opacity: 1,  amount: 1 ,radius:2 },
-        { name: "house",  opacity: 1, amount: 1   ,radius:5 },
-        { name: "snowGnd",   opacity: 1,  amount: 5   ,radius:5 },
-        { name: "building",   opacity: 1,  amount:1   ,radius:5 },
-        { name: "ball",   opacity: 1,  amount:50   ,radius:5 },
-        { name: "trees",   opacity: 1,  amount:10   ,radius:5 },
+        { name: "runDeer",      opacity: 1,  amount: 1   ,radius:10},
+        { name: "gift1",        opacity: 1,  amount: 1 ,radius:2 },
+        { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
+        { name: "snowGnd",      opacity: 1,  amount: 1  ,radius:5 },
+        { name: "building",     opacity: 1,  amount:1   ,radius:5 },
+        { name: "ball",         opacity: 1,  amount:50   ,radius:5 },
+        { name: "trees",        opacity: 1,  amount:10   ,radius:5 },
         { name: "helicopter",   opacity: 1,  amount:1   ,radius:5 },
-        { name: "moon",   opacity: 1,  amount:1   ,radius:5 },
+        { name: "moon",         opacity: 1,  amount:1   ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -176,8 +176,8 @@
     function gameProcess(){
         let score=0
         let runDeer=voxelAnimas["runDeer"][0]
-        let ground=voxelAnimas["snowGnd"]
-        let house=voxelAnimas["house"][0]
+        let ground=voxelAnimas["snowGnd"][0]
+        let houses=voxelAnimas["house"]
         let gift1=voxelAnimas["gift1"][0]
         let building=voxelAnimas["building"][0]
         let helicopter=voxelAnimas["helicopter"][0]
@@ -194,22 +194,23 @@
         building.position.set(10,0,0)
         scene.add(Santa)
         // fighter.position.set(0,10,10)
-        ground[0].position.set(-40,0,0)
-        ground[1].position.set(-20,0,0)
-        ground[2].position.set( 0,0,0)
-        ground[3].position.set( 20,0,0)
-        ground[4].position.set( 40,0,0)
+        ground.position.set(0,0,0)
         console.log(ground)
 
-        house.position.set(0,0,0)
+        // house.position.set(0,0,0)
         // trees.position.set(0,0,0)
         helicopter.position.set(-20,20,0)
         moon.position.set(0,25,-30)
         moon.scale.set(3,3,3)
  
+        houses.forEach(function(item, index, array) {
+            item.position.set(Math.random()*100+50,0,0)
+        });
+
         snow.forEach(function(item, index, array) {
             item.position.set(Math.random()*100-50,Math.random()*20,Math.random()*10-5)
         });
+
         trees.forEach(function(item, index, array) {
             item.position.set(Math.random()*100-50,0,Math.random()*10-5)
             item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
@@ -252,8 +253,13 @@
                 gift1.rotation.z=0
             }
 
-            house.position.x-=.2
-            if(house.position.x<-50){house.position.x=Math.random()*100+50}
+            houses.forEach(function(item, index, array) {
+                item.position.x-=.2
+                if(item.position.x<-50){ item.position.x=Math.random()*100+50 }
+            });
+
+
+
             building.position.x-=.2
             if(building.position.x<-50){building.position.x=Math.random()*100+50}
             helicopter.position.x-=.2
