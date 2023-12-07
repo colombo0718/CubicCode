@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <title>HUD示例</title>
     <style>
+        @import url('https://fonts.cdnfonts.com/css/public-pixel');
+        @import url('https://fonts.cdnfonts.com/css/common-pixel');
         body { margin: 0; }
         #hud {
             position: absolute;
@@ -13,14 +15,15 @@
             height: 100%;
             color: white;
             font-size: 24px;
+            font-family: 'Public Pixel', sans-serif;
             pointer-events: none;
         }
     </style>
 </head>
 <body>
     <div id="container"></div>
-    <div id="hud">
-        a禮物
+    <div id="hud" style="pointer-events: auto;">
+        press R to restart
         <button id="startButton">開始</button>
     </div>
     <script type="importmap">
@@ -57,7 +60,7 @@ import * as THREE from 'three';
         scene.add(cube);
 
         // 创建HUD元素
-        const hud = document.getElementById('hud');
+        // const hud = document.getElementById('hud');
         // const hudText = document.createElement('div');
         // hudText.textContent = '<h1>HUD文本</h1>';
         // hud.appendChild(hudText);
@@ -78,6 +81,7 @@ import * as THREE from 'three';
 
         // 确保DOM已加载
         window.addEventListener("DOMContentLoaded", function() {
+            console.log('aaa')
             const startButton = document.getElementById("startButton");
             startButton.addEventListener("click", function() {
                 console.log('按下了按钮');
