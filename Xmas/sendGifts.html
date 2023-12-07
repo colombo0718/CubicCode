@@ -1,7 +1,10 @@
-
-<div id="canvas" style="width: 1600px;height: 900px;"></div>
-<button id="startButton">開始</button>
-<input type="file" id="fileInput" accept=".vox" />
+<style>
+    body { margin: 0; }
+</style>
+<!-- <div id="canvas" style="width: 1600px;height: 900px;"></div> -->
+<div id="canvas"></div>
+<!-- <button id="startButton">開始</button>
+<input type="file" id="fileInput" accept=".vox" /> -->
 <!-- <h3>W:向上飛 / E:丟禮物 </h3> -->
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <script type="importmap">
@@ -20,12 +23,14 @@
     var canvas = document.getElementById('canvas');
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    var camera = new THREE.PerspectiveCamera(60,window.innerWidth/ window.innerHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    // renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
@@ -115,26 +120,26 @@
         }
 
     // 上傳選定戰機
-    fileInput.addEventListener('change', function (event) {
-        if (!event.target.files.length) {
-            console.log('No files were selected!');
-            return; // 直接返回，不執行後面的代碼
-        }
-        scene.remove(voxelAnimas['fighter'][0])
-        var file = event.target.files[0];
-        var reader = new FileReader();
-        console.log(voxelAnimas )
-        reader.onload = function (event) {
-            var contents = event.target.result;
-            const loader = new VOXLoader();
-            var chunks= loader.parse(contents)
-            const models=createModelArray(chunks,1,1,10)
-            voxelAnimas['gift1'] = models;
-        };
-        reader.readAsArrayBuffer(file);
-        clearInterval(intervalID);
-        gameProcess()
-    });
+    // fileInput.addEventListener('change', function (event) {
+    //     if (!event.target.files.length) {
+    //         console.log('No files were selected!');
+    //         return; // 直接返回，不執行後面的代碼
+    //     }
+    //     scene.remove(voxelAnimas['fighter'][0])
+    //     var file = event.target.files[0];
+    //     var reader = new FileReader();
+    //     console.log(voxelAnimas )
+    //     reader.onload = function (event) {
+    //         var contents = event.target.result;
+    //         const loader = new VOXLoader();
+    //         var chunks= loader.parse(contents)
+    //         const models=createModelArray(chunks,1,1,10)
+    //         voxelAnimas['gift1'] = models;
+    //     };
+    //     reader.readAsArrayBuffer(file);
+    //     clearInterval(intervalID);
+    //     gameProcess()
+    // });
 
     // 繪製voxel動畫
     var slowIndex=0
@@ -175,9 +180,10 @@
 
     // 遊戲主流程
     var intervalID
-    var startLoop=function(){}
     function gameProcess(){
-        let score=0
+        var Vx=0.2,Ay=-.01
+        var Santa=new THREE.Object3D();
+        var  score=0
         let runDeer=voxelAnimas["runDeer"][0]
         let stopDeer=voxelAnimas["stopDeer"][0]
         let ground=voxelAnimas["snowGnd"][0]
@@ -189,50 +195,54 @@
         let snow=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
         let mistletoe= voxelAnimas["Mistletoe"][0]
-        let Vx=0.2,Ay=-.01
-
-        // gift1.Vy=.1
-
-        var Santa=new THREE.Object3D();
-        Santa.add(runDeer)
-        Santa.add(stopDeer)
-        runDeer.visible=true
-        stopDeer.visible=false
-        Santa.Vy=.3
-         
-        Santa.position.set(-20,10,0)
-        building.position.set(10,0,0)
-        scene.add(Santa)
-        // fighter.position.set(0,10,10)
-        ground.position.set(0,0,0)
-        mistletoe.position.set(100,10,0)
-        ground.scale.set(40,1,10)
-
-        // house.position.set(0,0,0)
-        // trees.position.set(0,0,0)
-        helicopter.position.set(-20,20,0)
-        moon.position.set(0,25,-40)
-        moon.scale.set(3,3,3)
- 
-        houses.forEach(function(item, index, array) {
-            item.position.set(Math.random()*100+50,0,0)
-        });
-
-        gifts.forEach(function(item, index, array) {
-            Santa.add(item)
-            item.visible=true
-            item.Vy=.1
-        })
         var giftNum=10,giftCD=0
 
-        snow.forEach(function(item, index, array) {
-            item.position.set(Math.random()*100-50,Math.random()*20,Math.random()*40-20)
-        });
+            
 
-        trees.forEach(function(item, index, array) {
-            item.position.set(Math.random()*100-50,0,Math.random()*10-5)
-            item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
-        });
+        function setup(){
+            Vx=0.2
+
+            Santa.add(runDeer)
+            Santa.add(stopDeer)
+            runDeer.visible=true
+            stopDeer.visible=false
+            Santa.Vy=.3
+            
+            Santa.position.set(-20,10,0)
+            building.position.set(10,0,0)
+            scene.add(Santa)
+            // fighter.position.set(0,10,10)
+            ground.position.set(0,0,0)
+            mistletoe.position.set(100,10,0)
+            ground.scale.set(40,1,10)
+
+            // house.position.set(0,0,0)
+            // trees.position.set(0,0,0)
+            helicopter.position.set(-20,20,0)
+            moon.position.set(0,25,-40)
+            moon.scale.set(3,3,3)
+    
+            houses.forEach(function(item, index, array) {
+                item.position.set(Math.random()*100+50,0,0)
+            });
+
+            gifts.forEach(function(item, index, array) {
+                Santa.add(item)
+                item.visible=true
+                item.position.set(0,0,0)
+                item.Vy=.1
+            })
+            
+
+            snow.forEach(function(item, index, array) {
+                item.position.set(Math.random()*100-50,Math.random()*20,Math.random()*40-20)
+            });
+
+            trees.forEach(function(item, index, array) {
+                item.position.set(Math.random()*100-50,0,Math.random()*10-5)
+                item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
+            });
+        }setup()
         
         function startLoop(){
         intervalID=
@@ -344,20 +354,28 @@
                     item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
                 }
             });
-
-
-
-
         },10)
-        }startLoop()
-    }
-    
-// gameProcess()
-    window.addEventListener("load", function() {
-        const startButton = document.getElementById("startButton");
-        startButton.addEventListener("click", function() {
-            clearInterval(intervalID);
-            gameProcess(); // 點擊按鈕後觸發遊戲流程函數
+        }
+
+        
+        // 監聽鍵盤事件
+        document.addEventListener('keydown', function(event) {
+            console.log(event.key)
+            if (event.key === 'F2') {
+                setup()
+                clearInterval(intervalID);
+                startLoop()
+            }
         });
-    });
+    }
+
+    setTimeout(function(){gameProcess()},1000)
+
+    // window.addEventListener("load", function() {
+    //     const startButton = document.getElementById("startButton");
+    //     startButton.addEventListener("click", function() {
+    //         clearInterval(intervalID);
+    //         gameProcess(); // 點擊按鈕後觸發遊戲流程函數
+    //     });
+    // });
 </script>
