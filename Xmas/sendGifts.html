@@ -1,5 +1,19 @@
 <style>
+    @font-face {
+        font-family: 'Minecraft';
+        src: url(../Cubic_11_1.100_R.ttf);
+    }
     body { margin: 0; }
+    #hud {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        color: yellow;
+        font-size: 24px;
+        font-family: 'Minecraft';
+    }    
 </style>
 <!-- <div id="canvas" style="width: 1600px;height: 900px;"></div> -->
 <div id="canvas"></div>
@@ -7,6 +21,9 @@
 <input type="file" id="fileInput" accept=".vox" /> -->
 <!-- <h3>W:向上飛 / E:丟禮物 </h3> -->
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+<div id="hud" >
+    按下F2開始遊戲
+</div>
 <script type="importmap">
     {
         "imports": {
@@ -195,7 +212,7 @@
         let snow=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
         let mistletoe= voxelAnimas["Mistletoe"][0]
-        var giftNum=10,giftCD=0
+        var giftNum=10,giftCD=0,distence=0
 
             
 
@@ -207,7 +224,8 @@
             runDeer.visible=true
             stopDeer.visible=false
             Santa.Vy=.3
-            
+            distence=0
+
             Santa.position.set(-20,10,0)
             building.position.set(10,0,0)
             scene.add(Santa)
@@ -247,6 +265,15 @@
         function startLoop(){
         intervalID=
         setInterval(function() {
+            var hud=document.getElementById("hud");
+            hud.innerHTML="時間："+Math.floor(distence)+"<br>"+
+                "禮物："+giftNum+"<br>"+
+                "送出："
+            distence+=0.01*Vx/0.3
+
+
+
+
             if(Vx>0){
             // 控制聖誕老人，按W向上飛
                 if((keys['w']||keys['arrowup']) && Santa.position.y<=20) {
