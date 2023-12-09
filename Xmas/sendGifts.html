@@ -288,8 +288,13 @@
                     Santa.position.y -= .1;
                 }
             }else{ // 撞到東西，遊戲停止的行為
-                Santa.position.y+= Santa.Vy
-                Santa.Vy+=Ay
+
+                if(Santa.Vy<0 && Santa.position.y<=0){
+                    Santa.position.y=0
+                }else{
+                    Santa.position.y+= Santa.Vy
+                    Santa.Vy+=Ay
+                }
             }
 
             function collision(){
