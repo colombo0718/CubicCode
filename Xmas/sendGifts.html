@@ -214,7 +214,15 @@
         let mistletoe= voxelAnimas["Mistletoe"][0]
         var giftNum=10,giftCD=0,distence=0
 
-            
+        // 创建音乐
+        var BGM = new Audio('BGM.mp3');
+        BGM.loop = true;
+        BGM.volume =.1; // 设置音量（0-1）
+
+        var shoot = new Audio('shoot.mp3');
+        var hit = new Audio('hit.mp3');
+        var get = new Audio('get.mp3');
+        
 
         function setup(){
             Vx=0.2
@@ -298,6 +306,7 @@
             }
 
             function collision(){
+                
                 Vx=0
                 runDeer.visible=false
                 stopDeer.visible=true
@@ -315,6 +324,7 @@
                     scene.add(gift)
                     gift.position.copy(Santa.position);
                     giftNum-=1,giftCD=0
+                    shoot.play()
                 }
                 // 禮物飛行中
                 if (gift.parent === scene && gift.position.y>0) {
@@ -330,29 +340,32 @@
                 }
             })
 
+            if(Vx>0){
+                houses.forEach(function(house, index, array) {
+                    house.position.x-=Vx
+                    if(house.position.x<-50){ house.position.x=Math.random()*100+50 }
+                    if(Santa.position.distanceTo(house.position)<2){
+                        hit.play()
+                        collision()
+                    }
+                });
 
-            houses.forEach(function(house, index, array) {
-                house.position.x-=Vx
-                if(house.position.x<-50){ house.position.x=Math.random()*100+50 }
-                if(Santa.position.distanceTo(house.position)<2){
+                helicopter.position.x-=Vx*2
+                if(helicopter.position.x<-50){
+                    helicopter.position.set(Math.random()*100+50,Math.random()*10+10,0)
+                }
+                if(Santa.position.distanceTo(helicopter.position)<2){
+                    hit.play()
                     collision()
                 }
-            });
 
-            helicopter.position.x-=Vx*2
-            if(helicopter.position.x<-50){
-                helicopter.position.set(Math.random()*100+50,Math.random()*10+10,0)
+                building.position.x-=Vx
+                if(building.position.x<-50){building.position.x=Math.random()*100+50}
+                if(Math.abs(Santa.position.x-building.position.x)<2 && Santa.position.y<12){
+                    hit.play()
+                    collision()
+                }
             }
-            if(Santa.position.distanceTo(helicopter.position)<2){
-                collision()
-            }
-
-            building.position.x-=Vx
-            if(building.position.x<-50){building.position.x=Math.random()*100+50}
-            if(Math.abs(Santa.position.x-building.position.x)<2 && Santa.position.y<12){
-                collision()
-            }
-
 
             // 榭寄生移動，碰到補充禮物
             mistletoe.position.x-=Vx
@@ -366,6 +379,7 @@
                     scene.remove(item)
                     Santa.add(item)
                 })
+                get.play()
             }
             if(mistletoe.position.x<-50){
                 mistletoe.position.set(Math.random()*100+50,20,0)
@@ -393,6 +407,7 @@
         
         // 監聽鍵盤事件
         document.addEventListener('keydown', function(event) {
+            BGM.play();
             console.log(event.key)
             if (event.key === 'F2') {
                 setup()
