@@ -22,6 +22,7 @@
 <!-- <h3>W:向上飛 / E:丟禮物 </h3> -->
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <div id="hud" >
+    聖誕老人準備送禮物啦~<br>
     按下F2開始遊戲
 </div>
 <script type="importmap">
@@ -200,7 +201,7 @@
     function gameProcess(){
         var Vx=0.2,Ay=-.01
         var Santa=new THREE.Object3D();
-        var  score=0
+        var score=0
         let runDeer=voxelAnimas["runDeer"][0]
         let stopDeer=voxelAnimas["stopDeer"][0]
         let ground=voxelAnimas["snowGnd"][0]
@@ -222,6 +223,7 @@
         var shoot = new Audio('shoot.mp3');
         var hit = new Audio('hit.mp3');
         var get = new Audio('get.mp3');
+        var laugh = new Audio('laugh.mp3');
         
 
         function setup(){
@@ -233,6 +235,7 @@
             stopDeer.visible=false
             Santa.Vy=.3
             distence=0
+            score=0
 
             Santa.position.set(-20,10,0)
             building.position.set(10,0,0)
@@ -273,13 +276,15 @@
         function startLoop(){
         intervalID=
         setInterval(function() {
-            var hud=document.getElementById("hud");
-            hud.innerHTML="W：飛起, E：發射  <br>"+
-                "時間："+Math.floor(distence)+"<br>"+
-                "禮物："+giftNum+"<br>"+
-                "送達："
-            distence+=0.01*Vx/0.3
 
+            if(Vx>0){
+                var hud=document.getElementById("hud");
+                hud.innerHTML="W：飛起, E：發射  <br>"+
+                    "時間："+Math.floor(distence)+"<br>"+
+                    "禮物："+giftNum+"<br>"+
+                    "送達："+score+"<br><br>"
+                distence+=0.01*Vx/0.3
+            }
 
 
 
@@ -306,7 +311,8 @@
             }
 
             function collision(){
-                
+                hud.innerHTML+="好棒喔~~<br>截圖分享你送了多少禮物吧<br>按下F2重新挑戰"
+                hit.play()
                 Vx=0
                 runDeer.visible=false
                 stopDeer.visible=true
@@ -338,6 +344,14 @@
                     gift.position.x-=Vx
                     gift.position.y=0
                 }
+
+                houses.forEach(function(house, j, array) {
+                    if(gift.parent === scene && gift.position.distanceTo(house.position)<2){
+                        laugh.play()
+                        score+=1
+                        gift.position.z=1000
+                    }
+                });
             })
 
             if(Vx>0){
@@ -345,7 +359,7 @@
                     house.position.x-=Vx
                     if(house.position.x<-50){ house.position.x=Math.random()*100+50 }
                     if(Santa.position.distanceTo(house.position)<2){
-                        hit.play()
+                        // hit.play()
                         collision()
                     }
                 });
@@ -355,14 +369,14 @@
                     helicopter.position.set(Math.random()*100+50,Math.random()*10+10,0)
                 }
                 if(Santa.position.distanceTo(helicopter.position)<2){
-                    hit.play()
+                    // hit.play()
                     collision()
                 }
 
                 building.position.x-=Vx
                 if(building.position.x<-50){building.position.x=Math.random()*100+50}
                 if(Math.abs(Santa.position.x-building.position.x)<2 && Santa.position.y<12){
-                    hit.play()
+                    // hit.play()
                     collision()
                 }
             }
@@ -408,7 +422,6 @@
         // 監聽鍵盤事件
         document.addEventListener('keydown', function(event) {
             BGM.play();
-            console.log(event.key)
             if (event.key === 'F2') {
                 setup()
                 clearInterval(intervalID);
