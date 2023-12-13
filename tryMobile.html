@@ -41,15 +41,21 @@
         scene.add(cube);
 
         // 创建渲染循环
-        const animate = () => {
-            requestAnimationFrame(animate);
+        // const animate = () => {
+        //     requestAnimationFrame(animate);
 
-            // 旋转立方体
+        //     // 旋转立方体
+        //     cube.rotation.x += 0.01;
+        //     cube.rotation.y += 0.01;
+
+        //     renderer.render(scene, camera);
+        // };
+
+        setInterval(function() {            
             cube.rotation.x += 0.01;
             cube.rotation.y += 0.01;
 
-            renderer.render(scene, camera);
-        };
+            renderer.render(scene, camera);},30)
 
         // 适配移动设备屏幕大小
         const resizeRendererToDisplaySize = () => {
