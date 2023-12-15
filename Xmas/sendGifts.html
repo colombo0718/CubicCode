@@ -23,7 +23,7 @@
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <div id="hud" >
     聖誕老人準備送禮物啦~<br>
-    按下F2開始遊戲
+    按下[空白鍵]開始遊戲
 </div>
 <script type="importmap">
     {
@@ -311,7 +311,7 @@
             }
 
             function collision(){
-                hud.innerHTML+="好棒喔~~<br>截圖分享你送了多少禮物吧<br>按下F2重新挑戰"
+                hud.innerHTML+="好棒喔~~<br>截圖分享你送了多少禮物吧<br>按下[空白鍵]重新挑戰"
                 hit.play()
                 Vx=0
                 runDeer.visible=false
@@ -422,7 +422,7 @@
         // 監聽鍵盤事件
         document.addEventListener('keydown', function(event) {
             BGM.play();
-            if (event.key === 'F2') {
+            if (event.key === ' ') {
                 setup()
                 clearInterval(intervalID);
                 startLoop()
