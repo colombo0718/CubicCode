@@ -56,12 +56,12 @@ class VOXLoader extends Loader {
 		const id = data.getUint32( 0, true );
 		const version = data.getUint32( 4, true );
 
-		if ( id !== 542658390 || version !== 150 ) {
+		// if ( id !== 542658390 || version !== 150 ) {
 
-			console.error( 'Not a valid VOX file' );
-			return;
+		// 	console.error( 'Not a valid VOX file' );
+		// 	return;
 
-		}
+		// }
 
 		const DEFAULT_PALETTE = [
 			0x00000000, 0xffffffff, 0xffccffff, 0xff99ffff, 0xff66ffff, 0xff33ffff, 0xff00ffff, 0xffffccff,
