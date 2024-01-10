@@ -1,4 +1,11 @@
-<div id="canvas" style="width: 1200px;height: 800px;text-align:center;"></div>
+
+<style>
+    body {
+        margin: 0px;
+        /* overflow: hidden; */
+    }
+</style>
+<div id="canvas" ></div>
 <input type="file" id="fileInput" accept=".vox" />
 <script type="importmap">
     {
@@ -17,9 +24,9 @@
     var fileInput = document.getElementById('fileInput');
     var canvas = document.getElementById('canvas');
     var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth /window.innerHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.setSize(window.innerWidth,window.innerHeight);
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
@@ -34,10 +41,15 @@
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
 
-    // const pointLight1 = new THREE.PointLight(0xffffff,10);
-    // pointLight1.position.set(0, 2, 2);
-    // pointLight1.castShadow = true; // 讓此光能產生陰影
-    // scene.add(pointLight1);
+    const pointLight1 = new THREE.PointLight(0xffffff,10);
+    pointLight1.position.set(2, 2, 2);
+    pointLight1.castShadow = true; // 讓此光能產生陰影
+    scene.add(pointLight1);
+
+    const pointLight2 = new THREE.PointLight(0xffffff,10);
+    pointLight2.position.set(-2, 2, -2);
+    pointLight2.castShadow = true; // 讓此光能產生陰影
+    scene.add(pointLight2);
 
     // 添加網格
     var gridSize = 10; // 網格大小
