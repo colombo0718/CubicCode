@@ -1,0 +1,109 @@
+<div id="canvas" style="width: 1200px;height: 800px;text-align:center;"></div>
+<input type="file" id="fileInput" accept=".vox" />
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://threejs.org/build/three.module.js",
+            "three/addons/": "https://threejs.org/examples/jsm/"
+        }
+    }
+</script>
+<script type="module">
+    import * as THREE from 'three';
+    // import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+    import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    var fileInput = document.getElementById('fileInput');
+    var canvas = document.getElementById('canvas');
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    canvas.appendChild(renderer.domElement);
+
+    // 設置相機
+    camera.position.set(0,6,6)
+
+    // 添加燈光
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
+    directionalLight.position.set(1, 1, 1);
+    directionalLight.castShadow = true; // 讓此光能產生陰影
+    scene.add(directionalLight);
+
+    // 添加網格
+    var gridSize = 10; // 網格大小
+    var gridDivisions = 10; // 網格分段數
+    var gridSpace = new THREE.GridHelper(gridSize, gridDivisions, 0xffffff, 0x888888);
+    gridSpace.position.y = 0; // 放置在y=0的面上
+    scene.add(gridSpace);
+
+    // 添加OrbitControls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enablePan=false
+
+    // 建置vox動畫必要物件
+    const loader = new VOXLoader();
+    var anima= new THREE.Object3D();
+    scene.add( anima );  
+    const meshes = [];
+    let currentIndex = 0;
+
+    // 建置vox動畫流程
+    function processVoxelAnimation(chunks) {
+        // 清除voxel動畫物件
+        while (anima.children.length > 0) { 
+            anima.remove(anima.children[0]); 
+        }
+        meshes.length = 0;
+
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            const mesh = new VOXMesh(chunk);
+            // mesh.material.metalness=true
+            // mesh.material.roughness=1
+            mesh.scale.setScalar(.1);
+            mesh.visible = false;
+
+            meshes.push(mesh);
+            anima.add(mesh);
+        }
+    }
+
+    // 載入預設檔案
+    loader.load( 'https://cubiccode.vercel.app/vox/soldier-hack.vox', function ( chunks ) {
+    // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
+        processVoxelAnimation(chunks);
+          
+        // 開始動畫
+        setInterval(function() {
+            // 將前一個物件隱藏
+            meshes[currentIndex % meshes.length].visible = false;
+            currentIndex +=1
+            // 將新的物件顯示
+            meshes[currentIndex % meshes.length].visible = true;
+
+            controls.update(); // 需要加入這行才能讓OrbitControls工作
+            renderer.render(scene, camera);
+        },100)
+    } );
+
+    // 用戶點選檔案後
+    fileInput.addEventListener('change', function (event) { 
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function (event) {
+            var contents = event.target.result;
+            var chunks= loader.parse(contents)
+            console.log(chunks)
+
+            processVoxelAnimation(chunks);
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+</script>
