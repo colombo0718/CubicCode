@@ -58,6 +58,19 @@
     gridSpace.position.y = 0; // 放置在y=0的面上
     scene.add(gridSpace);
 
+
+    // 創建方塊幾何體
+    const geometry = new THREE.BoxGeometry(10, 0, 10); // 方塊的尺寸
+
+    // 創建綠色材質
+    const material = new THREE.MeshBasicMaterial({ color: 0x00aa00 }); // 綠色
+
+    // 創建網格（方塊）
+    const cube = new THREE.Mesh(geometry, material);
+
+    // 將方塊添加到場景
+    scene.add(cube);
+
     // 添加OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enablePan=false
