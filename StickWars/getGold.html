@@ -1,0 +1,269 @@
+<div id="canvas" style="width: 800px;height: 600px;"></div>
+<button id="startButton">play</button>
+<h3>按下[Play]後遊戲開始</h3> 
+<h3>方向鍵WSAD:前後左右 / E:攻擊 / Q:防禦</h3>
+<script src="https://unpkg.com/blockly/blockly.min.js"></script>
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://threejs.org/build/three.module.js",
+            "three/addons/": "https://threejs.org/examples/jsm/"
+        }
+    }
+</script>
+<script type="module">
+    import * as THREE from 'three';
+    import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+
+    var fileInput = document.getElementById('fileInput');
+    var canvas = document.getElementById('canvas');
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    canvas.appendChild(renderer.domElement);
+
+    // 設置相機
+    camera.position.y = 10/Math.sqrt(2);
+    camera.position.z = 10/Math.sqrt(2);
+    camera.rotation.x=-Math.PI/4
+
+    // 添加燈光
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
+    directionalLight.position.set(1, 1, 0);
+    directionalLight.castShadow = true; // 讓此光能產生陰影
+    scene.add(directionalLight);
+
+    // 添加網格
+    var grids=[]
+    var gridSize = 10; // 網格大小
+    var gridDivisions = 10; // 網格分段數
+    var gridColor1 = 0x00ff00;
+    var gridColor2 = 0x009900;
+    for (var i = -200; i <= 100; i += 100) {
+        var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
+        grid.position.set(0, 0, i);
+        scene.add(grid);
+        grids.push(grid);
+    }
+
+    const voxelSettings = [
+        { name: "blue_walk",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "blue_stand",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "blue_throw",  opacity: 1,  amount: 1   ,radius:10 ,loop:false},
+        { name: "blue_run",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        // 可以添加更多的voxel模型设置
+    ];
+    const voxelAnimas = {}; // 存储每个voxel模型的数组
+
+    // 加载voxel模型
+        function createModelArray(chunks,opacity,amount,raduis,loop){
+            const models = [];
+            for (let i = 0; i < amount; i++) {
+                const voxelObject = new THREE.Object3D();
+                voxelObject.startIndex=0
+                voxelObject.loop=loop
+                for (let j = 0; j < chunks.length; j++) {
+                    const chunk = chunks[j];
+                    const mesh = new VOXMesh(chunk);
+                    mesh.scale.setScalar(0.1);
+                    mesh.material.transparent = true;
+                    // mesh.material.emissive.set(0x008888);
+                    mesh.material.opacity = opacity;
+                    voxelObject.add(mesh);
+                }
+                // voxelObject.radius=raduis/10
+                // voxelObject.position.x=Math.random()*20-10
+                scene.add(voxelObject);
+                models.push(voxelObject);
+            }
+            return models
+        }
+
+        const loader = new VOXLoader();
+        for (const voxelSet of voxelSettings) {
+            loader.load('https://cubiccode.vercel.app/StickWars/'+voxelSet.name+'.vox',
+            function (chunks){
+                const models=createModelArray(chunks,voxelSet.opacity,voxelSet.amount,voxelSet.radius,voxelSet.loop)
+                voxelAnimas[voxelSet.name] = models;
+            })
+        }
+
+    // 繪製voxel動畫
+    var slowIndex=0
+    setInterval(function () {
+        slowIndex+=1
+        for (const voxelName in voxelAnimas) {
+            const voxelObjectsArray = voxelAnimas[voxelName];
+            for (let i = 0; i < voxelObjectsArray.length; i++) {
+                const voxelObject = voxelObjectsArray[i];
+                if( !voxelObject.loop && (slowIndex-voxelObject.startIndex>=voxelObject.children.length)){
+                    voxelObject.visible=false
+                }
+                const currentIndex = (slowIndex-voxelObject.startIndex) % voxelObject.children.length;
+                for (let j = 0; j < voxelObject.children.length; j++) {
+                    var voxelMesh=voxelObject.children[j]
+                    voxelMesh.visible = j === currentIndex;
+                }
+            }
+        }
+    }, 100);
+
+    // 渲染畫面
+    var fastIndex=0
+    setInterval(function() {
+        fastIndex+=1
+        renderer.render(scene, camera);
+    },10)
+
+    let keys = {};
+    keys.none=true
+
+    document.addEventListener('keydown', function(event) {
+        // 將 event.key 轉換成小寫，並儲存到 keys 物件中
+        const key = event.key.toLowerCase();
+        if(key === "alt"){return;}
+        keys[key] = true; // 設置按鍵為 true 表示按下該按鍵
+        keys.none=!Object.values(keys).includes(true)
+
+        if (key === " ") {
+            // 阻止預設行為，即阻止點擊按鈕
+            event.preventDefault();
+        }
+    });
+    document.addEventListener('keyup', function(event) {
+        // 將 event.key 轉換成小寫，並儲存到 keys 物件中
+        const key = event.key.toLowerCase();
+        keys[key] = false; // 設置按鍵為 false 表示釋放該按鍵
+        keys.none=!Object.values(keys).includes(true)
+    });
+
+    // scene.add(voxelAnimas["knight-stay"][0])
+    // 遊戲主流程
+    var intervalID
+    var startLoop=function(){}
+    function gameProcess(){
+        // let score=0
+        let stay=voxelAnimas["blue_stand"][0]
+        let walk=voxelAnimas["blue_walk"][0]
+        let hack=voxelAnimas["blue_throw"][0]
+        let jump=voxelAnimas["blue_run"][0]
+
+        console.log(stay.visible)
+        walk.visible=false
+        stay.visible=false
+        hack.visible=false
+        // keep.visible=false   
+        jump.visible=false
+        
+        let knight=new THREE.Object3D()
+        scene.add(knight)
+        knight.add(stay)
+        knight.add(walk)
+        knight.add(hack)
+        // knight.add(keep)
+        knight.add(jump)
+
+        knight.animas=[]
+        knight.animas.push(stay)
+        knight.animas.push(walk)
+        knight.animas.push(hack)
+        // knight.animas.push(keep)
+        knight.animas.push(jump)
+
+
+
+        
+        function startLoop(){
+        intervalID=
+        setInterval(function() {
+            // console.log(keys)
+            if((keys['w']||keys['arrowup']) && knight.position.z>-10) {
+                if(!walk.visible){
+                walk.visible=true
+                walk.startIndex=slowIndex
+                hack.visible=false
+                stay.visible=false
+                // keep.visible=false
+                }
+                knight.position.z -= .05;
+                knight.rotation.y = 0
+            }
+            if((keys['s']||keys['arrowdown']) && knight.position.z<10) {
+                if(!walk.visible){
+                walk.visible=true
+                walk.startIndex=slowIndex
+                hack.visible=false
+                stay.visible=false
+                // keep.visible=false
+                }
+                knight.position.z += .05;
+                knight.rotation.y = -Math.PI 
+            }
+            if((keys['a']||keys['arrowleft']) && knight.position.x>-10) {
+
+                if(!walk.visible){
+                walk.visible=true
+                walk.startIndex=slowIndex
+                hack.visible=false
+                stay.visible=false
+                // keep.visible=false
+                }
+                knight.position.x -= .05;
+                knight.rotation.y = Math.PI/2
+            }
+            if((keys['d']||keys['arrowright']) && knight.position.x<10) {
+                if(!walk.visible){
+                walk.visible=true
+                walk.startIndex=slowIndex
+                hack.visible=false
+                stay.visible=false
+                // keep.visible=false
+                }
+                knight.position.x += .05;
+                knight.rotation.y = -Math.PI/2
+            }
+            if(keys['e']) {
+                if(!hack.visible){
+                hack.visible=true
+                hack.startIndex=slowIndex
+                stay.visible=false
+                walk.visible=false
+                // keep.visible=false
+                }
+            }
+            if(keys['q']) {
+                if(!keep.visible){
+                // keep.visible=true
+                // keep.startIndex=slowIndex
+                hack.visible=false
+                stay.visible=false
+                walk.visible=false
+                }
+            }
+            if(keys.none){
+                // if(knight.animas.every(animation => !animation.visible)){
+                if(!stay.visible && !hack.visible){
+                stay.visible=true
+                stay.startIndex=slowIndex
+                walk.visible=false
+                hack.visible=false
+                // keep.visible=false
+                }
+            }
+        },10)
+        }startLoop()
+    }
+    
+// gameProcess()
+    window.addEventListener("load", function() {
+        const startButton = document.getElementById("startButton");
+        startButton.addEventListener("click", function() {
+            clearInterval(intervalID);
+            gameProcess(); // 點擊按鈕後觸發遊戲流程函數
+        });
+    });
+</script>
