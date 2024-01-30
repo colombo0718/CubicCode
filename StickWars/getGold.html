@@ -69,6 +69,7 @@
                 for (let j = 0; j < chunks.length; j++) {
                     const chunk = chunks[j];
                     const mesh = new VOXMesh(chunk);
+                    console.log(mesh)
                     mesh.scale.setScalar(0.1);
                     mesh.material.transparent = true;
                     // mesh.material.emissive.set(0x008888);
