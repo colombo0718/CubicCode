@@ -51,10 +51,10 @@
     }
 
     const voxelSettings = [
-        { name: "blue_walk",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
-        { name: "blue_stand",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
-        { name: "blue_throw",  opacity: 1,  amount: 1   ,radius:10 ,loop:false},
-        { name: "blue_run",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "stick_walk",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "stick_stand",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "stick_throw",  opacity: 1,  amount: 1   ,radius:10 ,loop:false},
+        { name: "stick_run",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -148,10 +148,10 @@
     var startLoop=function(){}
     function gameProcess(){
         // let score=0
-        let stay=voxelAnimas["blue_stand"][0]
-        let walk=voxelAnimas["blue_walk"][0]
-        let hack=voxelAnimas["blue_throw"][0]
-        let jump=voxelAnimas["blue_run"][0]
+        let stay=voxelAnimas["stick_stand"][0]
+        let walk=voxelAnimas["stick_walk"][0]
+        let hack=voxelAnimas["stick_throw"][0]
+        let jump=voxelAnimas["stick_run"][0]
 
             console.log(stay)
 
