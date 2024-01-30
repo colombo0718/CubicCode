@@ -69,7 +69,7 @@
                 for (let j = 0; j < chunks.length; j++) {
                     const chunk = chunks[j];
                     const mesh = new VOXMesh(chunk);
-                    console.log(mesh)
+                    // console.log(mesh.geometry.attributes.color.needsUpdate)
                     mesh.scale.setScalar(0.1);
                     mesh.material.transparent = true;
                     // mesh.material.emissive.set(0x008888);
@@ -153,7 +153,29 @@
         let hack=voxelAnimas["blue_throw"][0]
         let jump=voxelAnimas["blue_run"][0]
 
-        console.log(stay.visible)
+            console.log(stay)
+
+            let geo = stay.children[0].geometry;
+            let colors = geo.attributes.color.array;
+            console.log(colors)
+
+            for (let i = 0; i < colors.length; i += 3) {
+                // 获取当前顶点的颜色
+                let r = colors[i];
+                let g = colors[i + 1];
+                let b = colors[i + 2];
+
+                // 假设你想要替换的颜色是淡蓝色（RGB：0.5, 0.5, 1.0）
+                // 并且将其替换为淡红色（RGB：1.0, 0.5, 0.5）
+                if (r === 1 && g === 1 && b === 1) {
+                    colors[i] = 1.0;     // 红色分量
+                    colors[i + 1] = 0.5; // 绿色分量保持不变
+                    colors[i + 2] = 0.5; // 蓝色分量
+                }
+            }
+            // 标记颜色需要更新
+            geo.attributes.color.needsUpdate = true;
+
         walk.visible=false
         stay.visible=false
         hack.visible=false
