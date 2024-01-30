@@ -93,21 +93,32 @@
             })
         }
 
-    // 繪製voxel動畫
+    // 繪製所有voxel動畫
     var slowIndex=0
     setInterval(function () {
         slowIndex+=1
+        // 遍歷每種voxel動畫
+        // 例如有三個陣營，每個stick動畫就要有三份
         for (const voxelName in voxelAnimas) {
             const voxelObjectsArray = voxelAnimas[voxelName];
+            // 遍歷一種動畫的各個複製體
             for (let i = 0; i < voxelObjectsArray.length; i++) {
                 const voxelObject = voxelObjectsArray[i];
-                if( !voxelObject.loop && (slowIndex-voxelObject.startIndex>=voxelObject.children.length)){
-                    voxelObject.visible=false
-                }
+
+                // startIndex 是動畫開始於哪個瞬間，記錄當時的slowIndex
+                // currentIndex 是當下該撥到動畫的第幾個影格
                 const currentIndex = (slowIndex-voxelObject.startIndex) % voxelObject.children.length;
+                // 遍歷voxel動畫裡的每個影格物件
                 for (let j = 0; j < voxelObject.children.length; j++) {
                     var voxelMesh=voxelObject.children[j]
+                    // 直接用遍歷所有影格的引數j，是否等於currentIndex，作為影格是否出現的判定
                     voxelMesh.visible = j === currentIndex;
+                }
+
+                // 沒有loop的動畫 播放結束後就要關掉
+                // 先播新影格再決定是否關掉，否則動畫接續時會一閃
+                if( !voxelObject.loop && (slowIndex-voxelObject.startIndex>=voxelObject.children.length)){
+                    voxelObject.visible=false
                 }
             }
         }
@@ -153,28 +164,65 @@
         let hack=voxelAnimas["stick_throw"][0]
         let jump=voxelAnimas["stick_run"][0]
 
-            console.log(stay)
+            // console.log(stay)
 
-            let geo = stay.children[0].geometry;
-            let colors = geo.attributes.color.array;
-            console.log(colors)
+            // let geo = stay.children[0].geometry;
+            // let colors = geo.attributes.color.array;
+            // console.log(colors)
 
-            for (let i = 0; i < colors.length; i += 3) {
-                // 获取当前顶点的颜色
-                let r = colors[i];
-                let g = colors[i + 1];
-                let b = colors[i + 2];
+            // for (let i = 0; i < colors.length; i += 3) {
+            //     // 获取当前顶点的颜色
+            //     let r = colors[i];
+            //     let g = colors[i + 1];
+            //     let b = colors[i + 2];
 
-                // 假设你想要替换的颜色是淡蓝色（RGB：0.5, 0.5, 1.0）
-                // 并且将其替换为淡红色（RGB：1.0, 0.5, 0.5）
-                if (r === 1 && g === 1 && b === 1) {
-                    colors[i] = 1.0;     // 红色分量
-                    colors[i + 1] = 0.5; // 绿色分量保持不变
-                    colors[i + 2] = 0.5; // 蓝色分量
+            //     // 假设你想要替换的颜色是淡蓝色（RGB：0.5, 0.5, 1.0）
+            //     // 并且将其替换为淡红色（RGB：1.0, 0.5, 0.5）
+            //     if (r === 1 && g === 1 && b === 1) {
+            //         colors[i] = 1.0;     // 红色分量
+            //         colors[i + 1] = 0.5; // 绿色分量保持不变
+            //         colors[i + 2] = 0.5; // 蓝色分量
+            //     }
+            // }
+            // // 标记颜色需要更新
+            // geo.attributes.color.needsUpdate = true;
+        
+        // 為每個stick動畫重新上陣營色
+        // 遍歷每種voxel動畫
+        for (const voxelName in voxelAnimas) {
+        const voxelObjectsArray = voxelAnimas[voxelName];
+            // 遍歷一種動畫的各個複製體
+            for (let i = 0; i < voxelObjectsArray.length; i++) {
+                const voxelObject = voxelObjectsArray[i];
+                // 遍歷voxel動畫裡的每個影格物件
+                for (let j = 0; j < voxelObject.children.length; j++) {
+                    var voxelMesh=voxelObject.children[j]
+                    let geo=voxelMesh.geometry
+                    let colors = geo.attributes.color.array;
+                    // console.log(colors)
+
+                    for (let i = 0; i < colors.length; i += 3) {
+                        // 获取当前顶点的颜色
+                        let r = colors[i];
+                        let g = colors[i + 1];
+                        let b = colors[i + 2];
+
+                        if (r == 1 && g == 1 && b == 1) {
+                            colors[i] = 0.5;     // 红色分量
+                            colors[i + 1] = 0.5; // 绿色分量保持不变
+                            colors[i + 2] = 1.0; // 蓝色分量
+                        }
+                        if (r == 1 && g == 0 && b == 0) {
+                            colors[i] = 0;     // 红色分量
+                            colors[i + 1] = 0; // 绿色分量保持不变
+                            colors[i + 2] = 1.0; // 蓝色分量
+                        }
+                    }
+                    // 标记颜色需要更新
+                    geo.attributes.color.needsUpdate = true;
                 }
             }
-            // 标记颜色需要更新
-            geo.attributes.color.needsUpdate = true;
+        }
 
         walk.visible=false
         stay.visible=false
