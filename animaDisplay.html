@@ -26,6 +26,10 @@
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(75, window.innerWidth /window.innerHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
     renderer.setSize(window.innerWidth,window.innerHeight);
     canvas.appendChild(renderer.domElement);
 
@@ -39,6 +43,18 @@
     var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
     directionalLight.position.set(0, 1, 1);
     directionalLight.castShadow = true; // 讓此光能產生陰影
+
+    // 設定光源可產生影子的範圍與精細度
+    directionalLight.shadow.camera.left = -50;
+    directionalLight.shadow.camera.right = 50;
+    directionalLight.shadow.camera.top = 50;
+    directionalLight.shadow.camera.bottom = -50;
+    directionalLight.shadow.camera.near = 1;
+    directionalLight.shadow.camera.far = 200;
+
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
+
     scene.add(directionalLight);
 
     const pointLight1 = new THREE.PointLight(0xffffff,10);
@@ -68,8 +84,14 @@
     // 創建網格（方塊）
     const cube = new THREE.Mesh(geometry, material);
 
+    cube.receiveShadow = true
+    cube.castShadow = true;
+    cube.clipShadows = true;
+
+
     // 將方塊添加到場景
     scene.add(cube);
+
 
     // 添加OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -98,14 +120,17 @@
             mesh.scale.setScalar(.1);
             mesh.visible = false;
 
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+
             meshes.push(mesh);
             anima.add(mesh);
         }
     }
 
     // 載入預設檔案
-    // loader.load( 'https://cubiccode.vercel.app/vox/Tyrannosaurus_walking.vox', function ( chunks ) {
-    loader.load( 'https://comfy-cucurucho-9c697a.netlify.app/knight-walk.vox', function ( chunks ) {
+    loader.load( 'https://cubiccode.vercel.app/vox/Tyrannosaurus_walking.vox', function ( chunks ) {
+    // loader.load( 'https://comfy-cucurucho-9c697a.netlify.app/knight-walk.vox', function ( chunks ) {
     // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
         processVoxelAnimation(chunks);
           
