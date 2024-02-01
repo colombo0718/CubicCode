@@ -51,16 +51,51 @@
     }
 
     const voxelSettings = [
-        { name: "stick_walk",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
-        { name: "stick_stand",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
-        { name: "stick_throw",  opacity: 1,  amount: 1   ,radius:10 ,loop:false},
-        { name: "stick_run",  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "b_walk",file: "stick_walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "b_stand",file: "stick_stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "b_throw",file: "stick_throw",faction:'b',  opacity: 1,  amount: 1   ,radius:10 ,loop:false},
+        { name: "b_run",file: "stick_run",faction:'b',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
 
+    function plotFactionColor(mesh,faction){
+
+        const factionColors = {
+            b: { light: [0.5, 0.5, 1.0], dark: [0, 0, 1] }, // 淡蓝和深蓝
+            r: { light: [1.0, 0.5, 0.5], dark: [1, 0, 0] }, // 淡红和深红
+            g: { light: [0.5, 1.0, 0.5], dark: [0, 1, 0] }, // 淡绿和深绿
+        };
+
+        let geo=mesh.geometry
+        let colors = geo.attributes.color.array;
+        // console.log(colors)
+        console.log(faction)
+        let fc=factionColors[faction]
+
+        for (let i = 0; i < colors.length; i += 3) {
+            // 获取当前顶点的颜色
+            let r = colors[i + 0];
+            let g = colors[i + 1];
+            let b = colors[i + 2];
+
+            if (r == 1 && g == 1 && b == 1) {
+                colors[i + 0] = fc.light[0];     // 红色分量
+                colors[i + 1] = fc.light[1]; // 绿色分量保持不变
+                colors[i + 2] = fc.light[2]; // 蓝色分量
+            }
+            if (r == 1 && g == 0 && b == 0) {
+                colors[i + 0] = fc.dark[0];     // 红色分量
+                colors[i + 1] = fc.dark[1]; // 绿色分量保持不变
+                colors[i + 2] = fc.dark[2]; // 蓝色分量
+            }
+        }
+        // 标记颜色需要更新
+        geo.attributes.color.needsUpdate = true;
+    }
+
     // 加载voxel模型
-        function createModelArray(chunks,opacity,amount,raduis,loop){
+        function createModelArray(chunks,faction,opacity,amount,raduis,loop){
             const models = [];
             for (let i = 0; i < amount; i++) {
                 const voxelObject = new THREE.Object3D();
@@ -75,6 +110,33 @@
                     // mesh.material.emissive.set(0x008888);
                     mesh.material.opacity = opacity;
                     voxelObject.add(mesh);
+
+                    plotFactionColor(mesh,faction)
+
+                    // let geo=mesh.geometry
+                    // let colors = geo.attributes.color.array;
+                    // // console.log(colors)
+
+                    // for (let i = 0; i < colors.length; i += 3) {
+                    //     // 获取当前顶点的颜色
+                    //     let r = colors[i];
+                    //     let g = colors[i + 1];
+                    //     let b = colors[i + 2];
+
+                    //     if (r == 1 && g == 1 && b == 1) {
+                    //         colors[i] = 0.5;     // 红色分量
+                    //         colors[i + 1] = 0.5; // 绿色分量保持不变
+                    //         colors[i + 2] = 1.0; // 蓝色分量
+                    //     }
+                    //     if (r == 1 && g == 0 && b == 0) {
+                    //         colors[i] = 0;     // 红色分量
+                    //         colors[i + 1] = 0; // 绿色分量保持不变
+                    //         colors[i + 2] = 1.0; // 蓝色分量
+                    //     }
+                    // }
+                    // // 标记颜色需要更新
+                    // geo.attributes.color.needsUpdate = true;
+
                 }
                 // voxelObject.radius=raduis/10
                 // voxelObject.position.x=Math.random()*20-10
@@ -86,9 +148,9 @@
 
         const loader = new VOXLoader();
         for (const voxelSet of voxelSettings) {
-            loader.load('https://cubiccode.vercel.app/StickWars/'+voxelSet.name+'.vox',
+            loader.load('https://cubiccode.vercel.app/StickWars/'+voxelSet.file+'.vox',
             function (chunks){
-                const models=createModelArray(chunks,voxelSet.opacity,voxelSet.amount,voxelSet.radius,voxelSet.loop)
+                const models=createModelArray(chunks,voxelSet.faction,voxelSet.opacity,voxelSet.amount,voxelSet.radius,voxelSet.loop)
                 voxelAnimas[voxelSet.name] = models;
             })
         }
@@ -159,10 +221,10 @@
     var startLoop=function(){}
     function gameProcess(){
         // let score=0
-        let stay=voxelAnimas["stick_stand"][0]
-        let walk=voxelAnimas["stick_walk"][0]
-        let hack=voxelAnimas["stick_throw"][0]
-        let jump=voxelAnimas["stick_run"][0]
+        let stay=voxelAnimas["b_stand"][0]
+        let walk=voxelAnimas["b_walk"][0]
+        let hack=voxelAnimas["b_throw"][0]
+        let jump=voxelAnimas["b_run"][0]
 
             // console.log(stay)
 
@@ -189,40 +251,40 @@
         
         // 為每個stick動畫重新上陣營色
         // 遍歷每種voxel動畫
-        for (const voxelName in voxelAnimas) {
-        const voxelObjectsArray = voxelAnimas[voxelName];
-            // 遍歷一種動畫的各個複製體
-            for (let i = 0; i < voxelObjectsArray.length; i++) {
-                const voxelObject = voxelObjectsArray[i];
-                // 遍歷voxel動畫裡的每個影格物件
-                for (let j = 0; j < voxelObject.children.length; j++) {
-                    var voxelMesh=voxelObject.children[j]
-                    let geo=voxelMesh.geometry
-                    let colors = geo.attributes.color.array;
-                    // console.log(colors)
+        // for (const voxelName in voxelAnimas) {
+        // const voxelObjectsArray = voxelAnimas[voxelName];
+        //     // 遍歷一種動畫的各個複製體
+        //     for (let i = 0; i < voxelObjectsArray.length; i++) {
+        //         const voxelObject = voxelObjectsArray[i];
+        //         // 遍歷voxel動畫裡的每個影格物件
+        //         for (let j = 0; j < voxelObject.children.length; j++) {
+        //             var voxelMesh=voxelObject.children[j]
+        //             let geo=voxelMesh.geometry
+        //             let colors = geo.attributes.color.array;
+        //             // console.log(colors)
 
-                    for (let i = 0; i < colors.length; i += 3) {
-                        // 获取当前顶点的颜色
-                        let r = colors[i];
-                        let g = colors[i + 1];
-                        let b = colors[i + 2];
+        //             for (let i = 0; i < colors.length; i += 3) {
+        //                 // 获取当前顶点的颜色
+        //                 let r = colors[i];
+        //                 let g = colors[i + 1];
+        //                 let b = colors[i + 2];
 
-                        if (r == 1 && g == 1 && b == 1) {
-                            colors[i] = 0.5;     // 红色分量
-                            colors[i + 1] = 0.5; // 绿色分量保持不变
-                            colors[i + 2] = 1.0; // 蓝色分量
-                        }
-                        if (r == 1 && g == 0 && b == 0) {
-                            colors[i] = 0;     // 红色分量
-                            colors[i + 1] = 0; // 绿色分量保持不变
-                            colors[i + 2] = 1.0; // 蓝色分量
-                        }
-                    }
-                    // 标记颜色需要更新
-                    geo.attributes.color.needsUpdate = true;
-                }
-            }
-        }
+        //                 if (r == 1 && g == 1 && b == 1) {
+        //                     colors[i] = 0.5;     // 红色分量
+        //                     colors[i + 1] = 0.5; // 绿色分量保持不变
+        //                     colors[i + 2] = 1.0; // 蓝色分量
+        //                 }
+        //                 if (r == 1 && g == 0 && b == 0) {
+        //                     colors[i] = 0;     // 红色分量
+        //                     colors[i + 1] = 0; // 绿色分量保持不变
+        //                     colors[i + 2] = 1.0; // 蓝色分量
+        //                 }
+        //             }
+        //             // 标记颜色需要更新
+        //             geo.attributes.color.needsUpdate = true;
+        //         }
+        //     }
+        // }
 
         walk.visible=false
         stay.visible=false
