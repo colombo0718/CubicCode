@@ -26,6 +26,10 @@
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(75, window.innerWidth /window.innerHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
     renderer.setSize(window.innerWidth,window.innerHeight);
     canvas.appendChild(renderer.domElement);
 
@@ -37,19 +41,31 @@
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
-    directionalLight.position.set(0, 1, 1);
+    directionalLight.position.set(-10, 20, 10);
     directionalLight.castShadow = true; // 讓此光能產生陰影
+
+    // 設定光源可產生影子的範圍與精細度
+    directionalLight.shadow.camera.left = -20;
+    directionalLight.shadow.camera.right = 20;
+    directionalLight.shadow.camera.top = 20;
+    directionalLight.shadow.camera.bottom = -20;
+    directionalLight.shadow.camera.near = .1;
+    directionalLight.shadow.camera.far = 200;
+
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
+
     scene.add(directionalLight);
 
-    const pointLight1 = new THREE.PointLight(0xffffff,10);
-    pointLight1.position.set(2, 2, 2);
-    pointLight1.castShadow = true; // 讓此光能產生陰影
-    scene.add(pointLight1);
+    // const pointLight1 = new THREE.PointLight(0xffffff,10);
+    // pointLight1.position.set(2, 2, 2);
+    // pointLight1.castShadow = true; // 讓此光能產生陰影
+    // scene.add(pointLight1);
 
-    const pointLight2 = new THREE.PointLight(0xffffff,10);
-    pointLight2.position.set(-2, 2, -2);
-    pointLight2.castShadow = true; // 讓此光能產生陰影
-    scene.add(pointLight2);
+    // const pointLight2 = new THREE.PointLight(0xffffff,10);
+    // pointLight2.position.set(-2, 2, -2);
+    // pointLight2.castShadow = true; // 讓此光能產生陰影
+    // scene.add(pointLight2);
 
     // 添加網格
     var gridSize = 10; // 網格大小
@@ -60,16 +76,22 @@
 
 
     // 創建方塊幾何體
-    const geometry = new THREE.BoxGeometry(10, 0, 10); // 方塊的尺寸
+    const geometry = new THREE.BoxGeometry(10, .05, 10); // 方塊的尺寸
 
     // 創建綠色材質
-    const material = new THREE.MeshBasicMaterial({ color: 0xbbbb00 }); // 綠色
+    const material = new THREE.MeshLambertMaterial({ color: 0xffff00 }); // 綠色
 
     // 創建網格（方塊）
     const cube = new THREE.Mesh(geometry, material);
 
+    cube.receiveShadow = true
+    cube.castShadow = true;
+    // cube.clipShadows = true;
+
+
     // 將方塊添加到場景
     scene.add(cube);
+
 
     // 添加OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -98,14 +120,17 @@
             mesh.scale.setScalar(.1);
             mesh.visible = false;
 
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+
             meshes.push(mesh);
             anima.add(mesh);
         }
     }
 
     // 載入預設檔案
-    // loader.load( 'https://cubiccode.vercel.app/vox/Tyrannosaurus_walking.vox', function ( chunks ) {
-    loader.load( 'https://comfy-cucurucho-9c697a.netlify.app/knight-walk.vox', function ( chunks ) {
+    loader.load( 'https://cubiccode.vercel.app/vox/Tyrannosaurus_walking.vox', function ( chunks ) {
+    // loader.load( 'https://comfy-cucurucho-9c697a.netlify.app/knight-walk.vox', function ( chunks ) {
     // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
         processVoxelAnimation(chunks);
           
