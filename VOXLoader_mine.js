@@ -153,6 +153,7 @@ class VOXLoader extends Loader {
 				const numVoxels = data.getUint32( i, true ); i += 4;
 				console.log(numVoxels)
 				chunk.data = new Uint8Array( buffer, i, numVoxels * 4 );
+				console.log(buffer)
 
 				i += numVoxels * 4;
 
