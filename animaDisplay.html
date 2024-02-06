@@ -7,7 +7,7 @@
 <div id="canvas" ></div>
 <input type="file" id="fileInput" accept=".vox" />
 <input type="checkbox" id="checkFloor" checked >顯示地板</input>
-
+<input type="color" id="floorColor" name="cubeColor" value="#00ff00">
 <script type="importmap">
     {
         "imports": {
@@ -80,7 +80,7 @@
     const geometry = new THREE.BoxGeometry(10, .05, 10); // 方塊的尺寸
 
     // 創建綠色材質
-    const material = new THREE.MeshLambertMaterial({ color: 0xffff00 }); // 綠色
+    const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 }); // 綠色
 
     // 創建網格（方塊）
     const cube = new THREE.Mesh(geometry, material);
@@ -88,6 +88,23 @@
     cube.receiveShadow = true
     cube.castShadow = true;
     // cube.clipShadows = true;
+
+    document.getElementById('checkFloor').addEventListener('change', function() {
+        if(this.checked) {
+            // 如果checkbox被選中，添加方塊到場景
+            scene.add(cube);
+        } else {
+            // 如果checkbox被取消選中，從場景中移除方塊
+            scene.remove(cube);
+        }
+    });
+
+    document.getElementById('floorColor').addEventListener('input', function() {
+        // 讀取選擇的顏色
+        var color = this.value;
+        // 更新方塊的材質顏色
+        cube.material.color.set(color);
+    });
 
 
     // 將方塊添加到場景
