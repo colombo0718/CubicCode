@@ -61,7 +61,7 @@
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffcc, 1); // 產生方向光
-    directionalLight.position.set(1, 30, -30);
+    directionalLight.position.set(1, 30, -15);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
 
@@ -206,7 +206,7 @@
         let flaping=voxelAnimas["flap"][0]
         let gliding=voxelAnimas["glid"][0]
         let diveing=voxelAnimas["dive"][0]
-        let ground=voxelAnimas["snowGnd"][0]
+        let ground=voxelAnimas["gressGnd"][0]
         let houses=voxelAnimas["house"]
         let gifts=voxelAnimas["gift1"]
         let building=voxelAnimas["building"][0]
@@ -220,7 +220,7 @@
         // 创建音乐
         var BGM = new Audio('BGM.mp3');
         BGM.loop = true;
-        BGM.volume =.1; // 设置音量（0-1）
+        BGM.volume =0; // 设置音量（0-1）
 
         var shoot = new Audio('shoot.mp3');
         var hit = new Audio('hit.mp3');
@@ -245,9 +245,9 @@
             building.position.set(10,0,0)
             scene.add(Dragon)
             // fighter.position.set(0,10,10)
-            ground.position.set(0,0,0)
+            ground.position.set(0,0,-50)
             mistletoe.position.set(100,10,0)
-            ground.scale.set(40,1,10)
+            ground.scale.set(10,1,40)
 
             // house.position.set(0,0,0)
             // trees.position.set(0,0,0)
@@ -294,7 +294,7 @@
 
             if(Vx>0){
             // 控制聖誕老人，按W向上飛
-                if((keys['w']||keys['arrowup']) && Dragon.position.y<=10) {
+                if((keys['w']||keys['arrowup']) && Dragon.position.y<=15) {
                     Dragon.position.y += .1;
                     Dragon.rotation.x = .5;
                     flaping.visible=true
@@ -319,6 +319,9 @@
                     flaping.visible=false
                     gliding.visible=true
                     diveing.visible=false
+                }
+                else{
+
                 }
                 
                 
