@@ -256,7 +256,7 @@
             });
 
             gifts.forEach(function(item, index, array) {
-                Dragon.add(item)
+                // Dragon.add(item)
                 item.visible=true
                 item.position.set(0,0,0)
                 item.Vy=.1
@@ -292,22 +292,33 @@
             // 控制聖誕老人，按W向上飛
                 if((keys['w']||keys['arrowup']) && Dragon.position.y<=15) {
                     Dragon.position.y += .1;
+                    Dragon.rotation.x = .5;
+                    flaping.visible=true
+                    gliding.visible=false
                 }
                 else if((keys['w']||keys['arrowup'])) {
                     // 按住時靠在頂端不會震動
                 }
                 // 放開時往下降
                 else if(Dragon.position.y>1.2) {
-                    Dragon.position.y -= .1;
+                    Dragon.position.y -= .05;
+                    Dragon.rotation.x = 0;
+                    flaping.visible=false
+                    gliding.visible=true
                 }
                 
                 if((keys['a']||keys['arrowleft'])&& Dragon.position.x>=-10) {
                     console.log(Dragon.position.x)
                     Dragon.position.x -= .1;
+                    Dragon.rotation.z = .2;
                 }
-                if((keys['d']||keys['arrowright'])&& Dragon.position.x<=10) {
+                else if ((keys['d']||keys['arrowright'])&& Dragon.position.x<=10) {
                     console.log(Dragon.position.x)
                     Dragon.position.x += .1;
+                    Dragon.rotation.z = -.2;
+                }
+                else{
+                    Dragon.rotation.z = 0;
                 }
 
 
@@ -332,38 +343,38 @@
                 })
             }
 
-            // 控制禮物行為
-            giftCD+=1
-            gifts.forEach(function(gift, index, array) {
-                // 按E觸發禮物拋出
-                if(Vx>0 && (keys['e']||keys['arrowright']) && index==giftNum-1 && giftCD>50){
-                    Dragon.remove(gift)
-                    scene.add(gift)
-                    gift.position.copy(Dragon.position);
-                    giftNum-=1,giftCD=0
-                    shoot.play()
-                }
-                // 禮物飛行中
-                if (gift.parent === scene && gift.position.y>0) {
-                    gift.position.x+=.3
-                    gift.position.y+= gift.Vy
-                    gift.Vy+=Ay
-                    gift.rotation.z+=.1
-                }
-                // 禮物掉地上
-                if (gift.parent === scene && gift.position.y<=0) {
-                    gift.position.x-=Vx
-                    gift.position.y=0
-                }
+            // // 控制禮物行為
+            // giftCD+=1
+            // gifts.forEach(function(gift, index, array) {
+            //     // 按E觸發禮物拋出
+            //     if(Vx>0 && (keys['e']||keys['arrowright']) && index==giftNum-1 && giftCD>50){
+            //         Dragon.remove(gift)
+            //         scene.add(gift)
+            //         gift.position.copy(Dragon.position);
+            //         giftNum-=1,giftCD=0
+            //         shoot.play()
+            //     }
+            //     // 禮物飛行中
+            //     if (gift.parent === scene && gift.position.y>0) {
+            //         gift.position.x+=.3
+            //         gift.position.y+= gift.Vy
+            //         gift.Vy+=Ay
+            //         gift.rotation.z+=.1
+            //     }
+            //     // 禮物掉地上
+            //     if (gift.parent === scene && gift.position.y<=0) {
+            //         gift.position.x-=Vx
+            //         gift.position.y=0
+            //     }
 
-                houses.forEach(function(house, j, array) {
-                    if(gift.parent === scene && gift.position.distanceTo(house.position)<2){
-                        laugh.play()
-                        score+=1
-                        gift.position.z=1000
-                    }
-                });
-            })
+            //     houses.forEach(function(house, j, array) {
+            //         if(gift.parent === scene && gift.position.distanceTo(house.position)<2){
+            //             laugh.play()
+            //             score+=1
+            //             gift.position.z=1000
+            //         }
+            //     });
+            // })
 
             // if(Vx>0){
             //     houses.forEach(function(house, index, array) {
