@@ -90,7 +90,7 @@
     // }
 
     const voxelSettings = [
-        { name: "runDeer",      opacity: 1,  amount: 1   ,radius:10},
+        { name: "flap",      opacity: 1,  amount: 1   ,radius:10},
         { name: "stopDeer",      opacity: 1,  amount: 1   ,radius:10},
         { name: "gift1",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
@@ -130,7 +130,7 @@
 
         const loader = new VOXLoader();
         for (const voxelSet of voxelSettings) {
-            loader.load('https://cubiccode.vercel.app/Xmas/'+voxelSet.name+'.vox',
+            loader.load('https://cubiccode.vercel.app/flyDragon/'+voxelSet.name+'.vox',
             function (chunks){
                 const models=createModelArray(chunks,voxelSet.opacity,voxelSet.amount,voxelSet.radius)
                 voxelAnimas[voxelSet.name] = models;
