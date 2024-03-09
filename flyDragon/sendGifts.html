@@ -53,7 +53,7 @@
 
     // 設置相機
     camera.position.y = 15/Math.sqrt(2);
-    camera.position.z = 45/Math.sqrt(2);
+    camera.position.z = 60/Math.sqrt(2);
     camera.rotation.x=-Math.PI/16
 
     // 添加燈光
@@ -92,6 +92,7 @@
     const voxelSettings = [
         { name: "flap",         opacity: 1,  amount: 1   ,radius:10},
         { name: "glid",         opacity: 1,  amount: 1   ,radius:10},
+        { name: "dive",         opacity: 1,  amount: 1   ,radius:10},
         { name: "gift1",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
         { name: "snowGnd",      opacity: 1,  amount: 1   ,radius:5 },
@@ -204,6 +205,7 @@
         var score=0
         let flaping=voxelAnimas["flap"][0]
         let gliding=voxelAnimas["glid"][0]
+        let diveing=voxelAnimas["dive"][0]
         let ground=voxelAnimas["snowGnd"][0]
         let houses=voxelAnimas["house"]
         let gifts=voxelAnimas["gift1"]
@@ -231,13 +233,15 @@
 
             Dragon.add(flaping)
             Dragon.add(gliding)
+            Dragon.add(diveing)
             flaping.visible=true
             gliding.visible=false
+            diveing.visible=false
             Dragon.Vy=.3
             distence=0
             score=0
 
-            Dragon.position.set(0,10,10)
+            Dragon.position.set(0,10,20)
             building.position.set(10,0,0)
             scene.add(Dragon)
             // fighter.position.set(0,10,10)
@@ -290,22 +294,33 @@
 
             if(Vx>0){
             // 控制聖誕老人，按W向上飛
-                if((keys['w']||keys['arrowup']) && Dragon.position.y<=15) {
+                if((keys['w']||keys['arrowup']) && Dragon.position.y<=10) {
                     Dragon.position.y += .1;
                     Dragon.rotation.x = .5;
                     flaping.visible=true
                     gliding.visible=false
+                    diveing.visible=false
                 }
                 else if((keys['w']||keys['arrowup'])) {
                     // 按住時靠在頂端不會震動
                 }
-                // 放開時往下降
-                else if(Dragon.position.y>1.2) {
+                else if((keys['s']||keys['arrowdown']) && Dragon.position.y>1.2) {
+                    // 按住時靠在頂端不會震動
+                    Dragon.position.y -= .1;
+                    Dragon.rotation.x = -.5;
+                    flaping.visible=false
+                    gliding.visible=false
+                    diveing.visible=true
+                }
+                // 放開時滑翔
+                else if (Dragon.position.y>1.2) {
                     Dragon.position.y -= .03;
                     Dragon.rotation.x = 0;
                     flaping.visible=false
                     gliding.visible=true
+                    diveing.visible=false
                 }
+                
                 
                 if((keys['a']||keys['arrowleft'])&& Dragon.position.x>=-10) {
                     console.log(Dragon.position.x)
