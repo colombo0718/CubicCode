@@ -52,10 +52,9 @@
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
-    camera.position.y = 15/Math.sqrt(2);
-    camera.position.z = 60/Math.sqrt(2);
-    camera.rotation.x=-Math.PI/16
-
+    camera.position.y = 40/Math.sqrt(2);
+    camera.position.z = 40/Math.sqrt(2);
+    camera.rotation.x=-Math.PI/8
     // 添加燈光
     var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
     scene.add(ambientLight);
@@ -241,13 +240,13 @@
             distence=0
             score=0
 
-            Dragon.position.set(0,10,20)
+            Dragon.position.set(0,10,0)
             // building.position.set(10,0,0)
             scene.add(Dragon)
             // fighter.position.set(0,10,10)
             ground.position.set(0,0,-50)
             mistletoe.position.set(100,10,0)
-            ground.scale.set(10,1,40)
+            ground.scale.set(1000,1,40)
 
             // house.position.set(0,0,0)
             // trees.position.set(0,0,0)
@@ -261,9 +260,9 @@
 
             fires.forEach(function(item, index, array) {
                 Dragon.add(item)
-                item.visible=true
+                item.visible=false
                 item.position.set(0,0,0)
-                item.Vy=.1
+                // item.Vy=.1
             })
             fireNum=10
 
@@ -281,7 +280,7 @@
                 var hud=document.getElementById("hud");
                 hud.innerHTML="W：飛起, E：發射  <br>"+
                     "時間："+Math.floor(distence)+"<br>"+
-                    "禮物："+giftNum+"<br>"+
+                    // "禮物："+giftNum+"<br>"+
                     "送達："+score+"<br><br>"
                 distence+=0.01*Vx/0.3
             }
@@ -317,18 +316,21 @@
                     diveing.visible=false
                 }
                 else{
-
+                    Dragon.rotation.x = 0;
+                    flaping.visible=false
+                    gliding.visible=true
+                    diveing.visible=false
                 }
                 
                 
-                if((keys['a']||keys['arrowleft'])&& Dragon.position.x>=-10) {
+                if((keys['a']||keys['arrowleft'])&& Dragon.position.x>=-15) {
                     console.log(Dragon.position.x)
-                    Dragon.position.x -= .1;
+                    Dragon.position.x -= .15;
                     Dragon.rotation.z = .2;
                 }
-                else if ((keys['d']||keys['arrowright'])&& Dragon.position.x<=10) {
+                else if ((keys['d']||keys['arrowright'])&& Dragon.position.x<=15) {
                     console.log(Dragon.position.x)
-                    Dragon.position.x += .1;
+                    Dragon.position.x += .15;
                     Dragon.rotation.z = -.2;
                 }
                 else{
@@ -352,43 +354,46 @@
                 Vx=0
                 flaping.visible=false
                 gliding.visible=true
-                gifts.forEach(function(gift, index, array) {
-                    gift.visible=false
+                fires.forEach(function(fire, index, array) {
+                    fire.visible=false
                 })
             }
 
-            // // 控制禮物行為
-            // giftCD+=1
-            // gifts.forEach(function(gift, index, array) {
-            //     // 按E觸發禮物拋出
-            //     if(Vx>0 && (keys['e']||keys['arrowright']) && index==giftNum-1 && giftCD>50){
-            //         Dragon.remove(gift)
-            //         scene.add(gift)
-            //         gift.position.copy(Dragon.position);
-            //         giftNum-=1,giftCD=0
-            //         shoot.play()
-            //     }
-            //     // 禮物飛行中
-            //     if (gift.parent === scene && gift.position.y>0) {
-            //         gift.position.x+=.3
-            //         gift.position.y+= gift.Vy
-            //         gift.Vy+=Ay
-            //         gift.rotation.z+=.1
-            //     }
-            //     // 禮物掉地上
-            //     if (gift.parent === scene && gift.position.y<=0) {
-            //         gift.position.x-=Vx
-            //         gift.position.y=0
-            //     }
+            // 控制火球行為
+            fireCD+=1
+            fires.forEach(function(fire, index, array) {
+                // 按E觸發禮物拋出
+                if(Vx>0 && (keys['e']||keys['arrowright']) && index==fireNum-1 && fireCD>50){
+                    console.log('fire')
+                    fire.visible=true
+                    Dragon.remove(fire)
+                    scene.add(fire)
+                    fire.position.copy(Dragon.position);
+                    fireNum-=1,fireCD=0
+                    // shoot.play()
+                }
+                // 禮物飛行中
+                if (fire.parent === scene && fire.position.y>0) {
+                    // fire.position.x+=.3
+                    fire.position.z-= .5
+                    fire.Vy+=Ay
+                    fire.rotation.z+=.02
+                }
+                // 禮物掉地上
+                if (fire.parent === scene && fire.position.z<-50) {
+                    // fire.position.x-=Vx
+                    // fire.position.y=0
+                    fire.visible=false
+                }
 
-            //     houses.forEach(function(house, j, array) {
-            //         if(gift.parent === scene && gift.position.distanceTo(house.position)<2){
-            //             laugh.play()
-            //             score+=1
-            //             gift.position.z=1000
-            //         }
-            //     });
-            // })
+                houses.forEach(function(house, j, array) {
+                    if(fire.parent === scene && fire.position.distanceTo(house.position)<2){
+                        laugh.play()
+                        score+=1
+                        fire.position.z=1000
+                    }
+                });
+            })
 
             // if(Vx>0){
             //     houses.forEach(function(house, index, array) {
@@ -418,22 +423,22 @@
             // }
 
             // 榭寄生移動，碰到補充禮物
-            mistletoe.position.x-=Vx
-            if(Dragon.position.distanceTo(mistletoe.position)<1){
-                mistletoe.position.set(Math.random()*100+250,20,0)
-                giftNum=10
-                gifts.forEach(function(item, index, array) {
-                    item.position.set(0,0,0)
-                    item.Vy=.1
-                    item.rotation.z=0
-                    scene.remove(item)
-                    Dragon.add(item)
-                })
-                get.play()
-            }
-            if(mistletoe.position.x<-50){
-                mistletoe.position.set(Math.random()*100+50,20,0)
-            }
+            // mistletoe.position.x-=Vx
+            // if(Dragon.position.distanceTo(mistletoe.position)<1){
+            //     mistletoe.position.set(Math.random()*100+250,20,0)
+            //     giftNum=10
+            //     gifts.forEach(function(item, index, array) {
+            //         item.position.set(0,0,0)
+            //         item.Vy=.1
+            //         item.rotation.z=0
+            //         scene.remove(item)
+            //         Dragon.add(item)
+            //     })
+            //     get.play()
+            // }
+            // if(mistletoe.position.x<-50){
+            //     mistletoe.position.set(Math.random()*100+50,20,0)
+            // }
 
 
             // 隨機小樹林
