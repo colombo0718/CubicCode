@@ -93,11 +93,11 @@
         { name: "flap",         opacity: 1,  amount: 1   ,radius:10},
         { name: "glid",         opacity: 1,  amount: 1   ,radius:10},
         { name: "dive",         opacity: 1,  amount: 1   ,radius:10},
-        { name: "gift1",        opacity: 1,  amount: 10  ,radius:2 },
+        // { name: "gift1",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
         { name: "gressGnd",      opacity: 1,  amount: 1   ,radius:5 },
         // { name: "building",     opacity: 1,  amount: 1    ,radius:5 },
-        // { name: "ball",         opacity: 1,  amount: 50   ,radius:5 },
+        { name: "ball",         opacity: 1,  amount: 10   ,radius:5 },
         { name: "trees",        opacity: 1,  amount: 10   ,radius:5 },
         { name: "helicopter",   opacity: 1,  amount: 1    ,radius:5 },
         // { name: "moon",         opacity: 1,  amount: 1    ,radius:5 },
@@ -208,14 +208,14 @@
         let diveing=voxelAnimas["dive"][0]
         let ground=voxelAnimas["gressGnd"][0]
         let houses=voxelAnimas["house"]
-        let gifts=voxelAnimas["gift1"]
+        // let gifts=voxelAnimas["gift1"]
         // let building=voxelAnimas["building"][0]
         let helicopter=voxelAnimas["helicopter"][0]
         // let moon=voxelAnimas["moon"][0]
-        // let snow=voxelAnimas["ball"]
+        let fires=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
         let mistletoe= voxelAnimas["Mistletoe"][0]
-        var giftNum=10,giftCD=0,distence=0
+        var fireNum=10,fireCD=0,distence=0
 
         // 创建音乐
         var BGM = new Audio('BGM.mp3');
@@ -259,17 +259,13 @@
                 item.position.set(Math.random()*100+50,0,0)
             });
 
-            gifts.forEach(function(item, index, array) {
-                // Dragon.add(item)
+            fires.forEach(function(item, index, array) {
+                Dragon.add(item)
                 item.visible=true
                 item.position.set(0,0,0)
                 item.Vy=.1
             })
-            giftNum=10
-
-            // snow.forEach(function(item, index, array) {
-            //     item.position.set(Math.random()*100-50,Math.random()*20,Math.random()*40-20)
-            // });
+            fireNum=10
 
             trees.forEach(function(item, index, array) {
                 item.position.set(Math.random()*10-5,0,Math.random()*100-50)
@@ -439,14 +435,7 @@
                 mistletoe.position.set(Math.random()*100+50,20,0)
             }
 
-            // 隨機雪花
-            // snow.forEach(function(item, index, array) {
-            //     item.position.x-=Vx
-            //     item.position.y-=0.03
-            //     if(item.position.x<-50){
-            //         item.position.set(Math.random()*100+50,Math.random()*20+20,Math.random()*10-5)
-            //     }
-            // });
+
             // 隨機小樹林
             trees.forEach(function(item, index, array) {
                 item.position.z+=.5
