@@ -90,8 +90,8 @@
     // }
 
     const voxelSettings = [
-        { name: "flap",      opacity: 1,  amount: 1   ,radius:10},
-        { name: "stopDeer",      opacity: 1,  amount: 1   ,radius:10},
+        { name: "flap",         opacity: 1,  amount: 1   ,radius:10},
+        { name: "glid",         opacity: 1,  amount: 1   ,radius:10},
         { name: "gift1",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
         { name: "snowGnd",      opacity: 1,  amount: 1   ,radius:5 },
@@ -200,10 +200,10 @@
     var intervalID
     function gameProcess(){
         var Vx=0.2,Ay=-.01
-        var Santa=new THREE.Object3D();
+        var Dragon=new THREE.Object3D();
         var score=0
-        let runDeer=voxelAnimas["runDeer"][0]
-        let stopDeer=voxelAnimas["stopDeer"][0]
+        let flaping=voxelAnimas["flap"][0]
+        let gliding=voxelAnimas["glid"][0]
         let ground=voxelAnimas["snowGnd"][0]
         let houses=voxelAnimas["house"]
         let gifts=voxelAnimas["gift1"]
@@ -227,19 +227,19 @@
         
 
         function setup(){
-            Vx=0.2
+            Vx=0.01
 
-            Santa.add(runDeer)
-            Santa.add(stopDeer)
-            runDeer.visible=true
-            stopDeer.visible=false
-            Santa.Vy=.3
+            Dragon.add(flaping)
+            Dragon.add(gliding)
+            flaping.visible=true
+            gliding.visible=false
+            Dragon.Vy=.3
             distence=0
             score=0
 
-            Santa.position.set(-20,10,0)
+            Dragon.position.set(0,10,10)
             building.position.set(10,0,0)
-            scene.add(Santa)
+            scene.add(Dragon)
             // fighter.position.set(0,10,10)
             ground.position.set(0,0,0)
             mistletoe.position.set(100,10,0)
@@ -256,7 +256,7 @@
             });
 
             gifts.forEach(function(item, index, array) {
-                Santa.add(item)
+                Dragon.add(item)
                 item.visible=true
                 item.position.set(0,0,0)
                 item.Vy=.1
@@ -290,23 +290,34 @@
 
             if(Vx>0){
             // 控制聖誕老人，按W向上飛
-                if((keys['w']||keys['arrowup']) && Santa.position.y<=20) {
-                    Santa.position.y += .2;
+                if((keys['w']||keys['arrowup']) && Dragon.position.y<=15) {
+                    Dragon.position.y += .1;
                 }
                 else if((keys['w']||keys['arrowup'])) {
                     // 按住時靠在頂端不會震動
                 }
                 // 放開時往下降
-                else if(Santa.position.y>1.2) {
-                    Santa.position.y -= .1;
+                else if(Dragon.position.y>1.2) {
+                    Dragon.position.y -= .1;
                 }
+                
+                if((keys['a']||keys['arrowleft'])&& Dragon.position.x>=-10) {
+                    console.log(Dragon.position.x)
+                    Dragon.position.x -= .1;
+                }
+                if((keys['d']||keys['arrowright'])&& Dragon.position.x<=10) {
+                    console.log(Dragon.position.x)
+                    Dragon.position.x += .1;
+                }
+
+
             }else{ // 撞到東西，遊戲停止的行為
 
-                if(Santa.Vy<0 && Santa.position.y<=0){
-                    Santa.position.y=0
+                if(Dragon.Vy<0 && Dragon.position.y<=0){
+                    Dragon.position.y=0
                 }else{
-                    Santa.position.y+= Santa.Vy
-                    Santa.Vy+=Ay
+                    Dragon.position.y+= Dragon.Vy
+                    Dragon.Vy+=Ay
                 }
             }
 
@@ -314,8 +325,8 @@
                 hud.innerHTML+="好棒喔~~<br>截圖分享你送了多少禮物吧<br>按下[空白鍵]重新挑戰"
                 hit.play()
                 Vx=0
-                runDeer.visible=false
-                stopDeer.visible=true
+                flaping.visible=false
+                gliding.visible=true
                 gifts.forEach(function(gift, index, array) {
                     gift.visible=false
                 })
@@ -326,9 +337,9 @@
             gifts.forEach(function(gift, index, array) {
                 // 按E觸發禮物拋出
                 if(Vx>0 && (keys['e']||keys['arrowright']) && index==giftNum-1 && giftCD>50){
-                    Santa.remove(gift)
+                    Dragon.remove(gift)
                     scene.add(gift)
-                    gift.position.copy(Santa.position);
+                    gift.position.copy(Dragon.position);
                     giftNum-=1,giftCD=0
                     shoot.play()
                 }
@@ -354,36 +365,36 @@
                 });
             })
 
-            if(Vx>0){
-                houses.forEach(function(house, index, array) {
-                    house.position.x-=Vx
-                    if(house.position.x<-50){ house.position.x=Math.random()*100+50 }
-                    if(Santa.position.distanceTo(house.position)<2){
-                        // hit.play()
-                        collision()
-                    }
-                });
+            // if(Vx>0){
+            //     houses.forEach(function(house, index, array) {
+            //         house.position.x-=Vx
+            //         if(house.position.x<-50){ house.position.x=Math.random()*100+50 }
+            //         if(Dragon.position.distanceTo(house.position)<2){
+            //             // hit.play()
+            //             collision()
+            //         }
+            //     });
 
-                helicopter.position.x-=Vx*2
-                if(helicopter.position.x<-50){
-                    helicopter.position.set(Math.random()*100+50,Math.random()*10+10,0)
-                }
-                if(Santa.position.distanceTo(helicopter.position)<2){
-                    // hit.play()
-                    collision()
-                }
+            //     helicopter.position.x-=Vx*2
+            //     if(helicopter.position.x<-50){
+            //         helicopter.position.set(Math.random()*100+50,Math.random()*10+10,0)
+            //     }
+            //     if(Dragon.position.distanceTo(helicopter.position)<2){
+            //         // hit.play()
+            //         collision()
+            //     }
 
-                building.position.x-=Vx
-                if(building.position.x<-50){building.position.x=Math.random()*100+50}
-                if(Math.abs(Santa.position.x-building.position.x)<2 && Santa.position.y<12){
-                    // hit.play()
-                    collision()
-                }
-            }
+            //     building.position.x-=Vx
+            //     if(building.position.x<-50){building.position.x=Math.random()*100+50}
+            //     if(Math.abs(Dragon.position.x-building.position.x)<2 && Dragon.position.y<12){
+            //         // hit.play()
+            //         collision()
+            //     }
+            // }
 
             // 榭寄生移動，碰到補充禮物
             mistletoe.position.x-=Vx
-            if(Santa.position.distanceTo(mistletoe.position)<1){
+            if(Dragon.position.distanceTo(mistletoe.position)<1){
                 mistletoe.position.set(Math.random()*100+250,20,0)
                 giftNum=10
                 gifts.forEach(function(item, index, array) {
@@ -391,7 +402,7 @@
                     item.Vy=.1
                     item.rotation.z=0
                     scene.remove(item)
-                    Santa.add(item)
+                    Dragon.add(item)
                 })
                 get.play()
             }
