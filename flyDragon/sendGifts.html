@@ -95,12 +95,12 @@
         { name: "dive",         opacity: 1,  amount: 1   ,radius:10},
         { name: "gift1",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
-        { name: "snowGnd",      opacity: 1,  amount: 1   ,radius:5 },
-        { name: "building",     opacity: 1,  amount: 1    ,radius:5 },
-        { name: "ball",         opacity: 1,  amount: 50   ,radius:5 },
+        { name: "gressGnd",      opacity: 1,  amount: 1   ,radius:5 },
+        // { name: "building",     opacity: 1,  amount: 1    ,radius:5 },
+        // { name: "ball",         opacity: 1,  amount: 50   ,radius:5 },
         { name: "trees",        opacity: 1,  amount: 10   ,radius:5 },
         { name: "helicopter",   opacity: 1,  amount: 1    ,radius:5 },
-        { name: "moon",         opacity: 1,  amount: 1    ,radius:5 },
+        // { name: "moon",         opacity: 1,  amount: 1    ,radius:5 },
         { name: "Mistletoe",    opacity: 1,  amount: 1    ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
@@ -209,10 +209,10 @@
         let ground=voxelAnimas["gressGnd"][0]
         let houses=voxelAnimas["house"]
         let gifts=voxelAnimas["gift1"]
-        let building=voxelAnimas["building"][0]
+        // let building=voxelAnimas["building"][0]
         let helicopter=voxelAnimas["helicopter"][0]
-        let moon=voxelAnimas["moon"][0]
-        let snow=voxelAnimas["ball"]
+        // let moon=voxelAnimas["moon"][0]
+        // let snow=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
         let mistletoe= voxelAnimas["Mistletoe"][0]
         var giftNum=10,giftCD=0,distence=0
@@ -242,7 +242,7 @@
             score=0
 
             Dragon.position.set(0,10,20)
-            building.position.set(10,0,0)
+            // building.position.set(10,0,0)
             scene.add(Dragon)
             // fighter.position.set(0,10,10)
             ground.position.set(0,0,-50)
@@ -252,8 +252,8 @@
             // house.position.set(0,0,0)
             // trees.position.set(0,0,0)
             helicopter.position.set(-20,20,0)
-            moon.position.set(0,25,-40)
-            moon.scale.set(3,3,3)
+            // moon.position.set(0,25,-40)
+            // moon.scale.set(3,3,3)
     
             houses.forEach(function(item, index, array) {
                 item.position.set(Math.random()*100+50,0,0)
@@ -267,12 +267,12 @@
             })
             giftNum=10
 
-            snow.forEach(function(item, index, array) {
-                item.position.set(Math.random()*100-50,Math.random()*20,Math.random()*40-20)
-            });
+            // snow.forEach(function(item, index, array) {
+            //     item.position.set(Math.random()*100-50,Math.random()*20,Math.random()*40-20)
+            // });
 
             trees.forEach(function(item, index, array) {
-                item.position.set(Math.random()*100-50,0,Math.random()*10-5)
+                item.position.set(Math.random()*10-5,0,Math.random()*100-50)
                 item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
             });
         }setup()
@@ -440,18 +440,18 @@
             }
 
             // 隨機雪花
-            snow.forEach(function(item, index, array) {
-                item.position.x-=Vx
-                item.position.y-=0.03
-                if(item.position.x<-50){
-                    item.position.set(Math.random()*100+50,Math.random()*20+20,Math.random()*10-5)
-                }
-            });
+            // snow.forEach(function(item, index, array) {
+            //     item.position.x-=Vx
+            //     item.position.y-=0.03
+            //     if(item.position.x<-50){
+            //         item.position.set(Math.random()*100+50,Math.random()*20+20,Math.random()*10-5)
+            //     }
+            // });
             // 隨機小樹林
             trees.forEach(function(item, index, array) {
-                item.position.x-=Vx
-                if(item.position.x<-50){
-                    item.position.set(Math.random()*100+50,0,Math.random()*40-20)
+                item.position.z+=.5
+                if(item.position.z>30){
+                    item.position.set(Math.random()*40-20,0,Math.random()*100-150)
                     item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
                 }
             });
