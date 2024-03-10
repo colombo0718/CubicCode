@@ -52,8 +52,8 @@
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
-    camera.position.y = 40/Math.sqrt(2);
-    camera.position.z = 40/Math.sqrt(2);
+    camera.position.y = 50/Math.sqrt(2);
+    camera.position.z = 50/Math.sqrt(2);
     camera.rotation.x=-Math.PI/8
     // 添加燈光
     var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
@@ -246,7 +246,7 @@
             // fighter.position.set(0,10,10)
             ground.position.set(0,0,-50)
             mistletoe.position.set(100,10,0)
-            ground.scale.set(1000,1,40)
+            ground.scale.set(10,1,50)
 
             // house.position.set(0,0,0)
             // trees.position.set(0,0,0)
