@@ -92,16 +92,16 @@
         { name: "flap",         opacity: 1,  amount: 1   ,radius:10},
         { name: "glid",         opacity: 1,  amount: 1   ,radius:10},
         { name: "dive",         opacity: 1,  amount: 1   ,radius:10},
-        // { name: "gift1",        opacity: 1,  amount: 10  ,radius:2 },
+        { name: "magic",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
-        { name: "gressGnd",      opacity: 1,  amount: 1   ,radius:5 },
         { name: "soilGnd",      opacity: 1,  amount: 1   ,radius:5 },
+        { name: "gresGnd",      opacity: 1,  amount: 1   ,radius:5 },
         // { name: "building",     opacity: 1,  amount: 1    ,radius:5 },
         { name: "ball",         opacity: 1,  amount: 10   ,radius:5 },
         { name: "trees",        opacity: 1,  amount: 10   ,radius:5 },
-        { name: "helicopter",   opacity: 1,  amount: 1    ,radius:5 },
+        // { name: "helicopter",   opacity: 1,  amount: 1    ,radius:5 },
         // { name: "moon",         opacity: 1,  amount: 1    ,radius:5 },
-        { name: "Mistletoe",    opacity: 1,  amount: 1    ,radius:5 },
+        // { name: "Mistletoe",    opacity: 1,  amount: 1    ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -206,15 +206,16 @@
         let flaping=voxelAnimas["flap"][0]
         let gliding=voxelAnimas["glid"][0]
         let diveing=voxelAnimas["dive"][0]
-        let ground=voxelAnimas["gressGnd"][0]
+        let ground=voxelAnimas["gresGnd"][0]
+        let ground0=voxelAnimas["soilGnd"][0]
         let houses=voxelAnimas["house"]
         // let gifts=voxelAnimas["gift1"]
         // let building=voxelAnimas["building"][0]
-        let helicopter=voxelAnimas["helicopter"][0]
+        // let helicopter=voxelAnimas["helicopter"][0]
         // let moon=voxelAnimas["moon"][0]
         let fires=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
-        let mistletoe= voxelAnimas["Mistletoe"][0]
+        // let mistletoe= voxelAnimas["Mistletoe"][0]
         var fireNum=10,fireCD=0,distence=0
 
         // 创建音乐
@@ -246,12 +247,13 @@
             scene.add(Dragon)
             // fighter.position.set(0,10,10)
             ground.position.set(0,0,-50)
-            mistletoe.position.set(100,10,0)
+            // mistletoe.position.set(100,10,0)
             ground.scale.set(10,1,50)
-
+            ground0.position.set(0,-0.1,-50)
+            ground0.scale.set(1000,1,50)
             // house.position.set(0,0,0)
             // trees.position.set(0,0,0)
-            helicopter.position.set(-20,20,0)
+            // helicopter.position.set(-20,20,0)
             // moon.position.set(0,25,-40)
             // moon.scale.set(3,3,3)
     
