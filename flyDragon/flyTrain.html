@@ -210,6 +210,7 @@
         let magics=voxelAnimas["magic"]
         let fires=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
+        let sky=voxelAnimas["sky"][0]
         // let mistletoe= voxelAnimas["Mistletoe"][0]
         var fireNum=10,fireCD=0,distence=0
 
@@ -245,6 +246,8 @@
             ground.scale.set(10,1,100)
             ground0.position.set(0,-0.1,0)
             ground0.scale.set(1000,1,100)
+            sky.position.set(0,0,-200)
+            sky.scale.set(1000,100,1)
     
             houses.forEach(function(item, index, array) {
                 item.position.set(Math.random()*100+50,0,0)
@@ -391,7 +394,13 @@
                 });
             })
 
-
+            magics.forEach(function(item, index, array) {
+                item.position.z+=.5
+                if(item.position.z>30){
+                    item.position.set(Math.random()*30-15,0,300)
+                    // item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
+                }
+            });
 
 
             // 隨機小樹林
