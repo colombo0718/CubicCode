@@ -211,6 +211,7 @@
     function gameProcess(){
         var Vx=0.2,Ay=-.01
         var Dragon=new THREE.Object3D();
+        Dragon.rotating=false
         var score=0
         let flaping=voxelAnimas["flap"][0]
         let gliding=voxelAnimas["glid"][0]
@@ -231,7 +232,7 @@
         // 创建音乐
         var BGM = new Audio('BGM.mp3');
         BGM.loop = true;
-        BGM.volume =0; // 设置音量（0-1）
+        BGM.volume =1; // 设置音量（0-1）
 
         var shoot = new Audio('shoot.mp3');
         var hit = new Audio('hit.mp3');
@@ -250,6 +251,9 @@
             flaping.visible=true
             gliding.visible=false
             diveing.visible=false
+            looping.visible=false
+            deading.visible=false
+
             Dragon.Vy=.3
             distence=0
             score=0
@@ -320,6 +324,8 @@
                     flaping.visible=true
                     gliding.visible=false
                     diveing.visible=false
+                    looping.visible=false
+                    deading.visible=false
                 }
                 else if((keys['w']||keys['arrowup'])) {
                     // 按住時靠在頂端不會震動
@@ -331,6 +337,8 @@
                     flaping.visible=false
                     gliding.visible=false
                     diveing.visible=true
+                    looping.visible=false
+                    deading.visible=false
                 }
                 // 放開時滑翔
                 else if (Dragon.position.y>1.2) {
@@ -339,12 +347,24 @@
                     flaping.visible=false
                     gliding.visible=true
                     diveing.visible=false
+                    looping.visible=false
+                    deading.visible=false
                 }
                 else{
                     Dragon.rotation.x = 0;
                     flaping.visible=false
                     gliding.visible=true
                     diveing.visible=false
+                    looping.visible=false
+                    deading.visible=false
+                }
+
+                if(Dragon.rotating){
+                    flaping.visible=false
+                    gliding.visible=false
+                    diveing.visible=false
+                    looping.visible=true
+                    deading.visible=false
                 }
                 
                 
@@ -417,6 +437,12 @@
                 item.position.z+=.5
                 if(item.position.z>100){
                     item.position.set(Math.random()*30-15,Math.random()*14+1,-400)
+                    item.visible=true
+                }
+                if(item.position.z>0 && Dragon.position.distanceTo(item.position)<4 && item.visible){
+                    item.visible=false
+                    Dragon.rotating=true
+                    setTimeout(function(){Dragon.rotating=false},500)
                 }
             });
 
