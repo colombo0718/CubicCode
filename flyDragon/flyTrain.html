@@ -94,7 +94,7 @@
         { name: "glid",         opacity: 1,  amount: 1   ,radius:10},
         { name: "dive",         opacity: 1,  amount: 1   ,radius:10},
         { name: "ring",         opacity: 1,  amount: 5   ,radius:10},
-        { name: "target",       opacity: 1,  amount: 5   ,radius:10},
+        { name: "target",       opacity: 1,  amount: 1   ,radius:10},
         { name: "Griffin",      opacity: 1,  amount: 5   ,radius:10},
         { name: "magic",        opacity: 1,  amount: 5   ,radius:2 },
         { name: "sky",          opacity: 1,  amount: 1   ,radius:2 },
@@ -216,12 +216,12 @@
         let ground=voxelAnimas["gresGnd"][0]
         let ground0=voxelAnimas["soilGnd"][0]
         let rings=voxelAnimas["ring"]
-        let targets=voxelAnimas["targets"]
+        let target=voxelAnimas["target"][0]
         let magics=voxelAnimas["magic"]
         let fires=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
         let sky=voxelAnimas["sky"][0]
-        let griffin=voxelAnimas["Griffin"]
+        let griffins=voxelAnimas["Griffin"]
         var fireNum=10,fireCD=0,distence=0
 
         // 创建音乐
@@ -258,6 +258,8 @@
             ground0.scale.set(1000,1,100)
             sky.position.set(0,0,-200)
             sky.scale.set(1000,100,1)
+
+            target.position.set(Math.random()*30-15,Math.random()*14+1,-300)
     
             // houses.forEach(function(item, index, array) {
             //     item.position.set(Math.random()*100+50,0,0)
@@ -267,7 +269,7 @@
                 item.position.set(Math.random()*30-15,8,-index*100)
             });
 
-            griffin.forEach(function(item, index, array) {
+            griffins.forEach(function(item, index, array) {
                 item.position.set(Math.random()*30-15,8,-index*100-50)
             });
 
@@ -420,7 +422,7 @@
                 }
             });
 
-            griffin.forEach(function(item, index, array) {
+            griffins.forEach(function(item, index, array) {
                 item.position.z+=.5
                 if(item.position.z>100){
                     item.position.set(Math.random()*30-15,8,-400)
