@@ -215,6 +215,8 @@
         let flaping=voxelAnimas["flap"][0]
         let gliding=voxelAnimas["glid"][0]
         let diveing=voxelAnimas["dive"][0]
+        let looping=voxelAnimas["loop"][0]
+        let deading=voxelAnimas["dead"][0]
         let ground=voxelAnimas["gresGnd"][0]
         let ground0=voxelAnimas["soilGnd"][0]
         let rings=voxelAnimas["ring"]
@@ -243,6 +245,8 @@
             Dragon.add(flaping)
             Dragon.add(gliding)
             Dragon.add(diveing)
+            Dragon.add(looping)
+            Dragon.add(deading)
             flaping.visible=true
             gliding.visible=false
             diveing.visible=false
@@ -299,10 +303,10 @@
 
             if(Vx>0){
                 var hud=document.getElementById("hud");
-                hud.innerHTML="W：飛起, E：發射  <br>"+
+                hud.innerHTML="WASD：飛行, E：發射  <br>"+
                     "時間："+Math.floor(distence)+"<br>"+
                     // "禮物："+giftNum+"<br>"+
-                    "送達："+score+"<br><br>"
+                    "得分："+score+"<br><br>"
                 distence+=0.01*Vx/0.3
             }
 
