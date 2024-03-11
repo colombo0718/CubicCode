@@ -53,8 +53,8 @@
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
-    camera.position.y = 50/Math.sqrt(2);
-    camera.position.z = 50/Math.sqrt(2);
+    camera.position.y = 30/Math.sqrt(2);
+    camera.position.z = 30/Math.sqrt(2);
     camera.rotation.x=-Math.PI/8
     // 添加燈光
     var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
@@ -93,6 +93,7 @@
         { name: "flap",         opacity: 1,  amount: 1   ,radius:10},
         { name: "glid",         opacity: 1,  amount: 1   ,radius:10},
         { name: "dive",         opacity: 1,  amount: 1   ,radius:10},
+        { name: "Griffin",      opacity: 1,  amount: 1   ,radius:10},
         { name: "magic",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "sky",          opacity: 1,  amount: 1   ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
@@ -396,8 +397,8 @@
 
             magics.forEach(function(item, index, array) {
                 item.position.z+=.5
-                if(item.position.z>30){
-                    item.position.set(Math.random()*30-15,0,300)
+                if(item.position.z>50){
+                    item.position.set(Math.random()*30-15,8,-500)
                     // item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
                 }
             });
@@ -407,7 +408,7 @@
             trees.forEach(function(item, index, array) {
                 item.position.z+=.5
                 if(item.position.z>30){
-                    item.position.set(Math.random()*40-20,0,Math.random()*100-150)
+                    item.position.set(Math.random()*40-20,0,Math.random()*100-300)
                     item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
                 }
             });
