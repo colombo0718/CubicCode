@@ -93,8 +93,10 @@
         { name: "flap",         opacity: 1,  amount: 1   ,radius:10},
         { name: "glid",         opacity: 1,  amount: 1   ,radius:10},
         { name: "dive",         opacity: 1,  amount: 1   ,radius:10},
+        { name: "ring",         opacity: 1,  amount: 5   ,radius:10},
+        { name: "target",       opacity: 1,  amount: 5   ,radius:10},
         { name: "Griffin",      opacity: 1,  amount: 5   ,radius:10},
-        { name: "magic",        opacity: 1,  amount: 10  ,radius:2 },
+        { name: "magic",        opacity: 1,  amount: 5   ,radius:2 },
         { name: "sky",          opacity: 1,  amount: 1   ,radius:2 },
         { name: "soilGnd",      opacity: 1,  amount: 1   ,radius:5 },
         { name: "gresGnd",      opacity: 1,  amount: 1   ,radius:5 },
@@ -195,6 +197,13 @@
         keys[key] = false; // 設置按鍵為 false 表示釋放該按鍵
     });
 
+    
+
+
+
+
+
+
     // 遊戲主流程
     var intervalID
     function gameProcess(){
@@ -206,6 +215,8 @@
         let diveing=voxelAnimas["dive"][0]
         let ground=voxelAnimas["gresGnd"][0]
         let ground0=voxelAnimas["soilGnd"][0]
+        let rings=voxelAnimas["ring"]
+        let targets=voxelAnimas["targets"]
         let magics=voxelAnimas["magic"]
         let fires=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
@@ -258,6 +269,10 @@
 
             griffin.forEach(function(item, index, array) {
                 item.position.set(Math.random()*30-15,8,-index*100-50)
+            });
+
+            rings.forEach(function(item, index, array) {
+                item.position.set(Math.random()*30-15,Math.random()*14+1,-index*100-50)
             });
 
             fires.forEach(function(item, index, array) {
@@ -326,12 +341,12 @@
                 
                 
                 if((keys['a']||keys['arrowleft'])&& Dragon.position.x>=-15) {
-                    console.log(Dragon.position.x)
+                    // console.log(Dragon.position.x)
                     Dragon.position.x -= .15;
                     Dragon.rotation.z = .2;
                 }
                 else if ((keys['d']||keys['arrowright'])&& Dragon.position.x<=15) {
-                    console.log(Dragon.position.x)
+                    // console.log(Dragon.position.x)
                     Dragon.position.x += .15;
                     Dragon.rotation.z = -.2;
                 }
@@ -390,18 +405,25 @@
                 }
             })
 
+            rings.forEach(function(item, index, array) {
+                item.position.z+=.5
+                if(item.position.z>100){
+                    item.position.set(Math.random()*30-15,Math.random()*14+1,-400)
+                }
+            });
+
             magics.forEach(function(item, index, array) {
                 item.position.z+=.5
-                if(item.position.z>50){
-                    item.position.set(Math.random()*30-15,8,-500)
+                if(item.position.z>100){
+                    item.position.set(Math.random()*30-15,8,-400)
                     // item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
                 }
             });
 
             griffin.forEach(function(item, index, array) {
                 item.position.z+=.5
-                if(item.position.z>50){
-                    item.position.set(Math.random()*30-15,8,-500)
+                if(item.position.z>100){
+                    item.position.set(Math.random()*30-15,8,-400)
                 }
             });
 
@@ -417,6 +439,48 @@
         },10)
         }
 
+    window.addEventListener("gamepadconnected", function(e) {
+        console.log("控制器已連接，索引：" + e.gamepad.index);
+    });
+
+    window.addEventListener("gamepaddisconnected", function(e) {
+        console.log("控制器已斷開，索引：" + e.gamepad.index);
+    });
+
+    function readGamepad() {
+    var gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+    for (var i = 0; i < gamepads.length; i++) {
+        var gp = gamepads[i];
+        if (gp) {
+        // console.log("Gamepad detected at index " + gp.index);
+        // 讀取按鈕狀態
+        gp.buttons.forEach(function(button, index) {
+            if(button.pressed){console.log(index)}
+            if(index==0){
+                if(button.pressed){keys['e']=true}else{keys['e']=false}
+            }
+            if(index==9 && button.pressed){
+                setup()
+                clearInterval(intervalID);
+                startLoop()
+            }
+        });
+        // 讀取搖桿狀態
+        if(gp.axes[0]==-1){keys['a']=true}else{keys['a']=false}
+        if(gp.axes[0]== 1){keys['d']=true}else{keys['d']=false}
+        if(gp.axes[1]==-1){keys['w']=true}else{keys['w']=false}
+        if(gp.axes[1]== 1){keys['s']=true}else{keys['s']=false}
+        // console.log("Left Stick X Axis: " + gp.axes[0]);
+        // console.log("Left Stick Y Axis: " + gp.axes[1].toFixed(2));
+        // console.log("Righ Stick X Axis: " + gp.axes[2].toFixed(2));
+        // console.log("Righ Stick Y Axis: " + gp.axes[3].toFixed(2));
+        }
+    }
+    }
+
+    // 每隔100毫秒讀取一次控制器狀態
+    setInterval(readGamepad, 100);
+
         
         // 監聽鍵盤事件
         document.addEventListener('keydown', function(event) {
@@ -429,7 +493,7 @@
         });
     }
 
-    setTimeout(function(){gameProcess()},1000)
+    setTimeout(function(){gameProcess()},2000)
 
     // window.addEventListener("load", function() {
     //     const startButton = document.getElementById("startButton");
