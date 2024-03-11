@@ -40,6 +40,7 @@
     var fileInput = document.getElementById('fileInput');
     var canvas = document.getElementById('canvas');
     var scene = new THREE.Scene();
+    // scene.background = new THREE.Color(0x00ffff)
     var camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     var camera = new THREE.PerspectiveCamera(60,window.innerWidth/ window.innerHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -93,16 +94,12 @@
         { name: "glid",         opacity: 1,  amount: 1   ,radius:10},
         { name: "dive",         opacity: 1,  amount: 1   ,radius:10},
         { name: "magic",        opacity: 1,  amount: 10  ,radius:2 },
-        // { name: "magic",        opacity: 1,  amount: 10  ,radius:2 },
+        { name: "sky",          opacity: 1,  amount: 1   ,radius:2 },
         { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
         { name: "soilGnd",      opacity: 1,  amount: 1   ,radius:5 },
         { name: "gresGnd",      opacity: 1,  amount: 1   ,radius:5 },
-        // { name: "building",     opacity: 1,  amount: 1    ,radius:5 },
-        { name: "ball",         opacity: 1,  amount: 10   ,radius:5 },
-        { name: "trees",        opacity: 1,  amount: 10   ,radius:5 },
-        // { name: "helicopter",   opacity: 1,  amount: 1    ,radius:5 },
-        // { name: "moon",         opacity: 1,  amount: 1    ,radius:5 },
-        // { name: "Mistletoe",    opacity: 1,  amount: 1    ,radius:5 },
+        { name: "ball",         opacity: 1,  amount: 10  ,radius:5 },
+        { name: "trees",        opacity: 1,  amount: 10  ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -244,23 +241,17 @@
             // building.position.set(10,0,0)
             scene.add(Dragon)
             // fighter.position.set(0,10,10)
-            ground.position.set(0,0,-50)
             // mistletoe.position.set(100,10,0)
-            ground.scale.set(10,1,50)
-            ground0.position.set(0,-0.1,-50)
-            ground0.scale.set(1000,1,50)
-            // house.position.set(0,0,0)
-            // trees.position.set(0,0,0)
-            // helicopter.position.set(-20,20,0)
-            // moon.position.set(0,25,-40)
-            // moon.scale.set(3,3,3)
+            ground.scale.set(10,1,100)
+            ground0.position.set(0,-0.1,0)
+            ground0.scale.set(1000,1,100)
     
             houses.forEach(function(item, index, array) {
                 item.position.set(Math.random()*100+50,0,0)
             });
 
             magics.forEach(function(item, index, array) {
-                item.position.set(Math.random()*30-15,8,0)
+                item.position.set(Math.random()*30-15,8,-index*100)
             });
 
             fires.forEach(function(item, index, array) {
@@ -367,7 +358,7 @@
             // 控制火球行為
             fireCD+=1
             fires.forEach(function(fire, index, array) {
-                // 按E觸發禮物拋出
+                // 按E發射火球
                 if(Vx>0 && (keys['e']||keys['arrowright']) && index==fireNum-1 && fireCD>50){
                     console.log('fire')
                     fire.visible=true
@@ -377,7 +368,7 @@
                     fireNum-=1,fireCD=0
                     // shoot.play()
                 }
-                // 禮物飛行中
+                // 火球飛行中
                 if (fire.parent === scene && fire.position.y>0) {
                     // fire.position.x+=.3
                     fire.position.z-= .5
@@ -400,50 +391,7 @@
                 });
             })
 
-            // if(Vx>0){
-            //     houses.forEach(function(house, index, array) {
-            //         house.position.x-=Vx
-            //         if(house.position.x<-50){ house.position.x=Math.random()*100+50 }
-            //         if(Dragon.position.distanceTo(house.position)<2){
-            //             // hit.play()
-            //             collision()
-            //         }
-            //     });
 
-            //     helicopter.position.x-=Vx*2
-            //     if(helicopter.position.x<-50){
-            //         helicopter.position.set(Math.random()*100+50,Math.random()*10+10,0)
-            //     }
-            //     if(Dragon.position.distanceTo(helicopter.position)<2){
-            //         // hit.play()
-            //         collision()
-            //     }
-
-            //     building.position.x-=Vx
-            //     if(building.position.x<-50){building.position.x=Math.random()*100+50}
-            //     if(Math.abs(Dragon.position.x-building.position.x)<2 && Dragon.position.y<12){
-            //         // hit.play()
-            //         collision()
-            //     }
-            // }
-
-            // 榭寄生移動，碰到補充禮物
-            // mistletoe.position.x-=Vx
-            // if(Dragon.position.distanceTo(mistletoe.position)<1){
-            //     mistletoe.position.set(Math.random()*100+250,20,0)
-            //     giftNum=10
-            //     gifts.forEach(function(item, index, array) {
-            //         item.position.set(0,0,0)
-            //         item.Vy=.1
-            //         item.rotation.z=0
-            //         scene.remove(item)
-            //         Dragon.add(item)
-            //     })
-            //     get.play()
-            // }
-            // if(mistletoe.position.x<-50){
-            //     mistletoe.position.set(Math.random()*100+50,20,0)
-            // }
 
 
             // 隨機小樹林
