@@ -61,15 +61,15 @@
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffcc, 1); // 產生方向光
-    directionalLight.position.set(1, 30, -15);
+    directionalLight.position.set(1, 30, -10);
     directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
 
     // 設定光源可產生影子的範圍與精細度
     directionalLight.shadow.camera.left = -50;
     directionalLight.shadow.camera.right = 50;
-    directionalLight.shadow.camera.top = 50;
-    directionalLight.shadow.camera.bottom = -50;
+    directionalLight.shadow.camera.top = 200;
+    directionalLight.shadow.camera.bottom = -200;
     directionalLight.shadow.camera.near = 1;
     directionalLight.shadow.camera.far = 200;
 
@@ -93,10 +93,9 @@
         { name: "flap",         opacity: 1,  amount: 1   ,radius:10},
         { name: "glid",         opacity: 1,  amount: 1   ,radius:10},
         { name: "dive",         opacity: 1,  amount: 1   ,radius:10},
-        { name: "Griffin",      opacity: 1,  amount: 1   ,radius:10},
+        { name: "Griffin",      opacity: 1,  amount: 5   ,radius:10},
         { name: "magic",        opacity: 1,  amount: 10  ,radius:2 },
         { name: "sky",          opacity: 1,  amount: 1   ,radius:2 },
-        { name: "house",        opacity: 1,  amount: 3   ,radius:5 },
         { name: "soilGnd",      opacity: 1,  amount: 1   ,radius:5 },
         { name: "gresGnd",      opacity: 1,  amount: 1   ,radius:5 },
         { name: "ball",         opacity: 1,  amount: 10  ,radius:5 },
@@ -207,12 +206,11 @@
         let diveing=voxelAnimas["dive"][0]
         let ground=voxelAnimas["gresGnd"][0]
         let ground0=voxelAnimas["soilGnd"][0]
-        let houses=voxelAnimas["house"]
         let magics=voxelAnimas["magic"]
         let fires=voxelAnimas["ball"]
         let trees= voxelAnimas["trees"]
         let sky=voxelAnimas["sky"][0]
-        // let mistletoe= voxelAnimas["Mistletoe"][0]
+        let griffin=voxelAnimas["Griffin"]
         var fireNum=10,fireCD=0,distence=0
 
         // 创建音乐
@@ -250,12 +248,16 @@
             sky.position.set(0,0,-200)
             sky.scale.set(1000,100,1)
     
-            houses.forEach(function(item, index, array) {
-                item.position.set(Math.random()*100+50,0,0)
-            });
+            // houses.forEach(function(item, index, array) {
+            //     item.position.set(Math.random()*100+50,0,0)
+            // });
 
             magics.forEach(function(item, index, array) {
                 item.position.set(Math.random()*30-15,8,-index*100)
+            });
+
+            griffin.forEach(function(item, index, array) {
+                item.position.set(Math.random()*30-15,8,-index*100-50)
             });
 
             fires.forEach(function(item, index, array) {
@@ -288,7 +290,7 @@
 
 
             if(Vx>0){
-            // 控制聖誕老人，按W向上飛
+            // 控制飛龍，按W向上飛
                 if((keys['w']||keys['arrowup']) && Dragon.position.y<=15) {
                     Dragon.position.y += .1;
                     Dragon.rotation.x = .5;
@@ -370,29 +372,22 @@
                     scene.add(fire)
                     fire.position.copy(Dragon.position);
                     fireNum-=1,fireCD=0
+                    if(fireNum==0){fireNum=10}
                     // shoot.play()
                 }
                 // 火球飛行中
                 if (fire.parent === scene && fire.position.y>0) {
-                    // fire.position.x+=.3
                     fire.position.z-= .5
                     fire.Vy+=Ay
                     fire.rotation.z+=.02
                 }
-                // 禮物掉地上
-                if (fire.parent === scene && fire.position.z<-50) {
-                    // fire.position.x-=Vx
-                    // fire.position.y=0
+                // 火球飛到底
+                if (fire.parent === scene && fire.position.z<-200) {
                     fire.visible=false
+                    scene.remove(fire)
+                    Dragon.add(fire)
+                    fire.position.set(0,0,0)
                 }
-
-                houses.forEach(function(house, j, array) {
-                    if(fire.parent === scene && fire.position.distanceTo(house.position)<2){
-                        laugh.play()
-                        score+=1
-                        fire.position.z=1000
-                    }
-                });
             })
 
             magics.forEach(function(item, index, array) {
@@ -400,6 +395,13 @@
                 if(item.position.z>50){
                     item.position.set(Math.random()*30-15,8,-500)
                     // item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
+                }
+            });
+
+            griffin.forEach(function(item, index, array) {
+                item.position.z+=.5
+                if(item.position.z>50){
+                    item.position.set(Math.random()*30-15,8,-500)
                 }
             });
 
