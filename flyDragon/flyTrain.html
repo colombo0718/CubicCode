@@ -22,7 +22,7 @@
 <!-- <h3>W:向上飛 / E:丟禮物 </h3> -->
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <div id="hud" >
-    聖誕老人準備送禮物啦~<br>
+    御龍飛行訓練即將開始<br>
     按下[空白鍵]開始遊戲
 </div>
 <script type="importmap">
@@ -209,10 +209,12 @@
     // 遊戲主流程
     var intervalID
     function gameProcess(){
-        var Vx=0.2,Ay=-.01
+        // 飛龍基礎速度
+        var Vx=.2,Vy=.1,Vz=.5,Vr=.5
+        var Rate=1,maxRate=1 // 速度比率，控制遊戲進程
+        var time=0,score=0,distence=0
+
         var Dragon=new THREE.Object3D();
-        Dragon.rotating=false
-        var score=0
         let flaping=voxelAnimas["flap"][0]
         let gliding=voxelAnimas["glid"][0]
         let diveing=voxelAnimas["dive"][0]
@@ -227,22 +229,29 @@
         let trees= voxelAnimas["trees"]
         let sky=voxelAnimas["sky"][0]
         let griffins=voxelAnimas["Griffin"]
-        var fireNum=10,fireCD=0,distence=0
+        
+        var fireNum=10,fireCD=0
 
         // 创建音乐
         var BGM = new Audio('BGM.mp3');
         BGM.loop = true;
-        BGM.volume =1; // 设置音量（0-1）
+        BGM.volume =.1; // 设置音量（0-1）
 
-        var shoot = new Audio('shoot.mp3');
+        var fast= new Audio('fast.mp3');
+        // var shoot = new Audio('shoot.mp3');
         var hit = new Audio('hit.mp3');
-        var get = new Audio('get.mp3');
-        var laugh = new Audio('laugh.mp3');
+        // var get = new Audio('get.mp3');
+        // var laugh = new Audio('laugh.mp3');
         
 
         function setup(){
-            Vx=0.01
 
+            Rate=1,maxRate=1
+            time=0
+            score=0
+            distence=0
+            // 建立飛龍腳色
+            
             Dragon.add(flaping)
             Dragon.add(gliding)
             Dragon.add(diveing)
@@ -253,27 +262,30 @@
             diveing.visible=false
             looping.visible=false
             deading.visible=false
+            Dragon.rotating=false
+            
 
-            Dragon.Vy=.3
-            distence=0
-            score=0
 
             Dragon.position.set(0,10,0)
-            // building.position.set(10,0,0)
+            Dragon.rotation.set(0,0,0)
+            Dragon.scale.set(1.5,1.5,1.5)
             scene.add(Dragon)
-            // fighter.position.set(0,10,10)
-            // mistletoe.position.set(100,10,0)
+
+            // 天空與地面設置
             ground.scale.set(10,1,100)
             ground0.position.set(0,-0.1,0)
             ground0.scale.set(1000,1,100)
             sky.position.set(0,0,-200)
             sky.scale.set(1000,100,1)
 
+
+
+
+            rings.forEach(function(item, index, array) {
+                item.position.set(Math.random()*30-15,Math.random()*14+1,-index*100-50)
+            });
+
             target.position.set(Math.random()*30-15,Math.random()*14+1,-300)
-    
-            // houses.forEach(function(item, index, array) {
-            //     item.position.set(Math.random()*100+50,0,0)
-            // });
 
             magics.forEach(function(item, index, array) {
                 item.position.set(Math.random()*30-15,8,-index*100-300)
@@ -282,10 +294,7 @@
             griffins.forEach(function(item, index, array) {
                 item.position.set(Math.random()*30-15,8,-index*100-50-300)
             });
-
-            rings.forEach(function(item, index, array) {
-                item.position.set(Math.random()*30-15,Math.random()*14+1,-index*100-50)
-            });
+            
 
             fires.forEach(function(item, index, array) {
                 Dragon.add(item)
@@ -299,27 +308,37 @@
                 item.position.set(Math.random()*100-50,0,Math.random()*300-200)
                 item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
             });
+
         }setup()
         
         function startLoop(){
         intervalID=
         setInterval(function() {
-
-            if(Vx>0){
-                var hud=document.getElementById("hud");
-                hud.innerHTML="WASD：飛行, E：發射  <br>"+
-                    "時間："+Math.floor(distence)+"<br>"+
-                    // "禮物："+giftNum+"<br>"+
-                    "得分："+score+"<br><br>"
+            var hud=document.getElementById("hud");
+            if(Rate>0){
+                // var hud=document.getElementById("hud");
+                hud.innerHTML="WASD/左搖桿：飛行<br>"+
+                    "時間："+Math.floor(time)+"<br>"+
+                    "距離："+Math.floor(distence)+"<br>"+
+                    "得分："+score+"<br>"+
+                    "速度："+Rate.toFixed(1)+"<br>"+
+                    "極限："+maxRate.toFixed(1)+"<br><br><br><br>"
                 distence+=0.01*Vx/0.3
             }
 
+            if(Rate>=1){
+                // 遊戲正常進行中
+                time+=0.01
+                distence+=0.01*Vz*Rate
 
-
-            if(Vx>0){
-            // 控制飛龍，按W向上飛
+            
+                if(Rate>=1.01){
+                    // console.log(Rate)
+                    Rate-=0.005
+                }
+            // 控制飛龍，按W向上飛，S
                 if((keys['w']||keys['arrowup']) && Dragon.position.y<=15) {
-                    Dragon.position.y += .1;
+                    Dragon.position.y += Vy*Rate;
                     Dragon.rotation.x = .5;
                     flaping.visible=true
                     gliding.visible=false
@@ -330,9 +349,9 @@
                 else if((keys['w']||keys['arrowup'])) {
                     // 按住時靠在頂端不會震動
                 }
-                else if((keys['s']||keys['arrowdown']) && Dragon.position.y>1.2) {
+                else if((keys['s']||keys['arrowdown']) ) {
                     // 按住時靠在頂端不會震動
-                    Dragon.position.y -= .1;
+                    Dragon.position.y -= Vy*Rate;
                     Dragon.rotation.x = -.5;
                     flaping.visible=false
                     gliding.visible=false
@@ -341,16 +360,8 @@
                     deading.visible=false
                 }
                 // 放開時滑翔
-                else if (Dragon.position.y>1.2) {
-                    Dragon.position.y -= .03;
-                    Dragon.rotation.x = 0;
-                    flaping.visible=false
-                    gliding.visible=true
-                    diveing.visible=false
-                    looping.visible=false
-                    deading.visible=false
-                }
                 else{
+                    Dragon.position.y -= 0.3*Vy;
                     Dragon.rotation.x = 0;
                     flaping.visible=false
                     gliding.visible=true
@@ -367,42 +378,67 @@
                     deading.visible=false
                 }
                 
-                
+                // 控制飛龍左右飛
                 if((keys['a']||keys['arrowleft'])&& Dragon.position.x>=-15) {
                     // console.log(Dragon.position.x)
-                    Dragon.position.x -= .15;
+                    Dragon.position.x -= Vx*Rate;
                     Dragon.rotation.z = .2;
                 }
                 else if ((keys['d']||keys['arrowright'])&& Dragon.position.x<=15) {
                     // console.log(Dragon.position.x)
-                    Dragon.position.x += .15;
+                    Dragon.position.x += Vx*Rate;
                     Dragon.rotation.z = -.2;
                 }
                 else{
                     Dragon.rotation.z = 0;
                 }
 
+                if(Dragon.position.y<.15){
+                    
+                    Dragon.position.y=.15
+                    Dragon.rotation.x+=1
+                    Rate-=.1
+                }
 
-            }else{ // 撞到東西，遊戲停止的行為
 
-                if(Dragon.Vy<0 && Dragon.position.y<=0){
-                    Dragon.position.y=0
-                }else{
-                    Dragon.position.y+= Dragon.Vy
-                    Dragon.Vy+=Ay
+            }
+            else if(Rate<1 && Rate>0){ // 撞到東西，遊戲停止的行為
+                Dragon.position.y=.15
+                Dragon.rotation.x+=Vr*Rate
+                Rate-=.02
+                
+                flaping.visible=false
+                gliding.visible=false
+                diveing.visible=false
+                looping.visible=false
+                deading.visible=true
+
+                if(Rate<=0.02){
+                    hit.play()
+                    hud.innerHTML+="好棒喔~~<br>截圖分享你的飛行紀錄<br>按下[空白鍵]重新挑戰"
                 }
             }
-
-            function collision(){
-                hud.innerHTML+="好棒喔~~<br>截圖分享你送了多少禮物吧<br>按下[空白鍵]重新挑戰"
-                hit.play()
-                Vx=0
+            else{
+                Rate=0
+                
                 flaping.visible=false
-                gliding.visible=true
-                fires.forEach(function(fire, index, array) {
-                    fire.visible=false
-                })
+                gliding.visible=false
+                diveing.visible=false
+                looping.visible=false
+                deading.visible=true
             }
+
+
+            // function collision(){
+            //     hud.innerHTML+="好棒喔~~<br>截圖分享你送了多少禮物吧<br>按下[空白鍵]重新挑戰"
+            //     hit.play()
+            //     Vx=0
+            //     flaping.visible=false
+            //     gliding.visible=true
+            //     fires.forEach(function(fire, index, array) {
+            //         fire.visible=false
+            //     })
+            // }
 
             // 控制火球行為
             fireCD+=1
@@ -421,7 +457,6 @@
                 // 火球飛行中
                 if (fire.parent === scene && fire.position.y>0) {
                     fire.position.z-= .5
-                    fire.Vy+=Ay
                     fire.rotation.z+=.02
                 }
                 // 火球飛到底
@@ -434,22 +469,30 @@
             })
 
             rings.forEach(function(item, index, array) {
-                item.position.z+=.5
+                item.position.z+=Vz*Rate
+                // 超出鏡頭後重製
                 if(item.position.z>100){
                     item.position.set(Math.random()*30-15,Math.random()*14+1,-400)
                     item.visible=true
                 }
+                // 被飛龍碰到得分
                 if(item.position.z>0 && Dragon.position.distanceTo(item.position)<4 && item.visible){
                     item.visible=false
                     Dragon.rotating=true
-                    setTimeout(function(){Dragon.rotating=false},500)
+                    setTimeout(function(){Dragon.rotating=false},1000)
+                    Rate+=1
+                    score+=1
+                    if(Rate>maxRate){maxRate=Rate}
+                    // 重製音效
+                    fast.pause();
+                    fast.currentTime = 0;
+                    fast.play()
                 }
             });
 
-            if(score>10){
-
+            if(score<-100){
                 magics.forEach(function(item, index, array) {
-                    item.position.z+=.5
+                    item.position.z+=Vz*Rate
                     if(item.position.z>100){
                         item.position.set(Math.random()*30-15,8,-400)
                         // item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
@@ -457,7 +500,7 @@
                 });
 
                 griffins.forEach(function(item, index, array) {
-                    item.position.z+=.5
+                    item.position.z+=Vz*Rate
                     if(item.position.z>100){
                         item.position.set(Math.random()*30-15,8,-400)
                     }
@@ -466,7 +509,7 @@
 
             // 隨機小樹林
             trees.forEach(function(item, index, array) {
-                item.position.z+=.5
+                item.position.z+=Vz*Rate
                 if(item.position.z>100){
                     item.position.set(Math.random()*100-50,0,Math.random()*100-300)
                     item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
@@ -532,12 +575,4 @@
     }
 
     setTimeout(function(){gameProcess()},2000)
-
-    // window.addEventListener("load", function() {
-    //     const startButton = document.getElementById("startButton");
-    //     startButton.addEventListener("click", function() {
-    //         clearInterval(intervalID);
-    //         gameProcess(); // 點擊按鈕後觸發遊戲流程函數
-    //     });
-    // });
 </script>
