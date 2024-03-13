@@ -103,7 +103,7 @@
         { name: "soilGnd",      opacity: 1,  amount: 1   ,radius:5 },
         { name: "gresGnd",      opacity: 1,  amount: 1   ,radius:5 },
         { name: "ball",         opacity: 1,  amount: 10  ,radius:5 },
-        { name: "trees",        opacity: 1,  amount: 10  ,radius:5 },
+        { name: "trees",        opacity: 1,  amount: 20  ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -276,11 +276,11 @@
             // });
 
             magics.forEach(function(item, index, array) {
-                item.position.set(Math.random()*30-15,8,-index*100)
+                item.position.set(Math.random()*30-15,8,-index*100-300)
             });
 
             griffins.forEach(function(item, index, array) {
-                item.position.set(Math.random()*30-15,8,-index*100-50)
+                item.position.set(Math.random()*30-15,8,-index*100-50-300)
             });
 
             rings.forEach(function(item, index, array) {
@@ -296,7 +296,7 @@
             fireNum=10
 
             trees.forEach(function(item, index, array) {
-                item.position.set(Math.random()*10-5,0,Math.random()*100-50)
+                item.position.set(Math.random()*100-50,0,Math.random()*300-200)
                 item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
             });
         }setup()
@@ -446,74 +446,78 @@
                 }
             });
 
-            magics.forEach(function(item, index, array) {
-                item.position.z+=.5
-                if(item.position.z>100){
-                    item.position.set(Math.random()*30-15,8,-400)
-                    // item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
-                }
-            });
+            if(score>10){
 
-            griffins.forEach(function(item, index, array) {
-                item.position.z+=.5
-                if(item.position.z>100){
-                    item.position.set(Math.random()*30-15,8,-400)
-                }
-            });
+                magics.forEach(function(item, index, array) {
+                    item.position.z+=.5
+                    if(item.position.z>100){
+                        item.position.set(Math.random()*30-15,8,-400)
+                        // item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
+                    }
+                });
 
+                griffins.forEach(function(item, index, array) {
+                    item.position.z+=.5
+                    if(item.position.z>100){
+                        item.position.set(Math.random()*30-15,8,-400)
+                    }
+                });
+            }
 
             // 隨機小樹林
             trees.forEach(function(item, index, array) {
                 item.position.z+=.5
-                if(item.position.z>30){
-                    item.position.set(Math.random()*40-20,0,Math.random()*100-300)
+                if(item.position.z>100){
+                    item.position.set(Math.random()*100-50,0,Math.random()*100-300)
                     item.rotation.y=Math.floor(Math.random() * 4) * Math.PI / 2
                 }
             });
+
+
         },10)
         }
 
-    window.addEventListener("gamepadconnected", function(e) {
-        console.log("控制器已連接，索引：" + e.gamepad.index);
-    });
-
-    window.addEventListener("gamepaddisconnected", function(e) {
-        console.log("控制器已斷開，索引：" + e.gamepad.index);
-    });
-
-    function readGamepad() {
-    var gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
-    for (var i = 0; i < gamepads.length; i++) {
-        var gp = gamepads[i];
-        if (gp) {
-        // console.log("Gamepad detected at index " + gp.index);
-        // 讀取按鈕狀態
-        gp.buttons.forEach(function(button, index) {
-            if(button.pressed){console.log(index)}
-            if(index==0){
-                if(button.pressed){keys['e']=true}else{keys['e']=false}
-            }
-            if(index==9 && button.pressed){
-                setup()
-                clearInterval(intervalID);
-                startLoop()
-            }
+        window.addEventListener("gamepadconnected", function(e) {
+            console.log("控制器已連接，索引：" + e.gamepad.index);
         });
-        // 讀取搖桿狀態
-        if(gp.axes[0]==-1){keys['a']=true}else{keys['a']=false}
-        if(gp.axes[0]== 1){keys['d']=true}else{keys['d']=false}
-        if(gp.axes[1]==-1){keys['w']=true}else{keys['w']=false}
-        if(gp.axes[1]== 1){keys['s']=true}else{keys['s']=false}
-        // console.log("Left Stick X Axis: " + gp.axes[0]);
-        // console.log("Left Stick Y Axis: " + gp.axes[1].toFixed(2));
-        // console.log("Righ Stick X Axis: " + gp.axes[2].toFixed(2));
-        // console.log("Righ Stick Y Axis: " + gp.axes[3].toFixed(2));
-        }
-    }
-    }
 
-    // 每隔100毫秒讀取一次控制器狀態
-    setInterval(readGamepad, 100);
+        window.addEventListener("gamepaddisconnected", function(e) {
+            console.log("控制器已斷開，索引：" + e.gamepad.index);
+        });
+
+        function readGamepad() {
+        var gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+        for (var i = 0; i < gamepads.length; i++) {
+            var gp = gamepads[i];
+            if (gp) {
+            // console.log("Gamepad detected at index " + gp.index);
+            // 讀取按鈕狀態
+            gp.buttons.forEach(function(button, index) {
+                if(button.pressed){console.log(index)}
+                if(index==0){
+                    if(button.pressed){keys['e']=true}else{keys['e']=false}
+                }
+                if(index==9 && button.pressed){
+                    setup()
+                    clearInterval(intervalID);
+                    startLoop()
+                }
+            });
+            // 讀取搖桿狀態
+            if(gp.axes[0]<-.5){keys['a']=true}else{keys['a']=false}
+            if(gp.axes[0]> .5){keys['d']=true}else{keys['d']=false}
+            if(gp.axes[1]<-.5){keys['w']=true}else{keys['w']=false}
+            if(gp.axes[1]> .5){keys['s']=true}else{keys['s']=false}
+            // console.log("Left Stick X Axis: " + gp.axes[0].toFixed(2));
+            // console.log("Left Stick Y Axis: " + gp.axes[1].toFixed(2));
+            // console.log("Righ Stick X Axis: " + gp.axes[2].toFixed(2));
+            // console.log("Righ Stick Y Axis: " + gp.axes[3].toFixed(2));
+            }
+        }
+        }
+
+        // 每隔100毫秒讀取一次控制器狀態
+        setInterval(readGamepad, 100);
 
         
         // 監聽鍵盤事件
