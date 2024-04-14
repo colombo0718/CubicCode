@@ -28,6 +28,7 @@ function readName(dataView, start) {
             if (readingKey) {
                 readingKey = false;
             } else {
+                console.log(key,value)
                 dict[key] = value;
                 key = '';
                 value = '';
