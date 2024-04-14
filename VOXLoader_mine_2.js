@@ -24,7 +24,7 @@ function readName(dataView, start) {
 
     // 读取键值对，直到遇到双 null 终止符
     while (dataView.getUint8(index) !== 0 || dataView.getUint8(index + 1) !== 0) {
-        console.log('reading ---',index,dataView.getUint8(index))
+        console.log('reading ---',index,dataView.getUint8(index),dataView.getUint8(index + 1))
         if (dataView.getUint8(index) === 0) {
             if (readingKey) {
                 readingKey = false;
