@@ -27,7 +27,7 @@ function readName(dataView, start) {
         chars+=String.fromCharCode(dataView.getUint8(index))
         index++
     }
-    console.log((chars+'   ').split('    '))
+    console.log((chars+'   '))
     // 读取键值对，直到遇到双 null 终止符
     // while (dataView.getUint8(index) !== 0 || dataView.getUint8(index + 1) !== 0) {
     //     console.log('reading ---',index,dataView.getUint8(index),dataView.getUint8(index + 1))
@@ -180,7 +180,7 @@ class VOXLoader extends Loader {
 				// 如果匹配，則讀取 childChunks 的值
 				// const childChunks = data.getUint32(i, true);
                 const nodeId = data.getUint32(i, true);
-                const nodeName = readName(data, i);
+                const nodeName = readName(data, i+4);
 
 				// // 讀取塊名稱（如果存在）
 				let chunkName = '';
