@@ -139,8 +139,9 @@ class VOXLoader extends Loader {
 
 				// // 讀取塊名稱（如果存在）
 				let chunkName = '';
+                var nameLength=''
 				if (childChunks > 0) {
-                    const nameLength = data.getUint8(i++); 
+                    nameLength = data.getUint8(i++); 
                     for (let j = 0; j < childChunks; j++) {
                         chunkName += String.fromCharCode(data.getUint8(i++));
                     }
