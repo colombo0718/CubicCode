@@ -15,7 +15,7 @@ import {
 
 
 function readName(dataView, start) {
-    console.log('getting name~~~')
+    console.log('getting name~~~',start)
     let index = start;
     let key = '';
     let value = '';
