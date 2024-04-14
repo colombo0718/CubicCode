@@ -22,10 +22,12 @@ function readName(dataView, start) {
     let readingKey = true;
     let dict = {};
 
+    var chars=''
     for(let i=0;i<100;i++){
-        console.log(String.fromCharCode(dataView.getUint8(index)))
+        chars+=String.fromCharCode(dataView.getUint8(index))
         index++
     }
+    console.log(chars)
     // 读取键值对，直到遇到双 null 终止符
     // while (dataView.getUint8(index) !== 0 || dataView.getUint8(index + 1) !== 0) {
     //     console.log('reading ---',index,dataView.getUint8(index),dataView.getUint8(index + 1))
