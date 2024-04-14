@@ -114,7 +114,7 @@ class VOXLoader extends Loader {
 			}
 
 			const chunkSize = data.getUint32( i, true ); i += 4;
-			// console.log(id,chunkSize)
+			console.log(id,chunkSize)
 			i += 4; // childChunks
 
 			if ( id === 'SIZE' ) {
@@ -138,13 +138,13 @@ class VOXLoader extends Loader {
 
 
 				// // 讀取塊名稱（如果存在）
-				// let chunkName = '';
+				let chunkName = '';
 				// if (childChunks > 0) {
 				// for (let j = 0; j < childChunks; j++) {
 				// 	chunkName += String.fromCharCode(data.getUint8(i++));
 				// }
 				// }
-				// console.log(chunkName)
+				console.log(chunkName)
 
 				i += chunkSize;
 				// console.log(childChunks)
