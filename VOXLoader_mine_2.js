@@ -13,6 +13,39 @@ import {
 	SRGBColorSpace
 } from 'three';
 
+
+function readName(dataView, start) {
+    let index = start;
+    let key = '';
+    let value = '';
+    let readingKey = true;
+    let dict = {};
+
+    // 读取键值对，直到遇到双 null 终止符
+    while (dataView.getUint8(index) !== 0 || dataView.getUint8(index + 1) !== 0) {
+        if (dataView.getUint8(index) === 0) {
+            if (readingKey) {
+                readingKey = false;
+            } else {
+                dict[key] = value;
+                key = '';
+                value = '';
+                readingKey = true;
+            }
+            index++;
+        } else {
+            if (readingKey) {
+                key += String.fromCharCode(dataView.getUint8(index));
+            } else {
+                value += String.fromCharCode(dataView.getUint8(index));
+            }
+            index++;
+        }
+    }
+
+    return dict['_name']; // 只返回需要的 _name 属性
+}
+
 class VOXLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
@@ -48,6 +81,8 @@ class VOXLoader extends Loader {
 		}, onProgress, onError );
 
 	}
+
+    
 
 	parse( buffer ) {
 
@@ -134,8 +169,9 @@ class VOXLoader extends Loader {
 
 			}else if (id === 'nTRN') {
 				// 如果匹配，則讀取 childChunks 的值
-				const childChunks = data.getUint32(i, true);
-
+				// const childChunks = data.getUint32(i, true);
+                const nodeId = data.getUint32(i, true);
+                const nodeName = readDict(data, i+4);
 
 				// // 讀取塊名稱（如果存在）
 				let chunkName = '';
@@ -178,6 +214,9 @@ class VOXLoader extends Loader {
 				i += chunkSize;
 
 			}
+
+
+            
 
 		}
 
