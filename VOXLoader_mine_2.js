@@ -144,7 +144,7 @@ class VOXLoader extends Loader {
 				// 	chunkName += String.fromCharCode(data.getUint8(i++));
 				// }
 				// }
-				console.log(chunkName)
+				console.log(chunkName,childChunks)
 
 				i += chunkSize;
 				// console.log(childChunks)
