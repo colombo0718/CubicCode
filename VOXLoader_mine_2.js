@@ -171,7 +171,7 @@ class VOXLoader extends Loader {
 				// 如果匹配，則讀取 childChunks 的值
 				// const childChunks = data.getUint32(i, true);
                 const nodeId = data.getUint32(i, true);
-                const nodeName = readDict(data, i+4);
+                const nodeName = readName(data, i+4);
 
 				// // 讀取塊名稱（如果存在）
 				let chunkName = '';
