@@ -44,7 +44,7 @@ function readName(dataView, start) {
             index++;
         }
     }
-
+    console.log(dict)
     return dict['_name']; // 只返回需要的 _name 属性
 }
 
