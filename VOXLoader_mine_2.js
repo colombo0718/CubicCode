@@ -184,11 +184,11 @@ class VOXLoader extends Loader {
 				if(nodeId>0){
 					var chars=''
 					for(let j=0;j<50;j++){
-						chars+=String.fromCharCode(dataView.getUint8(i+j))
+						chars+=String.fromCharCode(data.getUint8(i+j))
 					}
 					console.log(chars)
 				}
-				
+
                 const nodeName = readName(data, i+4);
 
 				// // 讀取塊名稱（如果存在）
