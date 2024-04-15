@@ -27,7 +27,7 @@ function readName(dataView, start) {
         chars+=String.fromCharCode(dataView.getUint8(index))
         index++
     }
-    console.log(chars.split('_name'))
+    console.log(chars)
     // 读取键值对，直到遇到双 null 终止符
     // while (dataView.getUint8(index) !== 0 || dataView.getUint8(index + 1) !== 0) {
     //     console.log('reading ---',index,dataView.getUint8(index),dataView.getUint8(index + 1))
