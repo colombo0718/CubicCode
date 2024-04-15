@@ -146,6 +146,7 @@ class VOXLoader extends Loader {
 
 		let chunk;
 		const chunks = [];
+		chunkNames=[]
 
 		while ( i < data.byteLength ) {
 
@@ -200,7 +201,7 @@ class VOXLoader extends Loader {
 					}
 					console.log(nodeId,nodeName)
 					// console.log(chunk)
-					chunk.name=nodeName
+					chunkNames.push(nodeName)
 					// console.log(chunk)
 				}
 
@@ -218,8 +219,6 @@ class VOXLoader extends Loader {
 				// console.log(chunkName,childChunks,nameLength)
 
 				i += chunkSize;
-				// console.log(nodeId)
-				chunk.name='zzz'
 			} else if ( id === 'XYZI' ) {
 
 				const numVoxels = data.getUint32( i, true ); i += 4;
@@ -254,7 +253,7 @@ class VOXLoader extends Loader {
             
 
 		}
-		console.log(chunks)
+		console.log(chunks,chunkNames)
 		return chunks;
 
 	}
