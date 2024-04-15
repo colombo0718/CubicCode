@@ -251,7 +251,7 @@ class VOXLoader extends Loader {
             
 
 		}
-
+		console.log(chunks)
 		return chunks;
 
 	}
