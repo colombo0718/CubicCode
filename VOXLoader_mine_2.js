@@ -198,6 +198,7 @@ class VOXLoader extends Loader {
 						nodeName+=String.fromCharCode(data.getUint8(i+j+21))
 					}
 					console.log(nodeId,nodeName)
+					chunk.name=nodeName
 				}
 
                 // const nodeName = readName(data, i+4);
