@@ -188,7 +188,7 @@ class VOXLoader extends Loader {
 					}
 					console.log(chars)
 					if(chars.split('_name').length>1){
-						j=i+17
+						var j=i+17
 						var len=data.getUint32(j, true)
 						console.log(len)
 					}
