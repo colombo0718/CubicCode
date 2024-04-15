@@ -13,48 +13,6 @@ import {
 	SRGBColorSpace
 } from 'three';
 
-
-// function readName(dataView, start) {
-//     console.log('getting name~~~',start)
-//     let index = start;
-//     let key = '';
-//     let value = '';
-//     let readingKey = true;
-//     let dict = {};
-
-//     var chars=''
-//     for(let i=0;i<100;i++){
-//         chars+=String.fromCharCode(dataView.getUint8(index))
-//         index++
-//     }
-//     console.log(chars.split('_name'))
-//     // 读取键值对，直到遇到双 null 终止符
-//     // while (dataView.getUint8(index) !== 0 || dataView.getUint8(index + 1) !== 0) {
-//     //     console.log('reading ---',index,dataView.getUint8(index),dataView.getUint8(index + 1))
-//     //     if (dataView.getUint8(index) === 0) {
-//     //         if (readingKey) {
-//     //             readingKey = false;
-//     //         } else {
-//     //             console.log(key,value)
-//     //             dict[key] = value;
-//     //             key = '';
-//     //             value = '';
-//     //             readingKey = true;
-//     //         }
-//     //         index++;
-//     //     } else {
-//     //         if (readingKey) {
-//     //             key += String.fromCharCode(dataView.getUint8(index));
-//     //         } else {
-//     //             value += String.fromCharCode(dataView.getUint8(index));
-//     //         }
-//     //         index++;
-//     //     }
-//     // }
-//     console.log(dict)
-//     return dict['_name']; // 只返回需要的 _name 属性
-// }
-
 class VOXLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
@@ -183,6 +141,7 @@ class VOXLoader extends Loader {
 				// const childChunks = data.getUint32(i, true);
                 const nodeId = data.getUint32(i, true);
 				var nodeName=''
+
 				// 讀取名字流程
 				if(nodeId>0){
 					var chars=''
@@ -200,23 +159,8 @@ class VOXLoader extends Loader {
 						nodeName+=String.fromCharCode(data.getUint8(i+j+21))
 					}
 					console.log(nodeId,nodeName)
-					// console.log(chunk)
 					chunkNames.push(nodeName)
-					// console.log(chunk)
 				}
-
-                // const nodeName = readName(data, i+4);
-
-				// // 讀取塊名稱（如果存在）
-				// let chunkName = '';
-                // var nameLength=''
-				// if (childChunks > 0) {
-                //     nameLength = data.getUint8(i++); 
-                //     for (let j = 0; j < childChunks; j++) {
-                //         chunkName += String.fromCharCode(data.getUint8(i++));
-                //     }
-				// }
-				// console.log(chunkName,childChunks,nameLength)
 
 				i += chunkSize;
 			} else if ( id === 'XYZI' ) {
@@ -253,7 +197,8 @@ class VOXLoader extends Loader {
             
 
 		}
-		// console.log(chunks,chunkNames)
+
+		// 將chunkNames逐一塞進每個chunk當中作為name屬性
 		// 假设 chunks 和 chunkNames 都是已经填充好的数组
 		if (chunks.length === chunkNames.length) {
 			for (let i = 0; i < chunks.length; i++) {
