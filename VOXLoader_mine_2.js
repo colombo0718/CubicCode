@@ -180,19 +180,24 @@ class VOXLoader extends Loader {
 				// 如果匹配，則讀取 childChunks 的值
 				// const childChunks = data.getUint32(i, true);
                 const nodeId = data.getUint32(i, true);
-
+				var nodeName=''
 				// 讀取名字流程
 				if(nodeId>0){
 					var chars=''
+					var len=0
 					for(let j=0;j<50;j++){
 						chars+=String.fromCharCode(data.getUint8(i+j))
 					}
 					console.log(chars)
 					if(chars.split('_name').length>1){
 						var j=i+17
-						var len=data.getUint32(j, true)
+						len=data.getUint32(j, true)
 						console.log(len)
 					}
+					for(let j=0;j<len;j++){
+						nodeName+=String.fromCharCode(data.getUint8(i+j+21))
+					}
+					console.log(nodeId,nodeName)
 				}
 
                 // const nodeName = readName(data, i+4);
