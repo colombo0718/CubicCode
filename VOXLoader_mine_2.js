@@ -14,46 +14,46 @@ import {
 } from 'three';
 
 
-function readName(dataView, start) {
-    console.log('getting name~~~',start)
-    let index = start;
-    let key = '';
-    let value = '';
-    let readingKey = true;
-    let dict = {};
+// function readName(dataView, start) {
+//     console.log('getting name~~~',start)
+//     let index = start;
+//     let key = '';
+//     let value = '';
+//     let readingKey = true;
+//     let dict = {};
 
-    var chars=''
-    for(let i=0;i<100;i++){
-        chars+=String.fromCharCode(dataView.getUint8(index))
-        index++
-    }
-    console.log(chars.split('_name'))
-    // 读取键值对，直到遇到双 null 终止符
-    // while (dataView.getUint8(index) !== 0 || dataView.getUint8(index + 1) !== 0) {
-    //     console.log('reading ---',index,dataView.getUint8(index),dataView.getUint8(index + 1))
-    //     if (dataView.getUint8(index) === 0) {
-    //         if (readingKey) {
-    //             readingKey = false;
-    //         } else {
-    //             console.log(key,value)
-    //             dict[key] = value;
-    //             key = '';
-    //             value = '';
-    //             readingKey = true;
-    //         }
-    //         index++;
-    //     } else {
-    //         if (readingKey) {
-    //             key += String.fromCharCode(dataView.getUint8(index));
-    //         } else {
-    //             value += String.fromCharCode(dataView.getUint8(index));
-    //         }
-    //         index++;
-    //     }
-    // }
-    console.log(dict)
-    return dict['_name']; // 只返回需要的 _name 属性
-}
+//     var chars=''
+//     for(let i=0;i<100;i++){
+//         chars+=String.fromCharCode(dataView.getUint8(index))
+//         index++
+//     }
+//     console.log(chars.split('_name'))
+//     // 读取键值对，直到遇到双 null 终止符
+//     // while (dataView.getUint8(index) !== 0 || dataView.getUint8(index + 1) !== 0) {
+//     //     console.log('reading ---',index,dataView.getUint8(index),dataView.getUint8(index + 1))
+//     //     if (dataView.getUint8(index) === 0) {
+//     //         if (readingKey) {
+//     //             readingKey = false;
+//     //         } else {
+//     //             console.log(key,value)
+//     //             dict[key] = value;
+//     //             key = '';
+//     //             value = '';
+//     //             readingKey = true;
+//     //         }
+//     //         index++;
+//     //     } else {
+//     //         if (readingKey) {
+//     //             key += String.fromCharCode(dataView.getUint8(index));
+//     //         } else {
+//     //             value += String.fromCharCode(dataView.getUint8(index));
+//     //         }
+//     //         index++;
+//     //     }
+//     // }
+//     console.log(dict)
+//     return dict['_name']; // 只返回需要的 _name 属性
+// }
 
 class VOXLoader extends Loader {
 
@@ -181,6 +181,7 @@ class VOXLoader extends Loader {
 				// const childChunks = data.getUint32(i, true);
                 const nodeId = data.getUint32(i, true);
 
+				// 讀取名字流程
 				if(nodeId>0){
 					var chars=''
 					for(let j=0;j<50;j++){
@@ -194,10 +195,10 @@ class VOXLoader extends Loader {
 					}
 				}
 
-                const nodeName = readName(data, i+4);
+                // const nodeName = readName(data, i+4);
 
 				// // 讀取塊名稱（如果存在）
-				let chunkName = '';
+				// let chunkName = '';
                 // var nameLength=''
 				// if (childChunks > 0) {
                 //     nameLength = data.getUint8(i++); 
