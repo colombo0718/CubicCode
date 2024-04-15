@@ -199,9 +199,9 @@ class VOXLoader extends Loader {
 						nodeName+=String.fromCharCode(data.getUint8(i+j+21))
 					}
 					console.log(nodeId,nodeName)
-					console.log(chunk)
+					// console.log(chunk)
 					chunk.name=nodeName
-					console.log(chunk)
+					// console.log(chunk)
 				}
 
                 // const nodeName = readName(data, i+4);
@@ -225,6 +225,7 @@ class VOXLoader extends Loader {
 				const numVoxels = data.getUint32( i, true ); i += 4;
 				console.log(numVoxels)
 				chunk.data = new Uint8Array( buffer, i, numVoxels * 4 );
+				console.log(chunk)
 				console.log(buffer)
 
 				i += numVoxels * 4;
