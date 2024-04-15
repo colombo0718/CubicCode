@@ -159,7 +159,7 @@ class VOXLoader extends Loader {
 			}
 
 			const chunkSize = data.getUint32( i, true ); i += 4;
-			console.log(id,chunkSize)
+			// console.log(id,chunkSize)
 			i += 4; // childChunks
 
 			if ( id === 'SIZE' ) {
@@ -253,9 +253,17 @@ class VOXLoader extends Loader {
             
 
 		}
-		console.log(chunks,chunkNames)
+		// console.log(chunks,chunkNames)
+		// 假设 chunks 和 chunkNames 都是已经填充好的数组
+		if (chunks.length === chunkNames.length) {
+			for (let i = 0; i < chunks.length; i++) {
+				chunks[i].name = chunkNames[i];  // 将名字添加为对应 chunk 的属性
+			}
+			// console.log("Names added to chunks successfully.");
+		} else {
+			console.error("Error: The length of chunks and chunkNames does not match.");
+		}
 		return chunks;
-
 	}
 
 }
