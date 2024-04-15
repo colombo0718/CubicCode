@@ -218,7 +218,7 @@ class VOXLoader extends Loader {
 
 				i += chunkSize;
 				// console.log(nodeId)
-				chunk.name=nodeName
+				chunk.name='zzz'
 			} else if ( id === 'XYZI' ) {
 
 				const numVoxels = data.getUint32( i, true ); i += 4;
