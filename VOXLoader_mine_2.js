@@ -180,8 +180,8 @@ class VOXLoader extends Loader {
 				// 如果匹配，則讀取 childChunks 的值
 				// const childChunks = data.getUint32(i, true);
                 const nodeId = data.getUint32(i, true);
-				console.log(data.getUint32(i+4, true);)
-				console.log(data.getUint32(i+8, true);)
+				console.log(data.getUint32(i+4, true))
+				console.log(data.getUint32(i+8, true))
                 const nodeName = readName(data, i+4);
 
 				// // 讀取塊名稱（如果存在）
