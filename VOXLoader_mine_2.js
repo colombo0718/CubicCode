@@ -146,7 +146,7 @@ class VOXLoader extends Loader {
 
 		let chunk;
 		const chunks = [];
-		chunkNames=[]
+		var chunkNames=[]
 
 		while ( i < data.byteLength ) {
 
