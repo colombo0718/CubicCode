@@ -199,6 +199,7 @@ class VOXLoader extends Loader {
 					}
 					console.log(nodeId,nodeName)
 					chunk.name=nodeName
+					console.log(chunk)
 				}
 
                 // const nodeName = readName(data, i+4);
