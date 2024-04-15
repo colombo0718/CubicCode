@@ -170,6 +170,7 @@ class VOXLoader extends Loader {
 				chunk = {
 					palette: DEFAULT_PALETTE,
 					size: { x: x, y: y, z: z },
+					name:''
 				};
 
 				chunks.push( chunk );
