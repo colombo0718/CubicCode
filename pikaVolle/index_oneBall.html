@@ -34,7 +34,7 @@
 
     // 加入地板
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
-    const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+    const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
     const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
     planeMesh.rotation.x = -Math.PI / 2;
     planeMesh.receiveShadow = true
@@ -53,40 +53,26 @@
             mesh.castShadow = true;
             ball.add( mesh );
         }
-    } );
+    });
     scene.add(ball);
 
     // 建立cannon.js空間
     const world = new CANNON.World();
     world.gravity.set(.1, -9.82, 0); // Set gravity in m/s²
-    console.log(world)
 
-    // 创建物体的材料
-    var sphereMaterial = new CANNON.Material({
-        friction: 0.3,     // 摩擦系数
-        restitution: .8   // 弹性系数
-    });
-
-    // Cannon.js plane
+    // Cannon.js 地板
     const planeShape = new CANNON.Plane();
-    const planeBody = new CANNON.Body({ mass: 0 ,material: sphereMaterial});
+    const planeBody = new CANNON.Body({ mass: 0});
     planeBody.addShape(planeShape);
     planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
     world.addBody(planeBody);
 
-    // 创建物体的材料
-    var sphereMaterial = new CANNON.Material({
-        friction: 0.3,     // 摩擦系数
-        restitution: 1   // 弹性系数
-    });
-
-    // Cannon.js sphere
+    // Cannon.js 球體
     const sphereShape = new CANNON.Sphere(.4);
-    const sphereBody = new CANNON.Body({ mass: 1 ,material: sphereMaterial});
+    const sphereBody = new CANNON.Body({ mass: 1});
     sphereBody.addShape(sphereShape);
     sphereBody.position.set(0, 8, 0);
     world.addBody(sphereBody);
-    console.log(sphereBody.material)
 
     // 開始動畫
     setInterval(animate, 10); // 每秒約 60 幀的更新率

@@ -37,6 +37,8 @@
             const chunk = chunks[ i ];
             const mesh = new VOXMesh( chunk );
             mesh.scale.setScalar( .1 );
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
             meshes.add( mesh );
             console.log(i,mesh,chunk.name)
         }
