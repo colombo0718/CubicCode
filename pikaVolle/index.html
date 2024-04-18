@@ -42,7 +42,7 @@
     scene.add(planeMesh);
 
     // 加入精靈球
-    var ball= new THREE.Object3D();
+    var ball1= new THREE.Object3D();
     const loader1 = new VOXLoader();
     loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball1.vox', function ( chunks ) {
         for ( let i = 0; i < chunks.length; i ++ ) {
@@ -51,10 +51,10 @@
             mesh.scale.setScalar( .1 );
             mesh.receiveShadow = true
             mesh.castShadow = true;
-            ball.add( mesh );
+            ball1.add( mesh );
         }
     } );
-    scene.add(ball);
+    scene.add(ball1);
 
     // 建立cannon.js空間
     const world = new CANNON.World();
@@ -92,8 +92,8 @@
     setInterval(animate, 10); // 每秒約 60 幀的更新率
     function animate() {
         world.step(0.01);
-        ball.position.copy(sphereBody.position);
-        ball.quaternion.copy(sphereBody.quaternion);
+        ball1.position.copy(sphereBody.position);
+        ball1.quaternion.copy(sphereBody.quaternion);
         renderer.render(scene, camera);
     }
 </script>
