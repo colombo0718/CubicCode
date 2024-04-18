@@ -1,0 +1,154 @@
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://threejs.org/build/three.module.js",
+            "three/addons/": "https://threejs.org/examples/jsm/"
+        }
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+<script type="module">
+    import * as THREE from 'three';
+    import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+
+    // 創建場景、相機和渲染器
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer();
+    renderer.shadowMap.enabled = true;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // 設置相機位置
+    camera.position.y = 2;  
+    camera.position.z = 10;
+
+    // 添加燈光
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
+    directionalLight.castShadow = true; // 讓此光能產生陰影
+    directionalLight.position.set(0, 20, -5);
+    scene.add(directionalLight);
+
+    // 加入地板
+    const planeGeometry = new THREE.PlaneGeometry(10, 10);
+    const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    planeMesh.rotation.x = -Math.PI / 2;
+    planeMesh.receiveShadow = true
+    planeMesh.castShadow = true;
+    scene.add(planeMesh);
+
+    // 加入精靈球
+    var ball1= new THREE.Object3D();
+    const loader1 = new VOXLoader();
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball1.vox', function ( chunks ) {
+        for ( let i = 0; i < chunks.length; i ++ ) {
+            const chunk = chunks[ i ];
+            const mesh = new VOXMesh( chunk );
+            mesh.scale.setScalar( .1 );
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+            ball1.add( mesh );
+        }
+    } );
+    scene.add(ball1);
+
+    // 加入精靈球2
+    var ball2= new THREE.Object3D();
+    // const loader1 = new VOXLoader();
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball2.vox', function ( chunks ) {
+        for ( let i = 0; i < chunks.length; i ++ ) {
+            const chunk = chunks[ i ];
+            const mesh = new VOXMesh( chunk );
+            mesh.scale.setScalar( .1 );
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+            ball2.add( mesh );
+        }
+    } );
+    scene.add(ball2);
+
+    // 加入精靈球3
+    var ball3= new THREE.Object3D();
+    // const loader1 = new VOXLoader();
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball3.vox', function ( chunks ) {
+        for ( let i = 0; i < chunks.length; i ++ ) {
+            const chunk = chunks[ i ];
+            const mesh = new VOXMesh( chunk );
+            mesh.scale.setScalar( .1 );
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+            ball3.add( mesh );
+        }
+    } );
+    scene.add(ball3);
+
+    // 建立cannon.js空間
+    const world = new CANNON.World();
+    world.gravity.set(0, -9.82, 0); // Set gravity in m/s²
+    console.log(world)
+
+    // 创建物体的材料
+    var sphereMaterial = new CANNON.Material({
+        friction: 0.3,     // 摩擦系数
+        restitution: 1   // 弹性系数
+    });
+
+    // Cannon.js plane
+    const planeShape = new CANNON.Plane();
+    const planeBody = new CANNON.Body({ mass: 0 ,material: sphereMaterial});
+    planeBody.addShape(planeShape);
+    planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+    world.addBody(planeBody);
+
+    // 创建物体的材料
+    var sphereMaterial1 = new CANNON.Material({
+        friction: 0.3,     // 摩擦系数
+        restitution: 1   // 弹性系数
+    });
+
+    // Cannon.js sphere
+    const sphereShape = new CANNON.Sphere(.4);
+    const sphereBody1 = new CANNON.Body({ mass: 1 ,material: sphereMaterial1});
+    sphereBody1.addShape(sphereShape);
+    sphereBody1.position.set(0, 8, 0);
+    world.addBody(sphereBody1);
+    // console.log(sphereBody.material)
+
+    var sphereMaterial2 = new CANNON.Material({
+        friction: 0.3,     // 摩擦系数
+        restitution: 1.1   // 弹性系数
+    });
+
+    const sphereBody2 = new CANNON.Body({ mass: 1 ,material: sphereMaterial2});
+    sphereBody2.addShape(sphereShape);
+    sphereBody2.position.set(2, 8, 0);
+    world.addBody(sphereBody2);
+
+    var sphereMaterial3 = new CANNON.Material({
+        friction: 0.3,     // 摩擦系数
+        restitution: .6   // 弹性系数
+    });
+
+
+    const sphereBody3 = new CANNON.Body({ mass: 1 ,material: sphereMaterial3});
+    sphereBody3.addShape(sphereShape);
+    sphereBody3.position.set(-2, 8, 0);
+    world.addBody(sphereBody3);
+
+    // 開始動畫
+    setInterval(animate, 10); // 每秒約 60 幀的更新率
+    function animate() {
+        world.step(0.01);
+        ball1.position.copy(sphereBody1.position);
+        ball1.quaternion.copy(sphereBody1.quaternion);
+        ball2.position.copy(sphereBody2.position);
+        ball2.quaternion.copy(sphereBody2.quaternion);
+        ball3.position.copy(sphereBody3.position);
+        ball3.quaternion.copy(sphereBody3.quaternion);
+        renderer.render(scene, camera);
+    }
+</script>
