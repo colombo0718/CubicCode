@@ -66,6 +66,7 @@
             mesh.scale.setScalar( .1 );
             mesh.receiveShadow = true
             mesh.castShadow = true;
+            mesh.rotation.y=1
             pika.add( mesh );
         }
     } );
@@ -104,7 +105,7 @@
     console.log(sphereBody.material)
 
     // 建立皮卡丘碰撞體
-    var cylinderHeight = .6;
+    var cylinderHeight = .8;
     var radius = .25;
 
     var cylinderShape = new CANNON.Cylinder(radius, radius, cylinderHeight, 16);
@@ -119,10 +120,10 @@
 
 
     // // 轉換圓柱以使其底部與世界原點對齊
-    cylinderBody.addShape(cylinderShape, new CANNON.Vec3(0, .3,0),quaternion);
+    cylinderBody.addShape(cylinderShape, new CANNON.Vec3(0, .4,0),quaternion);
 
     // // 將球體放在圓柱頂部
-    // sphereBody.addShape(headShape, new CANNON.Vec3(0, 0, cylinderHeight / 2 + radius));
+    sphereBody.addShape(headShape, new CANNON.Vec3(0, 0, cylinderHeight / 2 + radius));
 
 
     var PikaBody = new CANNON.Body({ mass: 1 });
