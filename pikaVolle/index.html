@@ -20,7 +20,7 @@
     document.body.appendChild(renderer.domElement);
 
     // 設置相機位置
-    camera.position.y = 1;  
+    camera.position.y = 3;  
     camera.position.z = 10;
 
     // 添加燈光
@@ -59,7 +59,7 @@
 
     // 加入皮卡丘
     var pika= new THREE.Object3D();
-    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/pika.vox', function ( chunks ) {
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/Pika.vox', function ( chunks ) {
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
             const mesh = new VOXMesh( chunk );
@@ -99,7 +99,7 @@
 
     // Cannon.js sphere
     const sphereShape = new CANNON.Sphere(.4);
-    const sphereBody = new CANNON.Body({ mass: 1 ,material: sphereMaterial});
+    const sphereBody = new CANNON.Body({ mass: .5 ,material: sphereMaterial});
     sphereBody.addShape(sphereShape);
     sphereBody.position.set(0, 8, 0);
     world.addBody(sphereBody);
@@ -112,26 +112,17 @@
     var cylinderShape = new CANNON.Cylinder(radius, radius, cylinderHeight, 16);
     var headShape = new CANNON.Sphere(radius);
 
-    var cylinderBody = new CANNON.Body({ mass: 1 });
-    var headBody = new CANNON.Body({ mass: 1 });
-
     // 使用四元数设置旋转
     var quaternion = new CANNON.Quaternion();
     quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2);  // 绕x轴旋转90度
 
 
-    // 轉換圓柱以使其底部與世界原點對齊
-    cylinderBody.addShape(cylinderShape, new CANNON.Vec3(0,0,0),quaternion);
-
-    // 將球體放在圓柱頂部
-    sphereBody.addShape(headShape, new CANNON.Vec3(0, 0, .4));
-
-
-    var pikaBody = new CANNON.Body({ mass: .5 });
+    var pikaBody = new CANNON.Body({ mass: 2 ,material: sphereMaterial});
     pikaBody.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0),quaternion);
     pikaBody.addShape(headShape, new CANNON.Vec3(0,.4,0));
-    pikaBody.position.set(.3, 1, 0);
+    pikaBody.position.set(.3, 2, 0);
     world.addBody(pikaBody);
+    pikaBody.angularVelocity.set(0, 10, 0); 
 
 
     // 開始動畫
