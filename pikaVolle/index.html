@@ -66,7 +66,7 @@
             mesh.scale.setScalar( .1 );
             mesh.receiveShadow = true
             mesh.castShadow = true;
-            mesh.rotation.y=1
+            mesh.rotation.y=-Math.PI / 2
             pika.add( mesh );
         }
     } );
@@ -106,7 +106,7 @@
 
     // 建立皮卡丘碰撞體
     var cylinderHeight = .8;
-    var radius = .25;
+    var radius = .3;
 
     var cylinderShape = new CANNON.Cylinder(radius, radius, cylinderHeight, 16);
     var headShape = new CANNON.Sphere(radius);
