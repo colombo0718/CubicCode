@@ -59,14 +59,15 @@
 
     // 加入皮卡丘
     var pika= new THREE.Object3D();
-    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/Pika.vox', function ( chunks ) {
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/pika.vox', function ( chunks ) {
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
             const mesh = new VOXMesh( chunk );
             mesh.scale.setScalar( .1 );
             mesh.receiveShadow = true
             mesh.castShadow = true;
-            mesh.rotation.y=-Math.PI / 2
+            mesh.rotation.y=-Math.PI / 4
+            mesh.position.y=-.4
             pika.add( mesh );
         }
     } );
@@ -74,7 +75,7 @@
 
     // 建立cannon.js空間
     const world = new CANNON.World();
-    world.gravity.set(.5, -9.82, 0); // Set gravity in m/s²
+    world.gravity.set(0, -9.82, 0); // Set gravity in m/s²
     console.log(world)
 
     // 创建物体的材料
@@ -119,17 +120,18 @@
     quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2);  // 绕x轴旋转90度
 
 
-    // // 轉換圓柱以使其底部與世界原點對齊
-    cylinderBody.addShape(cylinderShape, new CANNON.Vec3(0, .4,0),quaternion);
+    // 轉換圓柱以使其底部與世界原點對齊
+    cylinderBody.addShape(cylinderShape, new CANNON.Vec3(0,0,0),quaternion);
 
-    // // 將球體放在圓柱頂部
-    sphereBody.addShape(headShape, new CANNON.Vec3(0, 0, cylinderHeight / 2 + radius));
+    // 將球體放在圓柱頂部
+    sphereBody.addShape(headShape, new CANNON.Vec3(0, 0, .4));
 
 
-    var PikaBody = new CANNON.Body({ mass: 1 });
-    PikaBody.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0));
-    // PikaBody.addShape(headShape, new CANNON.Vec3(0,0,0));
-    world.addBody(cylinderBody);
+    var pikaBody = new CANNON.Body({ mass: .5 });
+    pikaBody.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0),quaternion);
+    pikaBody.addShape(headShape, new CANNON.Vec3(0,.4,0));
+    pikaBody.position.set(.3, 1, 0);
+    world.addBody(pikaBody);
 
 
     // 開始動畫
@@ -138,8 +140,8 @@
         world.step(0.01);
         ball1.position.copy(sphereBody.position);
         ball1.quaternion.copy(sphereBody.quaternion);
-        pika.position.copy(cylinderBody.position);
-        pika.quaternion.copy(cylinderBody.quaternion);
+        pika.position.copy(pikaBody.position);
+        pika.quaternion.copy(pikaBody.quaternion);
         renderer.render(scene, camera);
     }
 </script>
