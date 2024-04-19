@@ -20,7 +20,7 @@
     document.body.appendChild(renderer.domElement);
 
     // 設置相機位置
-    camera.position.y = 2;  
+    camera.position.y = 1;  
     camera.position.z = 10;
 
     // 添加燈光
@@ -58,23 +58,22 @@
 
 
     // 加入皮卡丘
-    var ball1= new THREE.Object3D();
-    const loader1 = new VOXLoader();
-    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball1.vox', function ( chunks ) {
+    var pika= new THREE.Object3D();
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/Pika.vox', function ( chunks ) {
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
             const mesh = new VOXMesh( chunk );
             mesh.scale.setScalar( .1 );
             mesh.receiveShadow = true
             mesh.castShadow = true;
-            ball1.add( mesh );
+            pika.add( mesh );
         }
     } );
-    scene.add(ball1);
+    scene.add(pika);
 
     // 建立cannon.js空間
     const world = new CANNON.World();
-    world.gravity.set(.1, -9.82, 0); // Set gravity in m/s²
+    world.gravity.set(.5, -9.82, 0); // Set gravity in m/s²
     console.log(world)
 
     // 创建物体的材料
@@ -104,12 +103,42 @@
     world.addBody(sphereBody);
     console.log(sphereBody.material)
 
+    // 建立皮卡丘碰撞體
+    var cylinderHeight = .6;
+    var radius = .25;
+
+    var cylinderShape = new CANNON.Cylinder(radius, radius, cylinderHeight, 16);
+    var headShape = new CANNON.Sphere(radius);
+
+    var cylinderBody = new CANNON.Body({ mass: 1 });
+    var headBody = new CANNON.Body({ mass: 1 });
+
+    // 使用四元数设置旋转
+    var quaternion = new CANNON.Quaternion();
+    quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2);  // 绕x轴旋转90度
+
+
+    // // 轉換圓柱以使其底部與世界原點對齊
+    cylinderBody.addShape(cylinderShape, new CANNON.Vec3(0, .3,0),quaternion);
+
+    // // 將球體放在圓柱頂部
+    // sphereBody.addShape(headShape, new CANNON.Vec3(0, 0, cylinderHeight / 2 + radius));
+
+
+    var PikaBody = new CANNON.Body({ mass: 1 });
+    PikaBody.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0));
+    // PikaBody.addShape(headShape, new CANNON.Vec3(0,0,0));
+    world.addBody(cylinderBody);
+
+
     // 開始動畫
     setInterval(animate, 10); // 每秒約 60 幀的更新率
     function animate() {
         world.step(0.01);
         ball1.position.copy(sphereBody.position);
         ball1.quaternion.copy(sphereBody.quaternion);
+        pika.position.copy(cylinderBody.position);
+        pika.quaternion.copy(cylinderBody.quaternion);
         renderer.render(scene, camera);
     }
 </script>
