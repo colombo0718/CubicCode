@@ -50,7 +50,7 @@
     // 加入精靈球
     var ball1= new THREE.Object3D();
     const loader1 = new VOXLoader();
-    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball1.vox', function ( chunks ) {
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball3.vox', function ( chunks ) {
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
             const mesh = new VOXMesh( chunk );
@@ -72,7 +72,7 @@
             mesh.scale.setScalar( .1 );
             mesh.receiveShadow = true
             mesh.castShadow = true;
-            // mesh.rotation.y= Math.PI / 4
+            mesh.rotation.y= Math.PI / 4
             mesh.position.y=-.4
             pika.add( mesh );
         }
@@ -106,10 +106,10 @@
 
     // Cannon.js sphere
     const sphereShape = new CANNON.Sphere(.4);
-    const sphereBody = new CANNON.Body({ mass: .5,material: sphereMaterial});
+    const sphereBody = new CANNON.Body({ mass: 1,material: sphereMaterial});
     sphereBody.addShape(sphereShape);
-    sphereBody.position.set(0, 8, 0);
-    sphereBody.velocity.x =0
+    sphereBody.position.set(4, 8, 0);
+    sphereBody.velocity.x = -3.1
     world.addBody(sphereBody);
     console.log(sphereBody.material)
 
@@ -134,7 +134,7 @@
     var pikaBody = new CANNON.Body({ mass: 1 ,material: pikaMaterial});
     pikaBody.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0),quaternion);
     pikaBody.addShape(headShape, new CANNON.Vec3(0,.4,0));
-    pikaBody.position.set(-.1, .4,-.1);
+    pikaBody.position.set(.1, .4, 0);
     world.addBody(pikaBody);
     // pikaBody.angularVelocity.set(20, 0, 0); 
 
