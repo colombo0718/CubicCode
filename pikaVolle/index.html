@@ -81,13 +81,13 @@
 
     // 建立cannon.js空間
     const world = new CANNON.World();
-    world.gravity.set(0, -9.82, 0); // Set gravity in m/s²
+    world.gravity.set(0, -10, 0); // Set gravity in m/s²
     // world.gravity.set(0, 0, 0); // Set gravity in m/s²
     console.log(world)
 
     // 创建物体的材料
     var sphereMaterial = new CANNON.Material({
-        friction: 0.3,     // 摩擦系数
+        friction: 0.1,     // 摩擦系数
         restitution: .5   // 弹性系数
     });
 
@@ -98,15 +98,40 @@
     planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
     world.addBody(planeBody);
 
+    // 建置四面牆
+    const wallBody1 = new CANNON.Body({ mass: 0 ,material: sphereMaterial});
+    wallBody1.addShape(planeShape);
+    wallBody1.position.z=-3
+    wallBody1.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 0);
+    world.addBody(wallBody1);
+
+    const wallBody2 = new CANNON.Body({ mass: 0 ,material: sphereMaterial});
+    wallBody2.addShape(planeShape);
+    wallBody2.position.x=-3
+    wallBody2.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),  Math.PI / 2);
+    world.addBody(wallBody2);
+
+    const wallBody3 = new CANNON.Body({ mass: 0 ,material: sphereMaterial});
+    wallBody3.addShape(planeShape);
+    wallBody3.position.z=3
+    wallBody3.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 2* Math.PI / 2);
+    world.addBody(wallBody3);
+
+    const wallBody4 = new CANNON.Body({ mass: 0 ,material: sphereMaterial});
+    wallBody4.addShape(planeShape);
+    wallBody4.position.x=3
+    wallBody4.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 3* Math.PI / 2);
+    world.addBody(wallBody4);
+
     // 创建物体的材料
     var sphereMaterial = new CANNON.Material({
-        friction: 0.3,     // 摩擦系数
-        restitution: 1   // 弹性系数
+        friction: 0.1,     // 摩擦系数
+        restitution: .6   // 弹性系数
     });
 
     // Cannon.js sphere
     const sphereShape = new CANNON.Sphere(.4);
-    const sphereBody = new CANNON.Body({ mass: .5,material: sphereMaterial});
+    const sphereBody = new CANNON.Body({ mass: .2,material: sphereMaterial});
     sphereBody.addShape(sphereShape);
     sphereBody.position.set(0, 8, 0);
     sphereBody.velocity.x =0
@@ -115,13 +140,13 @@
 
     // 建立皮卡丘碰撞體
     var pikaMaterial = new CANNON.Material({
-        friction: 0.3,     // 摩擦系数
-        restitution: 1   // 弹性系数
+        friction: .1,     // 摩擦系数
+        restitution: .6   // 弹性系数
     });
 
 
     var cylinderHeight = .8;
-    var radius = .3;
+    var radius = .5;
 
     var cylinderShape = new CANNON.Cylinder(radius, radius, cylinderHeight, 32);
     var headShape = new CANNON.Sphere(radius);
@@ -134,7 +159,7 @@
     var pikaBody = new CANNON.Body({ mass: 1 ,material: pikaMaterial});
     pikaBody.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0),quaternion);
     pikaBody.addShape(headShape, new CANNON.Vec3(0,.4,0));
-    pikaBody.position.set(-.1, .4,-.1);
+    pikaBody.position.set(0, .4,0);
     world.addBody(pikaBody);
     // pikaBody.angularVelocity.set(20, 0, 0); 
 
@@ -142,19 +167,33 @@
     document.addEventListener('keydown', function(event) {
         console.log(event.key)
         if (event.key === ' ') {  // 檢查是否是空白鍵
-            pikaBody.velocity.y = 10;  // 向上跳躍的速度
+            pikaBody.velocity.y = 7;  // 向上跳躍的速度
         }
-        if (event.key === 'u') {  // 檢查是否是空白鍵
-                // 直接设置四元数使圆柱体回到直立位置
-            var uprightQuaternion = new CANNON.Quaternion();
-            // uprightQuaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2); // 回到初始旋转
-            pikaBody.quaternion.copy(uprightQuaternion);
-            // pikaBody.applyForce(new CANNON.Vec3(100,0, 0),pikaBody.position)
+        if (event.key === 'r'){
+            sphereBody.position.set(0, 8, 0);
+            sphereBody.velocity.set(0, 0, 0);
         }
+
+        console.log(keys)
+    });
+
+
+    let keys = {};
+    document.addEventListener('keydown', function(event) {
+        // 將 event.key 轉換成小寫，並儲存到 keys 物件中
+        const key = event.key.toLowerCase();
+        keys[key] = true; // 設置按鍵為 true 表示按下該按鍵
+    });
+
+    document.addEventListener('keyup', function(event) {
+        // 將 event.key 轉換成小寫，並儲存到 keys 物件中
+        const key = event.key.toLowerCase();
+        keys[key] = false; // 設置按鍵為 false 表示釋放該按鍵
     });
 
 
     // 開始動畫
+    var pikaQuaternion = new CANNON.Quaternion();
     setInterval(animate, 10); // 每秒約 60 幀的更新率
     function animate() {
         world.step(0.01);
@@ -162,10 +201,27 @@
         ball1.quaternion.copy(sphereBody.quaternion);
         pika.position.copy(pikaBody.position);
         pika.quaternion.copy(pikaBody.quaternion);
-
-        // var uprightQuaternion = new CANNON.Quaternion();
-            // uprightQuaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2); // 回到初始旋转
-            // pikaBody.quaternion.copy(uprightQuaternion);
         renderer.render(scene, camera);
+
+        // sphereBody.applyForce(new CANNON.Vec3(0, 1.8, 0),sphereBody.position)
+        // if(pikaBody.position.y>0.399 && pikaBody.position.y <0.401){
+        if      (keys['w'] || keys['arrowup']){
+            pikaBody.position.z-=.05
+            pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 2*Math.PI / 2);
+        }else if(keys['s'] || keys['arrowdown']){
+            pikaBody.position.z+=.05
+            pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 0*Math.PI / 2);
+        }else if(keys['a'] || keys['arrowleft']){
+            pikaBody.position.x-=.05
+            // pikaBody.velocity.x-=.1
+            pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 3*Math.PI / 2);
+        }else if(keys['d'] || keys['arrowright']){
+            pikaBody.position.x+=.05
+            pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 1*Math.PI / 2);
+        }
+        // }   
+        pikaBody.quaternion.copy(pikaQuaternion);
+
+        console.log(pikaBody.position.y)
     }
 </script>
