@@ -203,7 +203,7 @@
         pika.quaternion.copy(pikaBody.quaternion);
         renderer.render(scene, camera);
 
-        // sphereBody.applyForce(new CANNON.Vec3(0, 1.8, 0),sphereBody.position)
+        sphereBody.applyForce(new CANNON.Vec3(0, 1.5, 0),sphereBody.position)
         // if(pikaBody.position.y>0.399 && pikaBody.position.y <0.401){
         if      (keys['w'] || keys['arrowup']){
             pikaBody.position.z-=.05
