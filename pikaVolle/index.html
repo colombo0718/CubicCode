@@ -50,7 +50,8 @@
 
 
     const voxelSettings = [
-        { name: "b_walk",file: "pika_walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "pika_walk",file: "pika_walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "pika_stay",file: "pika_stay",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         // { name: "b_stand",file: "stick_stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         // { name: "b_throw",file: "stick_throw",faction:'b',  opacity: 1,  amount: 1   ,radius:10 ,loop:false},
         // { name: "b_run",file: "stick_run",faction:'b',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
@@ -107,35 +108,12 @@
                     mesh.scale.setScalar(0.1);
                     mesh.material.transparent = true;
                     // mesh.material.emissive.set(0x008888);
+                                mesh.receiveShadow = true
+            mesh.castShadow = true;
                     mesh.material.opacity = opacity;
                     voxelObject.add(mesh);
 
                     plotFactionColor(mesh,faction)
-
-                    // let geo=mesh.geometry
-                    // let colors = geo.attributes.color.array;
-                    // // console.log(colors)
-
-                    // for (let i = 0; i < colors.length; i += 3) {
-                    //     // 获取当前顶点的颜色
-                    //     let r = colors[i];
-                    //     let g = colors[i + 1];
-                    //     let b = colors[i + 2];
-
-                    //     if (r == 1 && g == 1 && b == 1) {
-                    //         colors[i] = 0.5;     // 红色分量
-                    //         colors[i + 1] = 0.5; // 绿色分量保持不变
-                    //         colors[i + 2] = 1.0; // 蓝色分量
-                    //     }
-                    //     if (r == 1 && g == 0 && b == 0) {
-                    //         colors[i] = 0;     // 红色分量
-                    //         colors[i + 1] = 0; // 绿色分量保持不变
-                    //         colors[i + 2] = 1.0; // 蓝色分量
-                    //     }
-                    // }
-                    // // 标记颜色需要更新
-                    // geo.attributes.color.needsUpdate = true;
-
                 }
                 // voxelObject.radius=raduis/10
                 // voxelObject.position.x=Math.random()*20-10
@@ -190,7 +168,7 @@
     // 加入精靈球
     var ball1= new THREE.Object3D();
     const loader1 = new VOXLoader();
-    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball1.vox', function ( chunks ) {
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball2.vox', function ( chunks ) {
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
             const mesh = new VOXMesh( chunk );
@@ -205,19 +183,33 @@
 
     // 加入皮卡丘
     var pika= new THREE.Object3D();
-    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/pika_walk.vox', function ( chunks ) {
-        for ( let i = 0; i < chunks.length; i ++ ) {
-            const chunk = chunks[ i ];
-            const mesh = new VOXMesh( chunk );
-            mesh.scale.setScalar( .1 );
-            mesh.receiveShadow = true
-            mesh.castShadow = true;
-            // mesh.rotation.y= Math.PI / 4
-            mesh.position.y=-.4
-            pika.add( mesh );
-        }
-    } );
-    scene.add(pika);
+    console.log(voxelAnimas["pika_walk"])
+    setTimeout(addPika,1000)
+
+    var pika_walk,pika_stay
+    function addPika(){
+        pika_walk=voxelAnimas["pika_walk"][0]
+        pika_stay=voxelAnimas["pika_stay"][0]
+        pika.add(pika_walk)
+        pika.add(pika_stay)
+        scene.add(pika);
+        pika_stay.visible=false
+    }
+
+
+    // loader1.load( 'https://cubiccode.vercel.app/pikaVolle/pika_walk.vox', function ( chunks ) {
+    //     for ( let i = 0; i < chunks.length; i ++ ) {
+    //         const chunk = chunks[ i ];
+    //         const mesh = new VOXMesh( chunk );
+    //         mesh.scale.setScalar( .1 );
+    //         mesh.receiveShadow = true
+    //         mesh.castShadow = true;
+    //         // mesh.rotation.y= Math.PI / 4
+    //         // mesh.position.y=-.4
+    //         pika.add( mesh );
+    //     }
+    // } );
+    
 
     // 建立cannon.js空間
     const world = new CANNON.World();
@@ -270,7 +262,7 @@
     });
 
     // Cannon.js sphere
-    const sphereShape = new CANNON.Sphere(.4);
+    const sphereShape = new CANNON.Sphere(.05);
     const sphereBody = new CANNON.Body({ mass: .2,material: sphereMaterial});
     sphereBody.addShape(sphereShape);
     sphereBody.position.set(0, 8, 0);
@@ -323,12 +315,19 @@
         // 將 event.key 轉換成小寫，並儲存到 keys 物件中
         const key = event.key.toLowerCase();
         keys[key] = true; // 設置按鍵為 true 表示按下該按鍵
+        keys.none=!Object.values(keys).includes(true)
+
+        if (key === " ") {
+            // 阻止預設行為，即阻止點擊按鈕
+            event.preventDefault();
+        }
     });
 
     document.addEventListener('keyup', function(event) {
         // 將 event.key 轉換成小寫，並儲存到 keys 物件中
         const key = event.key.toLowerCase();
         keys[key] = false; // 設置按鍵為 false 表示釋放該按鍵
+        keys.none=!Object.values(keys).includes(true)
     });
 
 
@@ -336,6 +335,8 @@
     var pikaQuaternion = new CANNON.Quaternion();
     setInterval(animate, 10); // 每秒約 60 幀的更新率
     function animate() {
+        // console.log(voxelAnimas["pika_walk"])
+
         world.step(0.01);
         ball1.position.copy(sphereBody.position);
         ball1.quaternion.copy(sphereBody.quaternion);
@@ -345,6 +346,14 @@
 
         sphereBody.applyForce(new CANNON.Vec3(0, 1.5, 0),sphereBody.position)
         // if(pikaBody.position.y>0.399 && pikaBody.position.y <0.401){
+        if(keys.none){
+            pika_stay.visible=true
+            pika_walk.visible=false
+        }else{
+            pika_stay.visible=false
+            pika_walk.visible=true           
+        }
+
         if      (keys['w'] || keys['arrowup']){
             pikaBody.position.z-=.05
             pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 2*Math.PI / 2);
@@ -362,6 +371,6 @@
         // }   
         pikaBody.quaternion.copy(pikaQuaternion);
 
-        console.log(pikaBody.position.y)
+        // console.log(pikaBody.position.y)
     }
 </script>
