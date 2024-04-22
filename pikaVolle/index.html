@@ -26,7 +26,7 @@
     document.body.appendChild(renderer.domElement);
 
     // 設置相機位置
-    camera.position.y = 3;  
+    // camera.position.y = 3;  
     camera.position.z = 8;
 
     // 添加燈光
@@ -262,7 +262,7 @@
     });
 
     // Cannon.js sphere
-    const sphereShape = new CANNON.Sphere(.05);
+    const sphereShape = new CANNON.Sphere(.4);
     const sphereBody = new CANNON.Body({ mass: .2,material: sphereMaterial});
     sphereBody.addShape(sphereShape);
     sphereBody.position.set(0, 8, 0);
