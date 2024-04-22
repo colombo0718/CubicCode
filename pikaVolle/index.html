@@ -65,7 +65,7 @@
 
     // 加入皮卡丘
     var pika= new THREE.Object3D();
-    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/Pika.vox', function ( chunks ) {
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/pika_walk.vox', function ( chunks ) {
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
             const mesh = new VOXMesh( chunk );
@@ -151,7 +151,7 @@
     var cylinderShape = new CANNON.Cylinder(radius, radius, cylinderHeight, 32);
     var headShape = new CANNON.Sphere(radius);
 
-    // 使用四元数设置旋转
+    // 使用四元数设置旋转，將圓柱轉成直立
     var quaternion = new CANNON.Quaternion();
     quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2);  // 绕x轴旋转90度
 
