@@ -12,7 +12,8 @@
         }
     }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script> -->
+<script src="https://cubiccode.vercel.app/cannon.js-master/src/cannon.js"></script>
 <script type="module">
     import * as THREE from 'three';
     import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
@@ -26,8 +27,8 @@
     document.body.appendChild(renderer.domElement);
 
     // 設置相機位置
-    camera.position.y = .01;  
-    camera.position.z = 8;
+    camera.position.y = 4;  
+    camera.position.z = 10;
 
     // 添加燈光
     var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
@@ -185,7 +186,7 @@
     // 加入皮卡丘
     var pika= new THREE.Object3D();
     console.log(voxelAnimas["pika_walk"])
-    setTimeout(addPika,1000)
+    setTimeout(addPika,1500)
 
     var pika_walk,pika_stay
     function addPika(){
@@ -196,20 +197,6 @@
         scene.add(pika);
         pika_stay.visible=false
     }
-
-
-    // loader1.load( 'https://cubiccode.vercel.app/pikaVolle/pika_walk.vox', function ( chunks ) {
-    //     for ( let i = 0; i < chunks.length; i ++ ) {
-    //         const chunk = chunks[ i ];
-    //         const mesh = new VOXMesh( chunk );
-    //         mesh.scale.setScalar( .1 );
-    //         mesh.receiveShadow = true
-    //         mesh.castShadow = true;
-    //         // mesh.rotation.y= Math.PI / 4
-    //         // mesh.position.y=-.4
-    //         pika.add( mesh );
-    //     }
-    // } );
     
 
     // 建立cannon.js空間
@@ -298,7 +285,7 @@
 
     // 監聽鍵盤事件
     document.addEventListener('keydown', function(event) {
-        console.log(event.key)
+        // console.log(event.key)
         if (event.key === ' ') {  // 檢查是否是空白鍵
             pikaBody.velocity.y = 7;  // 向上跳躍的速度
         }
@@ -307,7 +294,7 @@
             sphereBody.velocity.set(0, 0, 0);
         }
 
-        console.log(keys)
+        // console.log(keys)
     });
 
 
@@ -331,6 +318,41 @@
         keys.none=!Object.values(keys).includes(true)
     });
 
+    world.addEventListener("fdas", function(event) {
+        console.log(event);
+        // if ((event.bodyA === pikaBody && event.bodyB === planeBody) || (event.bodyA === planeBody && event.bodyB ===  pikaBody)) {
+        //     // console.log(event);
+        // }
+    });
+    world.addEventListener('collision', function(event) {
+    console.log('Collision event detected', event);
+    });
+
+    world.addEventListener('beginContact', function(event) {
+        console.log('Begin contact event detected', event);
+    });
+
+    console.log(pikaBody)
+    // pikaBody.addEventListener('collide',(event) => {
+    //       console.log('The sphere just collided with the ground!')
+    //       console.log('Collided with body:', event.body)
+    //       console.log('Contact between bodies:', event.contact)
+    //     })
+    world.addEventListener('beginContact', function(event) {
+    console.log('Begin contact detected');
+});
+
+world.addEventListener('endContact', function(event) {
+    console.log('End contact detected');
+});
+
+world.addEventListener('preStep', function(event) {
+    console.log('Pre-step event');
+});
+
+world.addEventListener('postStep', function(event) {
+    console.log('Post-step event');
+});
 
     // 開始動畫
     var pikaQuaternion = new CANNON.Quaternion();
@@ -375,7 +397,7 @@
         }
         // }   
         pikaBody.quaternion.copy(pikaQuaternion);
-
-        console.log(sphereBody.quaternion)
+        // console.log(world.contacts ) 
+        // console.log(sphereBody.quaternion)
     }
 </script>
