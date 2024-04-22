@@ -168,7 +168,7 @@
     // 加入精靈球
     var ball1= new THREE.Object3D();
     const loader1 = new VOXLoader();
-    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball2.vox', function ( chunks ) {
+    loader1.load( 'https://cubiccode.vercel.app/pikaVolle/ball1.vox', function ( chunks ) {
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
             const mesh = new VOXMesh( chunk );
