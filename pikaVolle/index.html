@@ -13,7 +13,7 @@
     }
 </script>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script> -->
-<script src="https://cubiccode.vercel.app/cannon.js-master/src/Cannon.js"></script>
+<script src="https://cubiccode.vercel.app/cannon.js-master/build/cannon.js"></script>
 <script type="module">
     import * as THREE from 'three';
     import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
@@ -260,7 +260,7 @@
 
     // 建立皮卡丘碰撞體
     var pikaMaterial = new CANNON.Material({
-        friction: .1,     // 摩擦系数
+        friction: 0,     // 摩擦系数
         restitution: .6   // 弹性系数
     });
 
@@ -280,15 +280,17 @@
     pikaBody.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0),quaternion);
     pikaBody.addShape(headShape, new CANNON.Vec3(0,.4,0));
     pikaBody.position.set(0, .4,0);
+    pikaBody.angularDamping = 0.8;
     world.addBody(pikaBody);
     // pikaBody.angularVelocity.set(20, 0, 0); 
 
     // 監聽鍵盤事件
     document.addEventListener('keydown', function(event) {
         // console.log(event.key)
-        if (event.key === ' ') {  // 檢查是否是空白鍵
-            pikaBody.velocity.y = 7;  // 向上跳躍的速度
-        }
+        // if (event.key === ' ') {  // 檢查是否是空白鍵
+        //     // pikaBody.velocity.y = 7;  // 向上跳躍的速度
+        
+        // }
         if (event.key === 'r'){
             sphereBody.position.set(0, 8, 0);
             sphereBody.velocity.set(0, 0, 0);
@@ -333,26 +335,27 @@
     });
 
     console.log(pikaBody)
-    // pikaBody.addEventListener('collide',(event) => {
-    //       console.log('The sphere just collided with the ground!')
-    //       console.log('Collided with body:', event.body)
-    //       console.log('Contact between bodies:', event.contact)
-    //     })
-    world.addEventListener('beginContact', function(event) {
-    console.log('Begin contact detected');
-});
+    pikaBody.addEventListener('collide',(event) => {
+        // console.log(event)
+        //   console.log('The sphere just collided with the ground!')
+        //   console.log('Collided with body:', event.body)
+        //   console.log('Contact between bodies:', event.contact)
+        })
+//     world.addEventListener('beginContact', function(event) {
+//     console.log('Begin contact detected');
+// });
 
-world.addEventListener('endContact', function(event) {
-    console.log('End contact detected');
-});
+// world.addEventListener('endContact', function(event) {
+//     console.log('End contact detected');
+// });
 
-world.addEventListener('preStep', function(event) {
-    console.log('Pre-step event');
-});
+// world.addEventListener('preStep', function(event) {
+//     console.log('Pre-step event');
+// });
 
-world.addEventListener('postStep', function(event) {
-    console.log('Post-step event');
-});
+// world.addEventListener('postStep', function(event) {
+//     console.log('Post-step event');
+// });
 
     // 開始動畫
     var pikaQuaternion = new CANNON.Quaternion();
@@ -381,23 +384,48 @@ world.addEventListener('postStep', function(event) {
             pika_walk.visible=true           
         }
 
-        if      (keys['w'] || keys['arrowup']){
-            pikaBody.position.z-=.05
-            pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 2*Math.PI / 2);
-        }else if(keys['s'] || keys['arrowdown']){
-            pikaBody.position.z+=.05
-            pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 0*Math.PI / 2);
-        }else if(keys['a'] || keys['arrowleft']){
-            pikaBody.position.x-=.05
-            // pikaBody.velocity.x-=.1
-            pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 3*Math.PI / 2);
-        }else if(keys['d'] || keys['arrowright']){
-            pikaBody.position.x+=.05
-            pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 1*Math.PI / 2);
-        }
+
         // }   
-        pikaBody.quaternion.copy(pikaQuaternion);
-        // console.log(world.contacts ) 
-        // console.log(sphereBody.quaternion)
+        
+        // console.log(pikaBody)
+        // if(world.contacts.length>=32){
+        if(pikaBody.position.y<.6){
+            // console.log('land')
+            if      (keys['w'] || keys['arrowup']){
+                // pikaBody.position.z-=.05
+                pikaBody.velocity.x=0
+                pikaBody.velocity.z=-5
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 2*Math.PI / 2);
+            }else if(keys['s'] || keys['arrowdown']){
+                // pikaBody.position.z+=.05
+                pikaBody.velocity.x=0
+                pikaBody.velocity.z= 5
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 0*Math.PI / 2);
+            }else if(keys['a'] || keys['arrowleft']){
+                // pikaBody.position.x-=.05
+                pikaBody.velocity.x=-5
+                pikaBody.velocity.z=0
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 3*Math.PI / 2);
+            }else if(keys['d'] || keys['arrowright']){
+                // pikaBody.position.x+=.05
+                pikaBody.velocity.x= 5
+                pikaBody.velocity.z=0
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 1*Math.PI / 2);
+            }else if(keys.none){
+                pikaBody.velocity.x=0
+                pikaBody.velocity.z=0
+            }
+            if(keys[' ']){
+                pikaBody.velocity.y = 8;
+            }
+            pikaBody.quaternion.copy(pikaQuaternion);
+        }else{
+            if(keys['x']){
+                console.log('two jump')
+                pikaBody.angularVelocity.set(0, 0, -30); 
+            }
+        } 
+
+        // console.log(w)
     }
 </script>
