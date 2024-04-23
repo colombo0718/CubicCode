@@ -53,6 +53,8 @@
     const voxelSettings = [
         { name: "pika_walk",file: "pika_walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         { name: "pika_stay",file: "pika_stay",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "pika_rise",file: "pika_rise",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "pika_fall",file: "pika_fall",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         // { name: "b_stand",file: "stick_stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         // { name: "b_throw",file: "stick_throw",faction:'b',  opacity: 1,  amount: 1   ,radius:10 ,loop:false},
         // { name: "b_run",file: "stick_run",faction:'b',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
@@ -423,6 +425,11 @@
             if(keys['x']){
                 console.log('two jump')
                 pikaBody.angularVelocity.set(0, 0, -30); 
+            }
+            if(pikaBody.velocity.y>0){
+                console.log('rise')
+            }else{
+                console.log('fall')
             }
         } 
 
