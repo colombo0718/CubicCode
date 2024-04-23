@@ -53,6 +53,8 @@
     const voxelSettings = [
         { name: "pika_walk",file: "pika_walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         { name: "pika_stay",file: "pika_stay",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "pika_rise",file: "pika_rise",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "pika_fall",file: "pika_fall",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         // { name: "b_stand",file: "stick_stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         // { name: "b_throw",file: "stick_throw",faction:'b',  opacity: 1,  amount: 1   ,radius:10 ,loop:false},
         // { name: "b_run",file: "stick_run",faction:'b',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
@@ -188,14 +190,20 @@
     console.log(voxelAnimas["pika_walk"])
     setTimeout(addPika,1500)
 
-    var pika_walk,pika_stay
+    var pika_walk,pika_stay,pika_rise,pika_fall
     function addPika(){
         pika_walk=voxelAnimas["pika_walk"][0]
         pika_stay=voxelAnimas["pika_stay"][0]
+        pika_rise=voxelAnimas["pika_rise"][0]
+        pika_fall=voxelAnimas["pika_fall"][0]
         pika.add(pika_walk)
         pika.add(pika_stay)
+        pika.add(pika_rise)
+        pika.add(pika_fall)
         scene.add(pika);
         pika_stay.visible=false
+        pika_rise.visible=false
+        pika_fall.visible=false
     }
     
 
@@ -203,7 +211,7 @@
     const world = new CANNON.World();
     world.gravity.set(0, -10, 0); // Set gravity in m/s²
     // world.gravity.set(0, 0, 0); // Set gravity in m/s²
-    console.log(world)
+    console.log(world) 
 
     // 创建物体的材料
     var sphereMaterial = new CANNON.Material({
@@ -270,6 +278,7 @@
 
     var cylinderShape = new CANNON.Cylinder(radius, radius, cylinderHeight, 32);
     var headShape = new CANNON.Sphere(radius);
+    var tailShape = new CANNON.Box(new CANNON.Vec3(0.1, 0.3, 0.4));
 
     // 使用四元数设置旋转，將圓柱轉成直立
     var quaternion = new CANNON.Quaternion();
@@ -279,6 +288,7 @@
     var pikaBody = new CANNON.Body({ mass: 1 ,material: pikaMaterial});
     pikaBody.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0),quaternion);
     pikaBody.addShape(headShape, new CANNON.Vec3(0,.4,0));
+    pikaBody.addShape(tailShape, new CANNON.Vec3(0,.3,-.6));
     pikaBody.position.set(0, .4,0);
     pikaBody.angularDamping = 0.8;
     world.addBody(pikaBody);
@@ -320,112 +330,119 @@
         keys.none=!Object.values(keys).includes(true)
     });
 
-    world.addEventListener("fdas", function(event) {
-        console.log(event);
-        // if ((event.bodyA === pikaBody && event.bodyB === planeBody) || (event.bodyA === planeBody && event.bodyB ===  pikaBody)) {
-        //     // console.log(event);
-        // }
-    });
-    world.addEventListener('collision', function(event) {
-    console.log('Collision event detected', event);
-    });
-
-    world.addEventListener('beginContact', function(event) {
-        console.log('Begin contact event detected', event);
-    });
 
     console.log(pikaBody)
     pikaBody.addEventListener('collide',(event) => {
         // console.log(event)
-        //   console.log('The sphere just collided with the ground!')
-        //   console.log('Collided with body:', event.body)
-        //   console.log('Contact between bodies:', event.contact)
-        })
-//     world.addEventListener('beginContact', function(event) {
-//     console.log('Begin contact detected');
-// });
+    })
 
-// world.addEventListener('endContact', function(event) {
-//     console.log('End contact detected');
-// });
-
-// world.addEventListener('preStep', function(event) {
-//     console.log('Pre-step event');
-// });
-
-// world.addEventListener('postStep', function(event) {
-//     console.log('Post-step event');
 // });
 
     // 開始動畫
     var pikaQuaternion = new CANNON.Quaternion();
+    var spaceReleace=false,rotateChance=0
     setInterval(animate, 10); // 每秒約 60 幀的更新率
     function animate() {
-        // console.log(voxelAnimas["pika_walk"])
-
         world.step(0.01);
         var quaternion = new CANNON.Quaternion();
         quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), 1*Math.PI / 4);  // 绕x轴旋转90度
 
         ball1.position.copy(sphereBody.position);
-        // ball1.quaternion.copy(quaternion);
         ball1.quaternion.copy(sphereBody.quaternion);
         pika.position.copy(pikaBody.position);
         pika.quaternion.copy(pikaBody.quaternion);
         renderer.render(scene, camera);
 
+        // 給球加上浮力
         sphereBody.applyForce(new CANNON.Vec3(0, 1.5, 0),sphereBody.position)
-        // if(pikaBody.position.y>0.399 && pikaBody.position.y <0.401){
-        if(keys.none){
-            pika_stay.visible=true
-            pika_walk.visible=false
-        }else{
-            pika_stay.visible=false
-            pika_walk.visible=true           
-        }
 
-
-        // }   
-        
-        // console.log(pikaBody)
-        // if(world.contacts.length>=32){
+        // 皮卡丘行為控制
+        // 觸地階段
         if(pikaBody.position.y<.6){
-            // console.log('land')
-            if      (keys['w'] || keys['arrowup']){
-                // pikaBody.position.z-=.05
+            pikaBody.angularVelocity.set(0,0, 0);
+            // 縱橫移動
+            if(keys.none){
                 pikaBody.velocity.x=0
-                pikaBody.velocity.z=-5
-                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 2*Math.PI / 2);
+                pikaBody.velocity.z=0
             }else if(keys['s'] || keys['arrowdown']){
-                // pikaBody.position.z+=.05
                 pikaBody.velocity.x=0
                 pikaBody.velocity.z= 5
-                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 0*Math.PI / 2);
-            }else if(keys['a'] || keys['arrowleft']){
-                // pikaBody.position.x-=.05
-                pikaBody.velocity.x=-5
-                pikaBody.velocity.z=0
-                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 3*Math.PI / 2);
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 0*Math.PI / 4);
             }else if(keys['d'] || keys['arrowright']){
-                // pikaBody.position.x+=.05
                 pikaBody.velocity.x= 5
                 pikaBody.velocity.z=0
-                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 1*Math.PI / 2);
-            }else if(keys.none){
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 2*Math.PI / 4);
+            }else if(keys['w'] || keys['arrowup']){
                 pikaBody.velocity.x=0
+                pikaBody.velocity.z=-5
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 4*Math.PI / 4);
+            }else if(keys['a'] || keys['arrowleft']){
+                pikaBody.velocity.x=-5
                 pikaBody.velocity.z=0
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 6*Math.PI / 4);
             }
+            // 斜向移動
+            if((keys['s'] || keys['arrowdown'])&&(keys['d'] || keys['arrowright'])){
+                pikaBody.velocity.x= 3.5
+                pikaBody.velocity.z= 3.5
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 1*Math.PI / 4);
+            }else if((keys['d'] || keys['arrowright'])&&(keys['w'] || keys['arrowup'])){
+                pikaBody.velocity.x= 3.5
+                pikaBody.velocity.z=-3.5
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 3*Math.PI / 4);
+            }else if((keys['w'] || keys['arrowup'])&&(keys['a'] || keys['arrowleft'])){
+                pikaBody.velocity.x=-3.5
+                pikaBody.velocity.z=-3.5
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 5*Math.PI / 4);
+            }else if((keys['a'] || keys['arrowleft'])&&(keys['s'] || keys['arrowdown'])){
+                pikaBody.velocity.x=-3.5
+                pikaBody.velocity.z= 3.5
+                pikaQuaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 7*Math.PI / 4);
+            }
+            
+            // 起跳
             if(keys[' ']){
                 pikaBody.velocity.y = 8;
+                spaceReleace=false
+                rotateChance=1
+            }
+            // 皮卡丘走與停
+            if(keys.none){
+                pika_stay.visible=true
+                pika_walk.visible=false
+                pika_rise.visible=false
+                pika_fall.visible=false
+            }else{
+                pika_stay.visible=false
+                pika_walk.visible=true  
+                pika_rise.visible=false
+                pika_fall.visible=false         
             }
             pikaBody.quaternion.copy(pikaQuaternion);
+        // 騰空階段
         }else{
-            if(keys['x']){
-                console.log('two jump')
-                pikaBody.angularVelocity.set(0, 0, -50); 
+            // 二段跳為旋轉
+            if(keys[' '] && spaceReleace==true && rotateChance==1){
+                pikaBody.angularVelocity.set(0, 50, 0);
+                spaceReleace=false
+                rotateChance=0
+            }else if(keys[' ']==false){
+                spaceReleace=true
             }
-        } 
-
-        // console.log(w)
+            // 皮卡丘升與降
+            if(pikaBody.velocity.y>0){
+                // console.log('rise')
+                pika_stay.visible=false
+                pika_walk.visible=false
+                pika_rise.visible=true
+                pika_fall.visible=false
+            }else{
+                // console.log('fall')
+                pika_stay.visible=false
+                pika_walk.visible=false
+                pika_rise.visible=false
+                pika_fall.visible=true
+            }
+        }
     }
 </script>
