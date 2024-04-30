@@ -44,10 +44,10 @@
 
     // 建構對應剛體
     function buildRigidBody(chunk){
-        var x=[],y=[],z=[],c=[],voxNum
+        var x=[],y=[],z=[],c=[],voxNum=0
         var sumX=0,sumY=0,sumZ=0
         // 创建物体的材料
-        voxNum=0
+
 
         for (let i = 0; i < chunk.data.length; i += 4) {
             if(ci==1||ci==6||ci==31||ci==36||ci==181||ci==186||ci==211){
