@@ -52,7 +52,7 @@
         for (let i = 0; i < chunk.data.length; i += 4) {
             if(ci==1||ci==6||ci==31||ci==36||ci==181||ci==186||ci==211){
                 console.log(0.1*chunk.data[i+0],0.1*chunk.data[i+1],0.1*chunk.data[i+2])
-                continue
+                continue;
             }
             voxNum+=1
             x.push(0.1*chunk.data[i+0])
@@ -105,7 +105,7 @@
     var mesh
     
     var BodyArray=[],SkinArray=[]
-    loader1.load( 'https://cubiccode.vercel.app/vox/Catapult.vox', function(chunks){
+    loader1.load( 'https://cubiccode.vercel.app/vox/Catapult2.vox', function(chunks){
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
             
