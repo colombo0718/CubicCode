@@ -1,0 +1,157 @@
+<script type="importmap">
+        {
+            "imports": {
+                "three": "https://threejs.org/build/three.module.js",
+                "three/addons/": "https://threejs.org/examples/jsm/"
+            }
+        }
+</script>
+<script src="https://cubiccode.vercel.app/cannon.js-master/build/cannon.js"></script>
+<script type="module">
+    import * as THREE from 'three';
+    // import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+    import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine_2.js';
+    // 創建場景、相機和渲染器
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    // 設置相機位置
+    camera.position.y = 2;  
+    camera.position.z = 10;
+
+    // 添加燈光
+    var ambientLight = new THREE.AmbientLight(0xffffff, .5); // 產生柔和的光
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
+    directionalLight.position.set(0, 0, 1);
+    scene.add(directionalLight);
+
+
+    // 加入地板
+    const planeGeometry = new THREE.PlaneGeometry(6, 6);
+    const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    planeMesh.rotation.x = -Math.PI / 2;
+    planeMesh.receiveShadow = true
+    planeMesh.castShadow = true;
+    scene.add(planeMesh);
+
+
+    // 建構對應剛體
+    function buildRigidBody(chunk){
+        var x=[],y=[],z=[],c=[],voxNum
+        var sumX=0,sumY=0,sumZ=0
+        // 创建物体的材料
+        voxNum=chunk.data.length/4
+
+        for (let i = 0; i < chunk.data.length; i += 4) {
+            x.push(0.1*chunk.data[i+0])
+            y.push(0.1*chunk.data[i+1])
+            z.push(0.1*chunk.data[i+2])
+            c.push(0.1*chunk.data[i+3])
+            sumX+=0.1*chunk.data[i+0]
+            sumY+=0.1*chunk.data[i+1]
+            sumZ+=0.1*chunk.data[i+2]
+        }
+        var centerOfMass = new THREE.Vector3(sumX/voxNum,sumY/voxNum,sumZ/voxNum);
+        // console.log(centerOfMass)
+        var offset = new CANNON.Vec3(-sumX/voxNum, -sumZ/voxNum, -sumY/voxNum);
+
+
+        var sphereMaterial = new CANNON.Material({
+            friction: 0.1,     // 摩擦系数
+            restitution: 1   // 弹性系数
+        });
+
+        const rigidBody = new CANNON.Body({ mass: voxNum,material: sphereMaterial});
+        for(let i=0;i<x.length;i+=1){
+            console.log(i)
+            var sphereShape = new CANNON.Sphere(.1);
+            var spherePosition = new CANNON.Vec3(x[i], z[i], y[i]);
+            
+            spherePosition.vadd(offset, spherePosition);
+            console.log(spherePosition)
+            // console.log(sphereShape)
+            rigidBody.addShape(sphereShape,spherePosition);
+        }
+
+        var sphereShape = new CANNON.Sphere(.05);
+        console.log(sphereShape)
+        rigidBody.addShape(sphereShape)
+        rigidBody.position.set(0,4,0)
+        rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), -Math.PI / 4);
+        world.addBody(rigidBody);
+        // console.log(rigidBody.material)
+        return rigidBody
+    }
+
+    const loader1 = new VOXLoader();
+    var meshes= new THREE.Object3D();
+    var mesh
+    var manBody
+    loader1.load( 'https://cubiccode.vercel.app/vox/3head.vox', function ( chunks ) {
+    // loader1.load( './vox/Bulbasaur.vox', function ( chunks ) {
+        
+        console.log(chunks)
+        for ( let i = 0; i < chunks.length; i ++ ) {
+            const chunk = chunks[ i ];
+            console.log(chunk,chunk.data)
+
+            mesh = new VOXMesh( chunk );
+            manBody=buildRigidBody(chunk )
+
+            mesh.scale.setScalar( .1 );
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+            // meshes.add( mesh );
+            scene.add(mesh)
+            world.add(manBody)
+            console.log(i,mesh,chunk.name)
+
+            console.log(mesh,manBody)
+        }
+        // scene.add( meshes );
+
+    } );
+
+
+
+
+
+    // 建立cannon.js空間
+    const world = new CANNON.World();
+    world.gravity.set(0, -10, 0); // Set gravity in m/s²
+    // world.gravity.set(0, 0, 0); // Set gravity in m/s²
+    console.log(world) 
+
+    // 创建物体的材料
+    var sphereMaterial = new CANNON.Material({
+        friction: 0.1,     // 摩擦系数
+        restitution: .5   // 弹性系数
+    });
+
+    // Cannon.js plane
+    const planeShape = new CANNON.Plane();
+    const planeBody = new CANNON.Body({ mass: 0 ,material: sphereMaterial});
+    planeBody.addShape(planeShape);
+    planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+    world.addBody(planeBody);
+
+
+
+        // 開始動畫
+        setTimeout(setInterval(animate, 10),0)
+        ; // 每秒約 60 幀的更新率
+    function animate() {
+        world.step(0.01);
+        // console.log(manBody)
+        mesh.position.copy(manBody.position);
+        mesh.quaternion.copy(manBody.quaternion);
+
+        meshes.rotation.y += 0.01;
+        renderer.render(scene, camera);
+    }
+</script>
