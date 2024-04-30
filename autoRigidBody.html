@@ -78,8 +78,6 @@
             var spherePosition = new CANNON.Vec3(x[i], z[i], -y[i]);
             
             spherePosition.vadd(offset, spherePosition);
-            // console.log(spherePosition)
-            // console.log(sphereShape)
             rigidBody.addShape(sphereShape,spherePosition);
         }
 
@@ -88,7 +86,7 @@
         rigidBody.addShape(sphereShape)
         rigidBody.position.set(centerOfMass.x-center.x,centerOfMass.y ,centerOfMass.z-center.z)
         // rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-        rigidBody.angularVelocity.set(2, 0, 0); 
+        // rigidBody.angularVelocity.set(2, 0, 0); 
         world.addBody(rigidBody);
         // console.log(rigidBody.material)
         rigidBody.centerOfMass=centerOfMass
