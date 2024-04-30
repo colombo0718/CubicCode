@@ -10,12 +10,13 @@
 <script type="module">
     import * as THREE from 'three';
     // import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
-    import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine_2.js';
+    import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine.js';
     // 創建場景、相機和渲染器
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
     // 設置相機位置
     camera.position.y = 1;  
@@ -26,7 +27,8 @@
     scene.add(ambientLight);
 
     var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
-    directionalLight.position.set(0, 0, 1);
+    directionalLight.position.set(0, 20, 1);
+    directionalLight.castShadow = true; // 讓此光能產生陰影
     scene.add(directionalLight);
 
 
@@ -56,6 +58,8 @@
             sumY+=0.1*chunk.data[i+1]
             sumZ+=0.1*chunk.data[i+2]
         }
+
+        var center={x:0.1*chunk.size.x/2,y:0.1*chunk.size.z/2,z:-0.1*chunk.size.y/2}
         var centerOfMass = new THREE.Vector3(sumX/voxNum,sumZ/voxNum,-sumY/voxNum);
         // console.log(centerOfMass)
         var offset = new CANNON.Vec3(-sumX/voxNum, -sumZ/voxNum, sumY/voxNum);
@@ -82,9 +86,9 @@
         var sphereShape = new CANNON.Sphere(.05);
         console.log(sphereShape)
         rigidBody.addShape(sphereShape)
-        rigidBody.position.set(centerOfMass.x,centerOfMass.y,centerOfMass.z)
-        // rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 1),.3);
-        // rigidBody.angularVelocity.set(0, 0, 10); 
+        rigidBody.position.set(centerOfMass.x-center.x,centerOfMass.y ,centerOfMass.z-center.z)
+        // rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+        rigidBody.angularVelocity.set(2, 0, 0); 
         world.addBody(rigidBody);
         // console.log(rigidBody.material)
         rigidBody.centerOfMass=centerOfMass
@@ -96,39 +100,31 @@
     var mesh
     
     var BodyArray=[],SkinArray=[]
-    loader1.load( 'https://cubiccode.vercel.app/vox/Catapult.vox', function ( chunks ) {
-    // loader1.load( './vox/Bulbasaur.vox', function ( chunks ) {
-        
-        console.log(chunks)
+    loader1.load( 'https://cubiccode.vercel.app/vox/Catapult.vox', function(chunks){
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
-            console.log(chunk,chunk.data)
             
-            var manBody,manSkin= new THREE.Object3D();
+            var rigidBody,voxelSkin= new THREE.Object3D();
             mesh = new VOXMesh( chunk );
-            manBody=buildRigidBody(chunk )
+            rigidBody=buildRigidBody(chunk)
 
             // 計算voxel模型位置的偏差
             var center={x:0.1*chunk.size.x/2,y:0.1*chunk.size.z/2,z:-0.1*chunk.size.y/2}
-            var com=manBody.centerOfMass
+            var com=rigidBody.centerOfMass
             console.log(com,center)
-            mesh.position.set(center.x-com.x,center.y-com.y,center.z-com.z)
+            mesh.position.set(center.x-com.x-.05,center.y-com.y-.05,center.z-com.z+.05)
 
             mesh.scale.setScalar( .1 );
             mesh.receiveShadow = true
             mesh.castShadow = true;
-            // meshes.add( mesh );
-            manSkin.add(mesh)
-            world.add(manBody)
-            console.log(i,mesh,chunk.name)
 
-            console.log(mesh,manBody)
-            scene.add( manSkin);
-            BodyArray.push(manBody)
-            SkinArray.push(manSkin)
+            voxelSkin.add(mesh)
+            scene.add( voxelSkin);
+            world.add(rigidBody)
+
+            BodyArray.push(rigidBody)
+            SkinArray.push(voxelSkin)
         }
-        
-
     } );
 
 
@@ -161,7 +157,6 @@
         ; // 每秒約 60 幀的更新率
     function animate() {
         world.step(0.01);
-        // console.log(manBody)
         for(let i=0;i<BodyArray.length;i+=1){
             SkinArray[i].position.copy(BodyArray[i].position);
             SkinArray[i].quaternion.copy(BodyArray[i].quaternion);
