@@ -81,9 +81,9 @@
         var sphereShape = new CANNON.Sphere(.05);
         console.log(sphereShape)
         rigidBody.addShape(sphereShape)
-        rigidBody.position.set(0,4,0)
-        rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 1),3);
-        rigidBody.angularVelocity.set(10, 0, 0); 
+        rigidBody.position.set(0,2,0)
+        rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0),.3);
+        // rigidBody.angularVelocity.set(3, 0, 0); 
         world.addBody(rigidBody);
         // console.log(rigidBody.material)
         rigidBody.centerOfMass=centerOfMass
@@ -91,10 +91,11 @@
     }
 
     const loader1 = new VOXLoader();
-    var meshes= new THREE.Object3D();
+    // var meshes= new THREE.Object3D();
     var mesh
-    var manBody,manSkin= new THREE.Object3D();
-    loader1.load( 'https://cubiccode.vercel.app/vox/3head.vox', function ( chunks ) {
+    
+    var BodyArray=[],SkinArray=[]
+    loader1.load( 'https://cubiccode.vercel.app/vox/chain.vox', function ( chunks ) {
     // loader1.load( './vox/Bulbasaur.vox', function ( chunks ) {
         
         console.log(chunks)
@@ -102,9 +103,11 @@
             const chunk = chunks[ i ];
             console.log(chunk,chunk.data)
             
-
+            var manBody,manSkin= new THREE.Object3D();
             mesh = new VOXMesh( chunk );
             manBody=buildRigidBody(chunk )
+
+            // 計算voxel模型位置的偏差
             var center={x:0.1*chunk.size.x/2,y:0.1*chunk.size.z/2,z:-0.1*chunk.size.y/2}
             var com=manBody.centerOfMass
             console.log(com,center)
@@ -119,8 +122,11 @@
             console.log(i,mesh,chunk.name)
 
             console.log(mesh,manBody)
+            scene.add( manSkin);
+            BodyArray.push(manBody)
+            SkinArray.push(manSkin)
         }
-        scene.add( manSkin);
+        
 
     } );
 
@@ -155,9 +161,10 @@
     function animate() {
         world.step(0.01);
         // console.log(manBody)
-        manSkin.position.copy(manBody.position);
-        manSkin.quaternion.copy(manBody.quaternion);
-
+        for(let i=0;i<BodyArray.length;i+=1){
+            SkinArray[i].position.copy(BodyArray[i].position);
+            SkinArray[i].quaternion.copy(BodyArray[i].quaternion);
+        }
         // meshes.rotation.y += 0.01;
         renderer.render(scene, camera);
     }
