@@ -81,8 +81,8 @@
         var sphereShape = new CANNON.Sphere(.05);
         console.log(sphereShape)
         rigidBody.addShape(sphereShape)
-        rigidBody.position.set(0,2,0)
-        rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0),.3);
+        rigidBody.position.set(centerOfMass.x,centerOfMass.y,centerOfMass.z)
+        // rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0),.3);
         // rigidBody.angularVelocity.set(3, 0, 0); 
         world.addBody(rigidBody);
         // console.log(rigidBody.material)
@@ -95,7 +95,7 @@
     var mesh
     
     var BodyArray=[],SkinArray=[]
-    loader1.load( 'https://cubiccode.vercel.app/vox/chain.vox', function ( chunks ) {
+    loader1.load( 'https://cubiccode.vercel.app/vox/chain5.vox', function ( chunks ) {
     // loader1.load( './vox/Bulbasaur.vox', function ( chunks ) {
         
         console.log(chunks)
