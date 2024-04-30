@@ -56,9 +56,9 @@
             sumY+=0.1*chunk.data[i+1]
             sumZ+=0.1*chunk.data[i+2]
         }
-        var centerOfMass = new THREE.Vector3(sumX/voxNum,sumY/voxNum,sumZ/voxNum);
+        var centerOfMass = new THREE.Vector3(sumX/voxNum,sumZ/voxNum,-sumY/voxNum);
         // console.log(centerOfMass)
-        var offset = new CANNON.Vec3(-sumX/voxNum, -sumZ/voxNum, -sumY/voxNum);
+        var offset = new CANNON.Vec3(-sumX/voxNum, -sumZ/voxNum, sumY/voxNum);
 
 
         var sphereMaterial = new CANNON.Material({
@@ -70,7 +70,7 @@
         for(let i=0;i<x.length;i+=1){
             console.log(i)
             var sphereShape = new CANNON.Sphere(.1);
-            var spherePosition = new CANNON.Vec3(x[i], z[i], y[i]);
+            var spherePosition = new CANNON.Vec3(x[i], z[i], -y[i]);
             
             spherePosition.vadd(offset, spherePosition);
             console.log(spherePosition)
@@ -82,8 +82,8 @@
         console.log(sphereShape)
         rigidBody.addShape(sphereShape)
         rigidBody.position.set(0,4,0)
-        rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), -Math.PI / 2);
-        rigidBody.angularVelocity.set(20, 0, 0); 
+        rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 1),10);
+        rigidBody.angularVelocity.set(10, 5, 0); 
         world.addBody(rigidBody);
         // console.log(rigidBody.material)
         return rigidBody
