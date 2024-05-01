@@ -129,7 +129,7 @@
     // var mesh
     
     var BodyArray=[],SkinArray=[]
-    loader1.load( 'https://cubiccode.vercel.app/vox/Catapult2.vox', function(chunks){  // BostonDog
+    loader1.load( 'https://cubiccode.vercel.app/vox/BostonDog2.vox', function(chunks){  // BostonDog   Catapult
         // 根據chunks建立多個獨立的Body
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
@@ -190,7 +190,9 @@
                             axisB: direction,  // B的轉軸方向
                             maxForce: 1e3  // 最大力量
                         });
-                        console.log(world)
+                        // 設置角度限制，單位是弧度
+                        hingeConstraint.lowerLimit = -Math.PI / 4;  // -45度
+                        hingeConstraint.upperLimit = -Math.PI / 4;   // 45度
                         world.addConstraint(hingeConstraint);
                     }
                 })
