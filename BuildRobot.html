@@ -57,6 +57,7 @@
     function buildRigidBody(chunk){
         var x=[],y=[],z=[],c=[],voxNum=0
         var sumX=0,sumY=0,sumZ=0
+        var voxels=[]
         // 创建物体的材料
 
         var marks=[]
@@ -65,7 +66,7 @@
             var ci=chunk.data[i+3]
             if(ci==1||ci==6||ci==31||ci==36||ci==181||ci==186||ci==211){
                 // console.log(0.1*chunk.data[i+0],0.1*chunk.data[i+1],0.1*chunk.data[i+2])
-                marks.push({x:0.1*chunk.data[i+0],y:0.1*chunk.data[i+2],z:-0.1*chunk.data[i+1],c:chunk.data[i+3],})
+                marks.push({x:chunk.data[i+0],y:chunk.data[i+1],z:chunk.data[i+2],c:chunk.data[i+3]})
                  // 標記方塊不做碰撞體
                 continue;
             }
@@ -77,6 +78,7 @@
             sumX+=0.1*chunk.data[i+0]
             sumY+=0.1*chunk.data[i+1]
             sumZ+=0.1*chunk.data[i+2]
+            voxels.push({x:chunk.data[i+0],y:chunk.data[i+1],z:chunk.data[i+2],c:chunk.data[i+3]})
         }
 
         // voxel模型中心
@@ -108,8 +110,11 @@
         // rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 0), -Math.PI / 2);
         // rigidBody.angularVelocity.set(2, 0, 0); 
         world.addBody(rigidBody);
+
         rigidBody.centerOfMass=centerOfMass
+        rigidBody.offset=offset
         rigidBody.marks=marks
+        rigidBody.voxels=voxels
         return rigidBody
     }
 
@@ -118,7 +123,7 @@
     // var mesh
     
     var BodyArray=[],SkinArray=[]
-    loader1.load( 'https://cubiccode.vercel.app/vox/Catapult2.vox', function(chunks){
+    loader1.load( 'https://cubiccode.vercel.app/vox/Catapult2.vox', function(chunks){  // BostonDog
         // 根據chunks建立多個獨立的Body
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
@@ -146,6 +151,31 @@
         }
         // 讀取標記點建立約束
         console.log(BodyArray.length)
+        BodyArray.forEach(function(bodyA){
+        bodyA.marks.forEach(function(m){
+            if(m.c==1){// 尋找到關鍵白色標記點
+                var jointType,direction
+                bodyA.marks.forEach(function(n){
+                    if(n.c==6){
+                        //
+                        console.log(m,n)
+                        direction=new CANNON.Vec3(m.x-n.x , m.z-n.z , -(m.y-n.y) );
+                        console.log(direction)
+                    }
+                })
+
+
+
+                BodyArray.forEach(function(bodyB){
+                bodyB.voxels.forEach(function(v){
+                    if(m.x==v.x && m.y==v.y && m.z==v.z){ // 該標記點有東西跟他重和
+                        console.log(m,bodyA,bodyB)
+                    }
+                })
+                })
+            }
+        })
+        })
 
     });
 
