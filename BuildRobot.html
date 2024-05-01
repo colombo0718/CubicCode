@@ -52,6 +52,12 @@
     planeMesh.castShadow = true;
     scene.add(planeMesh);
 
+    // 建立cannon.js空間
+    const world = new CANNON.World();
+    world.gravity.set(.1, -10, 0); // Set gravity in m/s²
+    // world.gravity.set(0, 0, 0); // Set gravity in m/s²
+    console.log(world) 
+
 
     // 建構對應剛體
     function buildRigidBody(chunk){
@@ -155,21 +161,37 @@
         bodyA.marks.forEach(function(m){
             if(m.c==1){// 尋找到關鍵白色標記點
                 var jointType,direction
-                bodyA.marks.forEach(function(n){
+                bodyA.marks.forEach(function(n){ //找到黃色標記點定義方向
                     if(n.c==6){
                         //
                         console.log(m,n)
+                        // 轉軸方向調整成three.js座標
                         direction=new CANNON.Vec3(m.x-n.x , m.z-n.z , -(m.y-n.y) );
                         console.log(direction)
                     }
                 })
 
-
-
                 BodyArray.forEach(function(bodyB){
                 bodyB.voxels.forEach(function(v){
                     if(m.x==v.x && m.y==v.y && m.z==v.z){ // 該標記點有東西跟他重和
                         console.log(m,bodyA,bodyB)
+
+                        var pivotA= new CANNON.Vec3(0.1*m.x,0.1*m.z,-0.1*m.y)
+                        pivotA.vadd(bodyA.offset,pivotA);
+                        var pivotB= new CANNON.Vec3(0.1*m.x, 0.1*m.z, -0.1*m.y)
+                        pivotB.vadd(bodyB.offset,pivotB);
+
+
+                        // 創建絞鍊約束
+                        var hingeConstraint = new CANNON.HingeConstraint(bodyA, bodyB, {
+                            pivotA: pivotA,
+                            pivotB: pivotB,
+                            axisA: direction,  // A的轉軸方向
+                            axisB: direction,  // B的轉軸方向
+                            maxForce: 1e3  // 最大力量
+                        });
+                        console.log(world)
+                        world.addConstraint(hingeConstraint);
                     }
                 })
                 })
@@ -183,11 +205,7 @@
 
 
 
-    // 建立cannon.js空間
-    const world = new CANNON.World();
-    world.gravity.set(.1, -10, 0); // Set gravity in m/s²
-    // world.gravity.set(0, 0, 0); // Set gravity in m/s²
-    console.log(world) 
+
 
     // 创建物体的材料
     var sphereMaterial = new CANNON.Material({
