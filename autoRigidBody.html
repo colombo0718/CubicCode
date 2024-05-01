@@ -1,3 +1,9 @@
+<style>
+    body {
+        margin: 0px;
+        /* overflow: hidden; */
+    }
+</style>
 <script type="importmap">
         {
             "imports": {
@@ -11,16 +17,21 @@
     import * as THREE from 'three';
     // import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
     import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     // 創建場景、相機和渲染器
     var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / (window.innerHeight-30), 0.1, 1000);
     var renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight-30);
     renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
     // 設置相機位置
     camera.position.y = 1;  
     camera.position.z = 5;
+
+        // 添加OrbitControls
+        const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enablePan=false
 
     // 添加燈光
     var ambientLight = new THREE.AmbientLight(0xffffff, .5); // 產生柔和的光
@@ -33,7 +44,7 @@
 
 
     // 加入地板
-    const planeGeometry = new THREE.PlaneGeometry(6, 6);
+    const planeGeometry = new THREE.PlaneGeometry(10, 10);
     const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
     const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
     planeMesh.rotation.x = -Math.PI / 2;
@@ -50,24 +61,28 @@
 
 
         for (let i = 0; i < chunk.data.length; i += 4) {
+            // 抓出特殊顏色標記
             var ci=chunk.data[i+3]
             if(ci==1||ci==6||ci==31||ci==36||ci==181||ci==186||ci==211){
                 console.log(0.1*chunk.data[i+0],0.1*chunk.data[i+1],0.1*chunk.data[i+2])
+                 // 標記方塊不做碰撞體
                 continue;
             }
+            // 座標資料放進串列並加總
             voxNum+=1
             x.push(0.1*chunk.data[i+0])
             y.push(0.1*chunk.data[i+1])
             z.push(0.1*chunk.data[i+2])
-            c.push(chunk.data[i+3])
             sumX+=0.1*chunk.data[i+0]
             sumY+=0.1*chunk.data[i+1]
             sumZ+=0.1*chunk.data[i+2]
         }
 
+        // voxel模型中心
         var center={x:0.1*chunk.size.x/2,y:0.1*chunk.size.z/2,z:-0.1*chunk.size.y/2}
+        // three.js格式的重心
         var centerOfMass = new THREE.Vector3(sumX/voxNum,sumZ/voxNum,-sumY/voxNum);
-        // console.log(centerOfMass)
+        // cannon.js格式的重心
         var offset = new CANNON.Vec3(-sumX/voxNum, -sumZ/voxNum, sumY/voxNum);
 
 
@@ -80,9 +95,7 @@
         for(let i=0;i<x.length;i+=1){
             // console.log(i)
             var sphereShape = new CANNON.Sphere(.05);
-            // var sphereShape = new CANNON.Box(halfExtents);
             var spherePosition = new CANNON.Vec3(x[i], z[i], -y[i]);
-            
             spherePosition.vadd(offset, spherePosition);
             rigidBody.addShape(sphereShape,spherePosition);
         }
@@ -94,9 +107,8 @@
         // rigidBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 0), -Math.PI / 2);
         // rigidBody.angularVelocity.set(2, 0, 0); 
         world.addBody(rigidBody);
-        // console.log(rigidBody.material)
         rigidBody.centerOfMass=centerOfMass
-        return rigidBody//,centerOfMass
+        return rigidBody
     }
 
     const loader1 = new VOXLoader();
@@ -166,6 +178,7 @@
             SkinArray[i].quaternion.copy(BodyArray[i].quaternion);
         }
         // meshes.rotation.y += 0.01;
+        controls.update(); // 需要加入這行才能讓OrbitControls工作
         renderer.render(scene, camera);
     }
 </script>
