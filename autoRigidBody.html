@@ -64,8 +64,6 @@
             sumY+=0.1*chunk.data[i+1]
             sumZ+=0.1*chunk.data[i+2]
         }
-        console.log(voxNum)
-        // console.log(c)
 
         var center={x:0.1*chunk.size.x/2,y:0.1*chunk.size.z/2,z:-0.1*chunk.size.y/2}
         var centerOfMass = new THREE.Vector3(sumX/voxNum,sumZ/voxNum,-sumY/voxNum);
