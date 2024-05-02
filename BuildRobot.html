@@ -157,7 +157,7 @@
     
     var JoitArray=[]
     var BodyArray=[],SkinArray=[]
-    loader1.load( 'https://cubiccode.vercel.app/vox/Catapult2.vox', function(chunks){  // BostonDog   Catapult
+    loader1.load( 'https://cubiccode.vercel.app/vox/BostonDog2.vox', function(chunks){  // BostonDog   Catapult
         // 根據chunks建立多個獨立的Body
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
@@ -220,7 +220,6 @@
                         });
 
                         JoitArray.push(hingeConstraint)
-                        // 設置角度限制，單位是弧度
                         hingeConstraint.enableMotor();
                         // hingeConstraint.setMotorSpeed(-1)
                         // hingeConstraint.setSteeringValue(1)
@@ -275,6 +274,7 @@
         var qB=JoitArray[0].bodyB.quaternion
         var axis=  new CANNON.Vec3(0, 0, 1);
         var nVec = new CANNON.Vec3(1, 0, 0);
+        
 
         // 计算旋转后的参考向量
         var rVecA = qA.vmult(nVec);
@@ -293,7 +293,8 @@
         var dir =  crossProd.x * rAxis.x + crossProd.y * rAxis.y + crossProd.z * rAxis.z;
 
         console.log(angle,dir)
-        if(dir>0){JoitArray[0].setMotorSpeed(1)}
+        if(dir<0){angle*=-1}
+        if(angle>.4){JoitArray[0].setMotorSpeed(1)}
         else{JoitArray[0].setMotorSpeed(-1)}
             
 
