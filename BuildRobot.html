@@ -59,6 +59,33 @@
     console.log(world) 
 
 
+
+    function getHingeAngle(bodyA, bodyB, hingeAxis) {
+        // 將四元數轉換為軸角表示
+        var quaternionA = bodyA.quaternion;
+        var quaternionB = bodyB.quaternion;
+
+        // 計算bodyB相對於bodyA的旋轉四元數
+        var relativeQuaternion = quaternionB.mult(quaternionA.inverse());
+        
+        // 將相對四元數轉換為軸角形式
+        var axisAngle = relativeQuaternion.toAxisAngle();
+
+        // 獲取軸向
+        var axis = new CANNON.Vec3(axisAngle[0], axisAngle[1], axisAngle[2]);
+        // 獲取角度
+        var angle = axisAngle[3];
+
+        // 檢查軸向是否與絞鍊軸對齊
+        if (axis.dot(hingeAxis) > 0.999) {
+            return angle; // 返回角度
+        } else {
+            return -angle; // 軸向相反，返回負角度
+        }
+    }
+
+
+
     // 建構對應剛體
     function buildRigidBody(chunk){
         var x=[],y=[],z=[],c=[],voxNum=0
@@ -128,6 +155,7 @@
     // var meshes= new THREE.Object3D();
     // var mesh
     
+    var JoitArray=[]
     var BodyArray=[],SkinArray=[]
     loader1.load( 'https://cubiccode.vercel.app/vox/Catapult2.vox', function(chunks){  // BostonDog   Catapult
         // 根據chunks建立多個獨立的Body
@@ -190,15 +218,18 @@
                             axisB: direction,  // B的轉軸方向
                             maxForce: 50  // 最大力量
                         });
+
+                        JoitArray.push(hingeConstraint)
                         // 設置角度限制，單位是弧度
                         hingeConstraint.enableMotor();
-                        hingeConstraint.setMotorSpeed(-1)
+                        // hingeConstraint.setMotorSpeed(-1)
                         // hingeConstraint.setSteeringValue(1)
                         // hingeConstraint.maxMotorImpulse = 1e3; // 增加驅動脈衝力
                         // hingeConstraint.motorTargetVelocity = 100; // 速度單位為弧度/秒
                         // hingeConstraint.lowerLimit =  -Math.PI / 8;  // -45度
                         // hingeConstraint.upperLimit =   Math.PI / 8;   // 45度
-                        console.log(hingeConstraint)
+                        console.log(hingeConstraint,bodyA.quaternion,bodyB.quaternion)
+                        // console.log(getHingeAngle(bodyA,bodyB,hingeConstraint.axisA))
                         world.addConstraint(hingeConstraint);
                     }
                 })
@@ -240,6 +271,32 @@
             SkinArray[i].quaternion.copy(BodyArray[i].quaternion);
         }
         // meshes.rotation.y += 0.01;
+        var qA=JoitArray[0].bodyA.quaternion
+        var qB=JoitArray[0].bodyB.quaternion
+        var axis=  new CANNON.Vec3(0, 0, 1);
+        var nVec = new CANNON.Vec3(1, 0, 0);
+
+        // 计算旋转后的参考向量
+        var rVecA = qA.vmult(nVec);
+        var rVecB = qB.vmult(nVec);
+        var rAxis = qA.vmult(axis);
+
+        // 计算叉积和点积
+        var crossProd = rVecA.cross(rVecB);
+        // console.log(crossProd)
+        var dotProd= rVecA.x * rVecB.x + rVecA.y * rVecB.y + rVecA.z * rVecB.z;
+
+        // // 计算角度
+        var angle = Math.atan2(crossProd.length(), dotProd);
+
+        // // 计算夹角
+        var dir =  crossProd.x * rAxis.x + crossProd.y * rAxis.y + crossProd.z * rAxis.z;
+
+        console.log(angle,dir)
+        if(dir>0){JoitArray[0].setMotorSpeed(1)}
+        else{JoitArray[0].setMotorSpeed(-1)}
+            
+
         controls.update(); // 需要加入這行才能讓OrbitControls工作
         renderer.render(scene, camera);
     }
