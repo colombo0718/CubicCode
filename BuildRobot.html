@@ -16,7 +16,7 @@
 <script type="module">
     import * as THREE from 'three';
     // import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
-    import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine.js';
+    import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine_2.js';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     // 創建場景、相機和渲染器
     var scene = new THREE.Scene();
@@ -60,29 +60,67 @@
 
 
 
-    function getHingeAngle(bodyA, bodyB, hingeAxis) {
-        // 將四元數轉換為軸角表示
-        var quaternionA = bodyA.quaternion;
-        var quaternionB = bodyB.quaternion;
+    CANNON.HingeConstraint.prototype.getAngle = function() {
+        var bodyA = this.bodyA;
+        var bodyB = this.bodyB;
+        var axis = this.axisA; // 鉸鏈的軸
 
-        // 計算bodyB相對於bodyA的旋轉四元數
-        var relativeQuaternion = quaternionB.mult(quaternionA.inverse());
-        
-        // 將相對四元數轉換為軸角形式
-        var axisAngle = relativeQuaternion.toAxisAngle();
+        // 將軸向量從bodyA的坐標系轉換到世界坐標系
+        var worldAxisA = bodyA.quaternion.vmult(axis.clone());
 
-        // 獲取軸向
-        var axis = new CANNON.Vec3(axisAngle[0], axisAngle[1], axisAngle[2]);
-        // 獲取角度
-        var angle = axisAngle[3];
+        // 獲取bodyB相對於bodyA的旋轉
+        var relativeRotation = bodyB.quaternion.mult(bodyA.quaternion.inverse());
 
-        // 檢查軸向是否與絞鍊軸對齊
-        if (axis.dot(hingeAxis) > 0.999) {
-            return angle; // 返回角度
-        } else {
-            return -angle; // 軸向相反，返回負角度
+        // 把軸向量從bodyA的坐標系轉換到bodyB的坐標系
+        var axisInB = relativeRotation.inverse().vmult(worldAxisA);
+
+        // 計算夾角
+        var angle = Math.atan2(axisInB.y, axisInB.x);
+
+        // ------------------------
+        // meshes.rotation.y += 0.01;
+        var qA=this.bodyA.quaternion
+        var qB=this.bodyB.quaternion
+        var axis = this.axisA;  // 軸向量
+        // var nVec = new CANNON.Vec3(1, 0, 0);
+
+
+        var xx=new CANNON.Vec3(1, 0, 0);
+        var yy=new CANNON.Vec3(0, 1, 0);
+        var zz=new CANNON.Vec3(0, 0, 1); 
+
+        // 計算一個垂直於轉軸的法向量
+        var nVec = axis.cross(xx);
+        if(nVec.length()<0.1){
+            nVec = axis.cross(yy);
         }
-    }
+        if(nVec.length()<0.1){
+            nVec = axis.cross(zz);
+        }
+        // console.log(nVec)
+        
+
+        // 计算旋转后的参考向量
+        var rVecA = qA.vmult(nVec);
+        var rVecB = qB.vmult(nVec);
+        var rAxis = qA.vmult(axis);
+
+        // 计算叉积和点积
+        var crossProd = rVecA.cross(rVecB);
+        // console.log(crossProd)
+        var dotProd= rVecA.x * rVecB.x + rVecA.y * rVecB.y + rVecA.z * rVecB.z;
+
+        // // 计算角度
+        var angle = Math.atan2(crossProd.length(), dotProd);
+
+        // // 计算夹角
+        var dir =  crossProd.x * rAxis.x + crossProd.y * rAxis.y + crossProd.z * rAxis.z;
+        if(dir<0){angle*=-1}
+        // console.log(angle)
+
+
+        return angle;
+    };
 
 
 
@@ -157,7 +195,7 @@
     
     var JoitArray=[]
     var BodyArray=[],SkinArray=[]
-    loader1.load( 'https://cubiccode.vercel.app/vox/Catapult2.vox', function(chunks){  // BostonDog   Catapult
+    loader1.load( 'https://cubiccode.vercel.app/vox/BostonDog2.vox', function(chunks){  // BostonDog   Catapult
         // 根據chunks建立多個獨立的Body
         for ( let i = 0; i < chunks.length; i ++ ) {
             const chunk = chunks[ i ];
@@ -261,42 +299,51 @@
 
 
         // 開始動畫
+        var worldTime=0
         setTimeout(setInterval(animate, 10),0)
         ; // 每秒約 60 幀的更新率
     function animate() {
         world.step(0.01);
+        worldTime+=0.01
         for(let i=0;i<BodyArray.length;i+=1){
             SkinArray[i].position.copy(BodyArray[i].position);
             SkinArray[i].quaternion.copy(BodyArray[i].quaternion);
         }
-        // meshes.rotation.y += 0.01;
-        var qA=JoitArray[0].bodyA.quaternion
-        var qB=JoitArray[0].bodyB.quaternion
-        var axis=  new CANNON.Vec3(0, 0, 1);
-        var nVec = new CANNON.Vec3(1, 0, 0);
+        // // meshes.rotation.y += 0.01;
+        // var qA=JoitArray[0].bodyA.quaternion
+        // var qB=JoitArray[0].bodyB.quaternion
+        // var axis=  new CANNON.Vec3(0, 0, 1);
+        // var nVec = new CANNON.Vec3(1, 0, 0);
         
 
-        // 计算旋转后的参考向量
-        var rVecA = qA.vmult(nVec);
-        var rVecB = qB.vmult(nVec);
-        var rAxis = qA.vmult(axis);
+        // // 计算旋转后的参考向量
+        // var rVecA = qA.vmult(nVec);
+        // var rVecB = qB.vmult(nVec);
+        // var rAxis = qA.vmult(axis);
 
-        // 计算叉积和点积
-        var crossProd = rVecA.cross(rVecB);
-        // console.log(crossProd)
-        var dotProd= rVecA.x * rVecB.x + rVecA.y * rVecB.y + rVecA.z * rVecB.z;
+        // // 计算叉积和点积
+        // var crossProd = rVecA.cross(rVecB);
+        // // console.log(crossProd)
+        // var dotProd= rVecA.x * rVecB.x + rVecA.y * rVecB.y + rVecA.z * rVecB.z;
 
-        // // 计算角度
-        var angle = Math.atan2(crossProd.length(), dotProd);
+        // // // 计算角度
+        // var angle = Math.atan2(crossProd.length(), dotProd);
 
-        // // 计算夹角
-        var dir =  crossProd.x * rAxis.x + crossProd.y * rAxis.y + crossProd.z * rAxis.z;
-        JoitArray[0].enableMotor();
+        // // // 计算夹角
+        // var dir =  crossProd.x * rAxis.x + crossProd.y * rAxis.y + crossProd.z * rAxis.z;
+        // JoitArray[0].enableMotor();
 
-        console.log(angle,dir)
-        if(dir<0){angle*=-1}
-        if(angle>.1){JoitArray[0].setMotorSpeed(1)}
-        else{JoitArray[0].setMotorSpeed(-1)}
+        // console.log(angle,dir)
+        // if(dir<0){angle*=-1}
+        JoitArray.forEach(function(hinge){
+            var angle=hinge.getAngle()
+            if(angle>Math.sin(worldTime*3)){hinge.setMotorSpeed(1)}
+            else{hinge.setMotorSpeed(-1)}
+        })
+
+
+
+        // console.log(JoitArray[0].getAngle())
             
 
         controls.update(); // 需要加入這行才能讓OrbitControls工作
