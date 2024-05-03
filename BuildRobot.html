@@ -106,7 +106,7 @@
         var rAxis = qA.vmult(axis);
 
         // 计算叉积和点积
-        var crossProd = rVecA.cross(rVecB);
+        var crossProd = rVecB.cross(rVecA);
         // console.log(crossProd)
         var dotProd= rVecA.x * rVecB.x + rVecA.y * rVecB.y + rVecA.z * rVecB.z;
 
@@ -337,8 +337,8 @@
         // if(dir<0){angle*=-1}
         JoitArray.forEach(function(hinge){
             var angle=hinge.getAngle()
-            if(angle>Math.sin(worldTime*3)){hinge.setMotorSpeed(1)}
-            else{hinge.setMotorSpeed(-1)}
+            if(angle>Math.sin(worldTime*3)){hinge.setMotorSpeed(-1)}
+            else{hinge.setMotorSpeed(1)}
         })
 
 
