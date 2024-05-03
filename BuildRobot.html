@@ -216,12 +216,12 @@
                             pivotB: pivotB,
                             axisA: direction,  // A的轉軸方向
                             axisB: direction,  // B的轉軸方向
-                            maxForce: 50  // 最大力量
+                            maxForce: 100  // 最大力量
                         });
 
                         JoitArray.push(hingeConstraint)
                         // 設置角度限制，單位是弧度
-                        hingeConstraint.enableMotor();
+                        // hingeConstraint.enableMotor();
                         // hingeConstraint.setMotorSpeed(-1)
                         // hingeConstraint.setSteeringValue(1)
                         // hingeConstraint.maxMotorImpulse = 1e3; // 增加驅動脈衝力
@@ -275,6 +275,8 @@
         var qB=JoitArray[0].bodyB.quaternion
         var axis=  new CANNON.Vec3(0, 0, 1);
         var nVec = new CANNON.Vec3(1, 0, 0);
+        // var axis=  new CANNON.Vec3(1, 0, 0);
+        // var nVec = new CANNON.Vec3(0, 0, 1);
 
         // 计算旋转后的参考向量
         var rVecA = qA.vmult(nVec);
@@ -291,6 +293,7 @@
 
         // // 计算夹角
         var dir =  crossProd.x * rAxis.x + crossProd.y * rAxis.y + crossProd.z * rAxis.z;
+        JoitArray[0].enableMotor();
 
         console.log(angle,dir)
         if(dir>0){JoitArray[0].setMotorSpeed(1)}
