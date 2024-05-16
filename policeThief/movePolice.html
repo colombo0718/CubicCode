@@ -1,0 +1,184 @@
+<style>
+    body {
+        margin: 0px;
+        /* overflow: hidden; */
+    }
+</style>
+<div id="canvas" ></div>
+<input type="file" id="fileInput" accept=".vox" />
+<input type="checkbox" id="checkFloor" checked >顯示地板</input>
+<input type="color" id="floorColor" name="cubeColor" value="#00ff00">
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://threejs.org/build/three.module.js",
+            "three/addons/": "https://threejs.org/examples/jsm/"
+        }
+    }
+</script>
+<script type="module">
+    import * as THREE from 'three';
+    // import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+    import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    var fileInput = document.getElementById('fileInput');
+    var canvas = document.getElementById('canvas');
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth /(window.innerHeight-30), 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+    renderer.setSize(window.innerWidth,(window.innerHeight-30));
+    canvas.appendChild(renderer.domElement);
+
+    // 設置相機
+    camera.position.set(0,6,6)
+
+    // 添加燈光
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
+    directionalLight.position.set(-10, 20, 10);
+    directionalLight.castShadow = true; // 讓此光能產生陰影
+
+    // 設定光源可產生影子的範圍與精細度
+    directionalLight.shadow.camera.left = -20;
+    directionalLight.shadow.camera.right = 20;
+    directionalLight.shadow.camera.top = 20;
+    directionalLight.shadow.camera.bottom = -20;
+    directionalLight.shadow.camera.near = .1;
+    directionalLight.shadow.camera.far = 200;
+
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
+
+    scene.add(directionalLight);
+
+    // const pointLight1 = new THREE.PointLight(0xffffff,10);
+    // pointLight1.position.set(2, 2, 2);
+    // pointLight1.castShadow = true; // 讓此光能產生陰影
+    // scene.add(pointLight1);
+
+    // const pointLight2 = new THREE.PointLight(0xffffff,10);
+    // pointLight2.position.set(-2, 2, -2);
+    // pointLight2.castShadow = true; // 讓此光能產生陰影
+    // scene.add(pointLight2);
+
+    // 添加網格
+    var gridSize = 10; // 網格大小
+    var gridDivisions = 10; // 網格分段數
+    var gridSpace = new THREE.GridHelper(gridSize, gridDivisions, 0xffffff, 0x888888);
+    gridSpace.position.y = 0; // 放置在y=0的面上
+    scene.add(gridSpace);
+
+
+    // 創建方塊幾何體
+    const geometry = new THREE.BoxGeometry(10, .05, 10); // 方塊的尺寸
+
+    // 創建綠色材質
+    const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 }); // 綠色
+
+    // 創建網格（方塊）
+    const cube = new THREE.Mesh(geometry, material);
+
+    cube.receiveShadow = true
+    cube.castShadow = true;
+    // cube.clipShadows = true;
+
+    document.getElementById('checkFloor').addEventListener('change', function() {
+        if(this.checked) {
+            // 如果checkbox被選中，添加方塊到場景
+            scene.add(cube);
+        } else {
+            // 如果checkbox被取消選中，從場景中移除方塊
+            scene.remove(cube);
+        }
+    });
+
+    document.getElementById('floorColor').addEventListener('input', function() {
+        // 讀取選擇的顏色
+        var color = this.value;
+        // 更新方塊的材質顏色
+        cube.material.color.set(color);
+    });
+
+
+    // 將方塊添加到場景
+    scene.add(cube);
+
+
+    // 添加OrbitControls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enablePan=false
+
+    // 建置vox動畫必要物件
+    const loader = new VOXLoader();
+    var anima= new THREE.Object3D();
+    scene.add( anima );  
+    const meshes = [];
+    let currentIndex = 0;
+
+    // 建置vox動畫流程
+    function processVoxelAnimation(chunks) {
+        // 清除voxel動畫物件
+        while (anima.children.length > 0) { 
+            anima.remove(anima.children[0]); 
+        }
+        meshes.length = 0;
+
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            const mesh = new VOXMesh(chunk);
+            // mesh.material.metalness=true
+            // mesh.material.roughness=1
+            mesh.scale.setScalar(.1);
+            mesh.visible = false;
+
+            mesh.receiveShadow = true
+            mesh.castShadow = true;
+
+            meshes.push(mesh);
+            anima.add(mesh);
+        }
+    }
+
+    // 載入預設檔案
+    loader.load( 'https://cubiccode.vercel.app/policeThief/policeCar.vox', function ( chunks ) {
+    // loader.load( 'https://comfy-cucurucho-9c697a.netlify.app/knight-walk.vox', function ( chunks ) {
+    // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
+        processVoxelAnimation(chunks);
+          
+        // 開始動畫
+        setInterval(function() {
+            // 將前一個物件隱藏
+            meshes[currentIndex % meshes.length].visible = false;
+            currentIndex +=1
+            // 將新的物件顯示
+            meshes[currentIndex % meshes.length].visible = true;
+
+            controls.update(); // 需要加入這行才能讓OrbitControls工作
+            renderer.render(scene, camera);
+        },100)
+    } );
+
+    // 用戶點選檔案後
+    fileInput.addEventListener('change', function (event) { 
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function (event) {
+            var contents = event.target.result;
+            var chunks= loader.parse(contents)
+            console.log(chunks)
+
+            processVoxelAnimation(chunks);
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+</script>
+
