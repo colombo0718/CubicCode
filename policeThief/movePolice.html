@@ -6,8 +6,6 @@
 </style>
 <div id="canvas" ></div>
 <input type="file" id="fileInput" accept=".vox" />
-<input type="checkbox" id="checkFloor" checked >顯示地板</input>
-<input type="color" id="floorColor" name="cubeColor" value="#00ff00">
 <button id="runButton">Run Car</button>
 <script type="importmap">
     {
@@ -72,44 +70,57 @@
     // 添加網格
     var gridSize = 10; // 網格大小
     var gridDivisions = 10; // 網格分段數
-    var gridSpace = new THREE.GridHelper(gridSize, gridDivisions, 0xffffff, 0x888888);
+    var gridSpace = new THREE.GridHelper(gridSize, gridDivisions, 0xffffff, 0xaaaaaa);
     gridSpace.position.y = 0; // 放置在y=0的面上
     scene.add(gridSpace);
 
 
-    // 創建方塊幾何體
-    const geometry = new THREE.BoxGeometry(40, .05, 40); // 方塊的尺寸
+        // // 創建方塊幾何體
+        // const geometry = new THREE.BoxGeometry(40, .05, 40); // 方塊的尺寸
 
-    // 創建綠色材質
-    const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 }); // 綠色
+        // // 創建綠色材質
+        // const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 }); // 綠色
 
-    // 創建網格（方塊）
-    const cube = new THREE.Mesh(geometry, material);
+        // // 創建網格（方塊）
+        // const cube = new THREE.Mesh(geometry, material);
 
-    cube.receiveShadow = true
-    cube.castShadow = true;
-    // cube.clipShadows = true;
+        // cube.receiveShadow = true
+        // cube.castShadow = true;
+        // // cube.clipShadows = true;
 
-    document.getElementById('checkFloor').addEventListener('change', function() {
-        if(this.checked) {
-            // 如果checkbox被選中，添加方塊到場景
-            scene.add(cube);
-        } else {
-            // 如果checkbox被取消選中，從場景中移除方塊
-            scene.remove(cube);
+
+    // 加入地板
+    const planeGeometry = new THREE.PlaneGeometry(10, 10);
+    const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    planeMesh.rotation.x = -Math.PI / 2;
+    planeMesh.receiveShadow = true
+    planeMesh.castShadow = true;
+    scene.add(planeMesh);
+
+    // 创建道路
+    var roadArray=[]
+    for(var j=0;j<9;j++){
+        roadArray.push([])
+    for(var i=0;i<17;i++){
+        var roadMesh
+        if(i%2==0){
+            var roadGeometry = new THREE.BoxGeometry(0.2, 0.01, 1.2);
+            var roadMaterial = new THREE.MeshLambertMaterial({ color: 0x444444 });
+            roadMesh = new THREE.Mesh(roadGeometry, roadMaterial);
+            roadMesh.position.set(i/2-4,0,j-4-0.5); // 稍微抬高以避免与地板重叠
+            scene.add(roadMesh);
+        }else{
+            var roadGeometry = new THREE.BoxGeometry(1.2, 0.01, 0.2);
+            var roadMaterial = new THREE.MeshLambertMaterial({ color: 0x444444 });
+            roadMesh = new THREE.Mesh(roadGeometry, roadMaterial);
+            roadMesh.position.set(i/2-4,0,j-4); // 稍微抬高以避免与地板重叠
+            scene.add(roadMesh);
         }
-    });
-
-    document.getElementById('floorColor').addEventListener('input', function() {
-        // 讀取選擇的顏色
-        var color = this.value;
-        // 更新方塊的材質顏色
-        cube.material.color.set(color);
-    });
-
-
-    // 將方塊添加到場景
-    scene.add(cube);
+        roadArray[j].push(roadMesh)
+    }
+    }
+    console.log(roadArray)
 
 
     // 添加OrbitControls
@@ -136,7 +147,7 @@
             const mesh = new VOXMesh(chunk);
             // mesh.material.metalness=true
             // mesh.material.roughness=1
-            mesh.scale.setScalar(.1);
+            mesh.scale.setScalar(.01);
             mesh.visible = false;
 
             mesh.receiveShadow = true
@@ -154,6 +165,7 @@
     runbutton.addEventListener('click',function(){
         runtime=0.00
         setInterval(function() {
+            console.log(police.position.x)
             runtime+=0.01
             var nowAction=actions[Math.floor(runtime)]
             if(nowAction=='F'){
@@ -166,19 +178,19 @@
                 // 校正角度並前進  
                 if(Math.abs(police.rotation.y-0)<0.1){
                     police.rotation.y=0
-                    police.position.z-=.1
+                    police.position.z-=.01
                 }
                 if(Math.abs(police.rotation.y-Math.PI/2)<0.1){
                     police.rotation.y=Math.PI/2
-                    police.position.x-=.1
+                    police.position.x-=.01
                 }
                 if(Math.abs(police.rotation.y-Math.PI)<0.1){
                     police.rotation.y=Math.PI
-                    police.position.z+=.1
+                    police.position.z+=.01
                 }
                 if(Math.abs(police.rotation.y-3*Math.PI/2)<0.1){
                     police.rotation.y=3*Math.PI/2
-                    police.position.x+=.1
+                    police.position.x+=.01
                 }
             }
             // 左右轉
@@ -189,10 +201,7 @@
 
     // 載入預設檔案
     loader.load( 'https://cubiccode.vercel.app/policeThief/PoliceCar.vox', function ( chunks ) {
-    // loader.load( 'https://comfy-cucurucho-9c697a.netlify.app/knight-walk.vox', function ( chunks ) {
-    // loader.load( './vox/soldier-hack.vox', function ( chunks ) {
         processVoxelAnimation(chunks);
-          
         // 開始動畫
         setInterval(function() {
             // 將前一個物件隱藏
@@ -200,14 +209,27 @@
             currentIndex +=1
             // 將新的物件顯示
             meshes[currentIndex % meshes.length].visible = true;
-
             // anima.position.z-=.5            
         },100)
     } );
 
+
+    // 保存初始相机与目标的相对位置
+    let initialCameraOffset = new THREE.Vector3().subVectors(camera.position, controls.target);
+
+    controls.addEventListener('change', () => {
+        // 更新初始相机与目标的相对位置
+        initialCameraOffset = new THREE.Vector3().subVectors(camera.position, controls.target);
+    });
+
     // 繪製畫面
     setInterval(function() {
         renderer.render(scene, camera);
+
+        // 更新相机位置，使其保持与目标的相对位置不变
+        camera.position.copy(police.position).add(initialCameraOffset);
+        // 锁定目标到立方体
+        controls.target.copy(police.position);
         controls.update(); // 需要加入這行才能讓OrbitControls工作
     },10)
 
@@ -226,5 +248,20 @@
         reader.readAsArrayBuffer(file);
     });
 
+    var mapStr=[' _ _ _ _ _ _ _ _ ',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|']
+    for(var j=0;j<9;j++){
+    for(var i=0;i<17;i++){
+        if(mapStr[j][i]==' '){
+            roadArray[j][i].visible=false
+        }
+    }}
 </script>
 
