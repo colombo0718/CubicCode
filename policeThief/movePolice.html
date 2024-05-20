@@ -1,12 +1,74 @@
-<style>
-    body {
-        margin: 0px;
-        /* overflow: hidden; */
-    }
-</style>
-<div id="canvas" ></div>
-<input type="file" id="fileInput" accept=".vox" />
-<button id="runButton">Run Car</button>
+<head>
+    <style>
+        body {
+            margin: 0px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 定义列比例 */
+            height: 100vh; /* 使用视窗高度作为容器高度 */
+        }
+
+        .blockly-panel {
+            height: 100%; /* 充满容器的高度 */
+        }
+
+        .canvas-panel {
+            display: grid;
+            grid-template-rows: 5fr 1fr; /* 定义行比例 */
+            height: 100%; /* 充满容器的高度 */
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+
+        #canvas {
+            width: 100%; /* 使用相对宽度 */
+            height: 100%; /* 使用相对高度 */
+            text-align: center;
+        }
+
+        /* 隐藏垃圾桶图标 */
+        .blocklyTrashIcon {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="canvas-panel" > 
+        <div class="canvas-container">
+            <div id="canvas"></div>
+        </div>
+        <div class="ui-container">
+            <div class="level-selector">
+                <label>選擇關卡:</label>
+                <label><input type="radio" name="level" value="01">01</label>
+                <label><input type="radio" name="level" value="02">02</label>
+                <label><input type="radio" name="level" value="03">03</label>
+                <label><input type="radio" name="level" value="04">04</label>
+                <label><input type="radio" name="level" value="05">05</label>
+                <label><input type="radio" name="level" value="06">06</label>
+                <label><input type="radio" name="level" value="07">07</label>
+                <label><input type="radio" name="level" value="08">08</label>
+                <label><input type="radio" name="level" value="09">09</label>
+                <label><input type="radio" name="level" value="10">10</label>
+            </div>
+
+            <input type="file" id="fileInput" accept=".vox" />
+            <button id="showActions">Show Actions</button>
+            <button id="runButton">Run Car</button>
+        </div>    
+    </div>
+    <div  class="blockly-panel" > 
+        <div id="blocklyDiv"></div>
+    </div>
+</div>
+<script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <script type="importmap">
     {
         "imports": {
@@ -16,6 +78,94 @@
     }
 </script>
 <script type="module">
+
+
+        // 定义积木
+        Blockly.Blocks['move_forward'] = {
+          init: function() {
+            this.appendDummyInput()
+                .appendField("前进");
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour(160);
+            this.setTooltip("");
+            this.setHelpUrl("");
+          }
+        };
+
+        Blockly.Blocks['turn_left'] = {
+          init: function() {
+            this.appendDummyInput()
+                .appendField("左转");
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour(160);
+            this.setTooltip("");
+            this.setHelpUrl("");
+          }
+        };
+
+        Blockly.Blocks['turn_right'] = {
+          init: function() {
+            this.appendDummyInput()
+                .appendField("右转");
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour(160);
+            this.setTooltip("");
+            this.setHelpUrl("");
+          }
+        };
+
+        // 生成 JavaScript 代码
+        Blockly.JavaScript['move_forward'] = function(block) {
+          var code = 'moveForward();\n';
+          return code;
+        };
+
+        Blockly.JavaScript['turn_left'] = function(block) {
+          var code = 'turnLeft();\n';
+          return code;
+        };
+
+        Blockly.JavaScript['turn_right'] = function(block) {
+          var code = 'turnRight();\n';
+          return code;
+        };
+
+        // Blockly 配置
+        var workspace = Blockly.inject('blocklyDiv', {
+            toolbox: `
+                <xml>
+                    <block type="move_forward"></block>
+                    <block type="turn_left"></block>
+                    <block type="turn_right"></block>
+                    <block type="controls_repeat_ext">
+                        <value name="TIMES">
+                            <shadow type="math_number">
+                                <field name="NUM">4</field>
+                            </shadow>
+                        </value>
+                    </block>
+                </xml>
+            `
+        });
+
+        
+        // 生成并运行代码
+        function runCode() {
+            actions=''
+            var code = Blockly.JavaScript.workspaceToCode(workspace);
+            eval(code);
+            console.log(code)
+            console.log(actions)
+        }
+
+
+        var showbutton=document.getElementById('showActions');
+        showbutton.addEventListener('click',runCode)
+
+
     import * as THREE from 'three';
     // import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
     import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine.js';
@@ -24,13 +174,13 @@
     var fileInput = document.getElementById('fileInput');
     var canvas = document.getElementById('canvas');
     var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth /(window.innerHeight-30), 0.1, 1000);
+    var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
-    renderer.setSize(window.innerWidth,(window.innerHeight-30));
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight)
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
@@ -55,17 +205,7 @@
     directionalLight.shadow.mapSize.width = 1024;
     directionalLight.shadow.mapSize.height = 1024;
 
-    scene.add(directionalLight);
-
-    // const pointLight1 = new THREE.PointLight(0xffffff,10);
-    // pointLight1.position.set(2, 2, 2);
-    // pointLight1.castShadow = true; // 讓此光能產生陰影
-    // scene.add(pointLight1);
-
-    // const pointLight2 = new THREE.PointLight(0xffffff,10);
-    // pointLight2.position.set(-2, 2, -2);
-    // pointLight2.castShadow = true; // 讓此光能產生陰影
-    // scene.add(pointLight2);
+    scene.add(directionalLight)
 
     // 添加網格
     var gridSize = 10; // 網格大小
@@ -73,20 +213,6 @@
     var gridSpace = new THREE.GridHelper(gridSize, gridDivisions, 0xffffff, 0xaaaaaa);
     gridSpace.position.y = 0; // 放置在y=0的面上
     scene.add(gridSpace);
-
-
-        // // 創建方塊幾何體
-        // const geometry = new THREE.BoxGeometry(40, .05, 40); // 方塊的尺寸
-
-        // // 創建綠色材質
-        // const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 }); // 綠色
-
-        // // 創建網格（方塊）
-        // const cube = new THREE.Mesh(geometry, material);
-
-        // cube.receiveShadow = true
-        // cube.castShadow = true;
-        // // cube.clipShadows = true;
 
 
     // 加入地板
@@ -98,7 +224,7 @@
     planeMesh.castShadow = true;
     scene.add(planeMesh);
 
-    // 创建道路
+    // 创建道路陣列
     var roadArray=[]
     for(var j=0;j<9;j++){
         roadArray.push([])
@@ -122,10 +248,28 @@
     }
     console.log(roadArray)
 
+    // 根據地圖重構街道
+    var mapStr=[' _ _ _ _ _ _ _ _ ',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_ _|_|_|_|_|',
+                '|_|_|_|_| |_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|']
 
-    // 添加OrbitControls
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enablePan=false
+    function buildStreet(mapStr){
+        for(var j=0;j<9;j++){
+        for(var i=0;i<17;i++){
+            if(mapStr[j][i]==' '){
+                roadArray[j][i].visible=false
+            }
+        }}
+    }
+    buildStreet(mapStr)
+
+
 
     // 建置vox動畫必要物件
     const loader = new VOXLoader();
@@ -158,25 +302,63 @@
         }
     }
 
+
+     // 載入預設檔案
+     loader.load( 'https://cubiccode.vercel.app/policeThief/PoliceCar.vox', function ( chunks ) {
+        processVoxelAnimation(chunks);
+        // 開始動畫
+        setInterval(function() {
+            // 將前一個物件隱藏
+            meshes[currentIndex % meshes.length].visible = false;
+            currentIndex +=1
+            // 將新的物件顯示
+            meshes[currentIndex % meshes.length].visible = true;
+            // anima.position.z-=.5            
+        },100)
+    } );
+
+    // 用戶點選檔案後
+    fileInput.addEventListener('change', function (event) { 
+        var file = event.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function (event) {
+            var contents = event.target.result;
+            var chunks= loader.parse(contents)
+            console.log(chunks)
+
+            processVoxelAnimation(chunks);
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+
     // var actions='FRFLFRFLFRFLF'
-    var actions='FRFRFRFRFRFRFRFRFRFRFRFRFRFRFR'
+    var actions='FRFLFRFLFRFLFRFL'
     var runtime=0.00
     var runbutton=document.getElementById('runButton');
     runbutton.addEventListener('click',function(){
+        // runCode()
+        police.position.set(0,0,0)
+        police.rotation.set(0,0,0)
         runtime=0.00
         setInterval(function() {
-            console.log(police.position.x)
+            // console.log(police.position.x)
+            
             runtime+=0.01
             var nowAction=actions[Math.floor(runtime)]
+            // console.log(nowAction)
             if(nowAction=='F'){
                 // 角度拉回0~2pi
-                if(police.rotation.y>2*Math.PI){
+                if(police.rotation.y>=2*Math.PI){
                     police.rotation.y-=2*Math.PI
                 }else if(police.rotation.y<0 ){
                     police.rotation.y+=2*Math.PI
                 }
                 // 校正角度並前進  
-                if(Math.abs(police.rotation.y-0)<0.1){
+                console.log(police.rotation.y)
+                if(Math.abs(police.rotation.y-0)<0.1
+                || Math.abs(police.rotation.y-4*Math.PI/2)<0.1){
                     police.rotation.y=0
                     police.position.z-=.01
                 }
@@ -199,20 +381,24 @@
         },10)
     })
 
-    // 載入預設檔案
-    loader.load( 'https://cubiccode.vercel.app/policeThief/PoliceCar.vox', function ( chunks ) {
-        processVoxelAnimation(chunks);
-        // 開始動畫
-        setInterval(function() {
-            // 將前一個物件隱藏
-            meshes[currentIndex % meshes.length].visible = false;
-            currentIndex +=1
-            // 將新的物件顯示
-            meshes[currentIndex % meshes.length].visible = true;
-            // anima.position.z-=.5            
-        },100)
-    } );
 
+    function moveForward() {
+        actions += 'F';
+    }
+
+    function turnLeft() {
+        actions += 'L';
+    }
+
+    function turnRight() {
+        actions += 'R';
+    }
+
+   
+
+    // 添加OrbitControls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enablePan=false
 
     // 保存初始相机与目标的相对位置
     let initialCameraOffset = new THREE.Vector3().subVectors(camera.position, controls.target);
@@ -232,36 +418,6 @@
         controls.target.copy(police.position);
         controls.update(); // 需要加入這行才能讓OrbitControls工作
     },10)
-
-    // 用戶點選檔案後
-    fileInput.addEventListener('change', function (event) { 
-        var file = event.target.files[0];
-        var reader = new FileReader();
-
-        reader.onload = function (event) {
-            var contents = event.target.result;
-            var chunks= loader.parse(contents)
-            console.log(chunks)
-
-            processVoxelAnimation(chunks);
-        };
-        reader.readAsArrayBuffer(file);
-    });
-
-    var mapStr=[' _ _ _ _ _ _ _ _ ',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|']
-    for(var j=0;j<9;j++){
-    for(var i=0;i<17;i++){
-        if(mapStr[j][i]==' '){
-            roadArray[j][i].visible=false
-        }
-    }}
 </script>
+</body>
 
