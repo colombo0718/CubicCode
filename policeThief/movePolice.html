@@ -69,6 +69,8 @@
     </div>
 </div>
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+
+<script src="https://unpkg.com/blockly/javascript_compressed"></script>
 <script type="importmap">
     {
         "imports": {
@@ -78,7 +80,7 @@
     }
 </script>
 <script type="module">
-
+    function initBlockly() {
 
         // 定义积木
         Blockly.Blocks['move_forward'] = {
@@ -118,23 +120,23 @@
         };
 
         // 生成 JavaScript 代码
-        Blockly.JavaScript['move_forward'] = function(block) {
+        javascript.javascriptGenerator.forBlock['move_forward'] = function(block) {
           var code = 'moveForward();\n';
           return code;
         };
 
-        Blockly.JavaScript['turn_left'] = function(block) {
+        javascript.javascriptGenerator.forBlock['turn_left'] = function(block) {
           var code = 'turnLeft();\n';
           return code;
         };
 
-        Blockly.JavaScript['turn_right'] = function(block) {
+        javascript.javascriptGenerator.forBlock['turn_right'] = function(block) {
           var code = 'turnRight();\n';
           return code;
         };
 
         // Blockly 配置
-        var workspace = Blockly.inject('blocklyDiv', {
+        return Blockly.inject('blocklyDiv', {
             toolbox: `
                 <xml>
                     <block type="move_forward"></block>
@@ -150,8 +152,10 @@
                 </xml>
             `
         });
-
+    }
         
+    const workspace = initBlockly();
+
         // 生成并运行代码
         function runCode() {
             actions=''
@@ -159,6 +163,10 @@
             eval(code);
             console.log(code)
             console.log(actions)
+
+            var thief=voxelAnimas["ThiefCar"][0]
+            police=voxelAnimas["PoliceCar"][0]
+            console.log(thief.position.set(0,0,1))
         }
 
 
@@ -289,65 +297,12 @@
     const meshes = [];
     let currentIndex = 0;
 
-    // 建置vox動畫流程
-    function processVoxelAnimation(chunks) {
-        // 清除voxel動畫物件
-        while (police.children.length > 0) { 
-            police.remove(police.children[0]); 
-        }
-        meshes.length = 0;
-
-        for (let i = 0; i < chunks.length; i++) {
-            const chunk = chunks[i];
-            const mesh = new VOXMesh(chunk);
-            // mesh.material.metalness=true
-            // mesh.material.roughness=1
-            mesh.scale.setScalar(.01);
-            mesh.visible = false;
-
-            mesh.receiveShadow = true
-            mesh.castShadow = true;
-
-            meshes.push(mesh);
-            police.add(mesh);
-        }
-    }
-
-
-     // 載入預設檔案
-     loader.load( 'https://cubiccode.vercel.app/policeThief/PoliceCar.vox', function ( chunks ) {
-        processVoxelAnimation(chunks);
-        // 開始動畫
-        setInterval(function() {
-            // 將前一個物件隱藏
-            meshes[currentIndex % meshes.length].visible = false;
-            currentIndex +=1
-            // 將新的物件顯示
-            meshes[currentIndex % meshes.length].visible = true;
-            // anima.position.z-=.5            
-        },100)
-    } );
-
-    // 用戶點選檔案後
-    fileInput.addEventListener('change', function (event) { 
-        var file = event.target.files[0];
-        var reader = new FileReader();
-
-        reader.onload = function (event) {
-            var contents = event.target.result;
-            var chunks= loader.parse(contents)
-            console.log(chunks)
-
-            processVoxelAnimation(chunks);
-        };
-        reader.readAsArrayBuffer(file);
-    });
-
 
 
     const voxelSettings = [
-        { name: "soilGnd",      opacity: 1,  amount: 1   ,radius:5 },
-        { name: "gresGnd",      opacity: 1,  amount: 1   ,radius:5 },
+        { name: "PoliceCar",      opacity: 1,  amount: 1   ,radius:5 },
+        { name: "ThiefCar",      opacity: 1,  amount: 1   ,radius:5 },
+        { name: "coordinate",      opacity: 1,  amount: 1   ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -360,7 +315,7 @@
                 for (let j = 0; j < chunks.length; j++) {
                     const chunk = chunks[j];
                     const mesh = new VOXMesh(chunk);
-                    mesh.scale.setScalar(0.1);
+                    mesh.scale.setScalar(0.01);
                     // mesh.material.transparent = true;
                     // mesh.material.emissive.set(0x008888);
                     // mesh.material.opacity = opacity;
@@ -377,34 +332,12 @@
 
         const loader1 = new VOXLoader();
         for (const voxelSet of voxelSettings) {
-            loader.load('https://cubiccode.vercel.app/flyDragon/'+voxelSet.name+'.vox',
+            loader.load('https://cubiccode.vercel.app/policeThief/'+voxelSet.name+'.vox',
             function (chunks){
                 const models=createModelArray(chunks,voxelSet.opacity,voxelSet.amount,voxelSet.radius)
                 voxelAnimas[voxelSet.name] = models;
             })
         }
-
-    // 上傳選定戰機
-    // fileInput.addEventListener('change', function (event) {
-    //     if (!event.target.files.length) {
-    //         console.log('No files were selected!');
-    //         return; // 直接返回，不執行後面的代碼
-    //     }
-    //     scene.remove(voxelAnimas['fighter'][0])
-    //     var file = event.target.files[0];
-    //     var reader = new FileReader();
-    //     console.log(voxelAnimas )
-    //     reader.onload = function (event) {
-    //         var contents = event.target.result;
-    //         const loader = new VOXLoader();
-    //         var chunks= loader.parse(contents)
-    //         const models=createModelArray(chunks,1,1,10)
-    //         voxelAnimas['gift1'] = models;
-    //     };
-    //     reader.readAsArrayBuffer(file);
-    //     clearInterval(intervalID);
-    //     gameProcess()
-    // });
 
     // 繪製voxel動畫
     var slowIndex=0
@@ -424,13 +357,16 @@
     }, 100);
 
 
+
+
+
     // var actions='FRFLFRFLFRFLF'
     var actions='FRFLFRFLFRFLFRFL'
     var runtime=0.00
     let intervalId;
     var runbutton=document.getElementById('runButton');
     runbutton.addEventListener('click',function(){
-        // runCode()
+        runCode()
         clearInterval(intervalId);
         police.position.set(0,0,0)
         police.rotation.set(0,0,0)

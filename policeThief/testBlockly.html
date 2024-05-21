@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blockly Example</title>
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  <script>
+    // 定義自訂義積木
+    Blockly.Blocks['console_log_text'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField("console.log")
+            .appendField(new Blockly.FieldTextInput("Hello, world!"), "TEXT");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour(160);
+        this.setTooltip('');
+        this.setHelpUrl('');
+      }
+    };
+
+    // 定義生成的 JavaScript 代碼
+    // Blockly.JavaScript['console_log_text'] = function(block) {
+    //   var text = block.getFieldValue('TEXT');
+    //   var code = 'console.log("' + text + '");\n';
+    //   return code;
+    // };
+
+    javascript.javascriptGenerator.forBlock['console_log_text'] = function(block, generator) {
+        // TODO: Assemble javascript into code variable.
+        var text = block.getFieldValue('TEXT');
+        var code = 'console.log("' + text + '");\n';
+        return code;
+    };
+  </script>
+</head>
+<body>
+  <h1>Blockly Example</h1>
+  <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+  <xml id="toolbox" style="display: none">
+    <block type="console_log_text"></block>
+  </xml>
+
+  <button onclick="runCode()">Run Code</button>     
+  <pre id="codeOutput"></pre>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 初始化 Blockly 工作區
+      var workspace = Blockly.inject('blocklyDiv', {
+        toolbox: document.getElementById('toolbox')
+      });
+
+      function runCode() {
+        // 生成 JavaScript 代碼並顯示在 pre 元素中
+        var code = Blockly.JavaScript.workspaceToCode(workspace);
+        document.getElementById('codeOutput').textContent = code;
+        eval(code); // 執行生成的代碼
+      }
+
+      // 為按鈕設置點擊事件
+      document.querySelector("button").addEventListener("click", runCode);
+    });
+  </script>
+</body>
+</html>
