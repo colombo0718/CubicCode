@@ -259,6 +259,17 @@
                 '|_|_|_|_|_|_|_|_|',
                 '|_|_|_|_|_|_|_|_|']
 
+    // 根據地圖重構街道
+    var mapStr=['                 ',
+                '        |        ',
+                '        |        ',
+                '        |        ',
+                '        |        ',
+                '                 ',
+                '                 ',
+                '                 ',
+                '                 ']
+
     function buildStreet(mapStr){
         for(var j=0;j<9;j++){
         for(var i=0;i<17;i++){
@@ -336,13 +347,15 @@
     // var actions='FRFLFRFLFRFLF'
     var actions='FRFLFRFLFRFLFRFL'
     var runtime=0.00
+    let intervalId;
     var runbutton=document.getElementById('runButton');
     runbutton.addEventListener('click',function(){
         // runCode()
+        clearInterval(intervalId);
         police.position.set(0,0,0)
         police.rotation.set(0,0,0)
         runtime=0.00
-        setInterval(function() {
+        intervalId = setInterval(function() {
             // console.log(police.position.x)
             
             runtime+=0.01
@@ -393,6 +406,7 @@
     function turnRight() {
         actions += 'R';
     }
+
 
    
 
