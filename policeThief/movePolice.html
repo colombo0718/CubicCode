@@ -164,9 +164,7 @@
             console.log(code)
             console.log(actions)
 
-            var thief=voxelAnimas["ThiefCar"][0]
-            police=voxelAnimas["PoliceCar"][0]
-            console.log(thief.position.set(0,0,1))
+
         }
 
 
@@ -293,6 +291,7 @@
     // 建置vox動畫必要物件
     const loader = new VOXLoader();
     var police= new THREE.Object3D();
+    var thief = new THREE.Object3D();
     scene.add( police );  
     const meshes = [];
     let currentIndex = 0;
@@ -357,6 +356,13 @@
     }, 100);
 
 
+    setTimeout(function(){
+        thief=voxelAnimas["ThiefCar"][0]
+        police=voxelAnimas["PoliceCar"][0]
+        console.log(thief.position.set(0,0,1))
+        var coor=voxelAnimas["coordinate"][0]
+        console.log(coor.scale.set(5,5,5))
+    },1000)
 
 
 
