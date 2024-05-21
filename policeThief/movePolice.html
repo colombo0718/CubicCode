@@ -25,16 +25,10 @@
             height: 100%;
         }
 
-
         #canvas {
             width: 100%; /* 使用相对宽度 */
             height: 100%; /* 使用相对高度 */
             text-align: center;
-        }
-
-        /* 隐藏垃圾桶图标 */
-        .blocklyTrashIcon {
-            display: none !important;
         }
     </style>
 </head>
@@ -47,7 +41,7 @@
         <div class="ui-container">
             <div class="level-selector">
                 <label>選擇關卡:</label>
-                <label><input type="radio" name="level" value="01">01</label>
+                <label><input type="radio" name="level" value="01" checked>01</label>
                 <label><input type="radio" name="level" value="02">02</label>
                 <label><input type="radio" name="level" value="03">03</label>
                 <label><input type="radio" name="level" value="04">04</label>
@@ -163,8 +157,6 @@
             eval(code);
             console.log(code)
             console.log(actions)
-
-
         }
 
 
@@ -359,7 +351,7 @@
     setTimeout(function(){
         thief=voxelAnimas["ThiefCar"][0]
         police=voxelAnimas["PoliceCar"][0]
-        console.log(thief.position.set(0,0,1))
+        console.log(thief.position.set(0,0,-4))
         var coor=voxelAnimas["coordinate"][0]
         console.log(coor.scale.set(5,5,5))
     },1000)
