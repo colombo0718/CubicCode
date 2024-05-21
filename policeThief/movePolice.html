@@ -344,6 +344,86 @@
     });
 
 
+
+    const voxelSettings = [
+        { name: "soilGnd",      opacity: 1,  amount: 1   ,radius:5 },
+        { name: "gresGnd",      opacity: 1,  amount: 1   ,radius:5 },
+        // 可以添加更多的voxel模型设置
+    ];
+    const voxelAnimas = {}; // 存储每个voxel模型的数组
+
+    // 加载voxel模型
+        function createModelArray(chunks,opacity,amount,raduis){
+            const models = [];
+            for (let i = 0; i < amount; i++) {
+                const voxelObject = new THREE.Object3D();
+                for (let j = 0; j < chunks.length; j++) {
+                    const chunk = chunks[j];
+                    const mesh = new VOXMesh(chunk);
+                    mesh.scale.setScalar(0.1);
+                    // mesh.material.transparent = true;
+                    // mesh.material.emissive.set(0x008888);
+                    // mesh.material.opacity = opacity;
+                    mesh.receiveShadow = true
+                    mesh.castShadow = true;
+                    voxelObject.add(mesh);
+                }
+                voxelObject.radius=raduis/10
+                scene.add(voxelObject);
+                models.push(voxelObject);
+            }
+            return models
+        }
+
+        const loader1 = new VOXLoader();
+        for (const voxelSet of voxelSettings) {
+            loader.load('https://cubiccode.vercel.app/flyDragon/'+voxelSet.name+'.vox',
+            function (chunks){
+                const models=createModelArray(chunks,voxelSet.opacity,voxelSet.amount,voxelSet.radius)
+                voxelAnimas[voxelSet.name] = models;
+            })
+        }
+
+    // 上傳選定戰機
+    // fileInput.addEventListener('change', function (event) {
+    //     if (!event.target.files.length) {
+    //         console.log('No files were selected!');
+    //         return; // 直接返回，不執行後面的代碼
+    //     }
+    //     scene.remove(voxelAnimas['fighter'][0])
+    //     var file = event.target.files[0];
+    //     var reader = new FileReader();
+    //     console.log(voxelAnimas )
+    //     reader.onload = function (event) {
+    //         var contents = event.target.result;
+    //         const loader = new VOXLoader();
+    //         var chunks= loader.parse(contents)
+    //         const models=createModelArray(chunks,1,1,10)
+    //         voxelAnimas['gift1'] = models;
+    //     };
+    //     reader.readAsArrayBuffer(file);
+    //     clearInterval(intervalID);
+    //     gameProcess()
+    // });
+
+    // 繪製voxel動畫
+    var slowIndex=0
+    setInterval(function () {
+        slowIndex+=1
+        for (const voxelName in voxelAnimas) {
+            const voxelObjectsArray = voxelAnimas[voxelName];
+            for (let i = 0; i < voxelObjectsArray.length; i++) {
+                const voxelObject = voxelObjectsArray[i];
+                const currentIndex = slowIndex % voxelObject.children.length;
+                for (let j = 0; j < voxelObject.children.length; j++) {
+                    var voxelMesh=voxelObject.children[j]
+                    voxelMesh.visible = j === currentIndex;
+                }
+            }
+        }
+    }, 100);
+
+
     // var actions='FRFLFRFLFRFLF'
     var actions='FRFLFRFLFRFLFRFL'
     var runtime=0.00
