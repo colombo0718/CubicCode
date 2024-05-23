@@ -6,7 +6,7 @@
 
         .container {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* 定义列比例 */
+            grid-template-columns: 4fr 3fr; /* 定义列比例 */
             height: 100vh; /* 使用视窗高度作为容器高度 */
         }
 
@@ -41,16 +41,16 @@
         <div class="ui-container">
             <div class="level-selector">
                 <label>選擇關卡:</label>
-                <label><input type="radio" name="level" value="01" checked>01</label>
-                <label><input type="radio" name="level" value="02">02</label>
-                <label><input type="radio" name="level" value="03">03</label>
-                <label><input type="radio" name="level" value="04">04</label>
-                <label><input type="radio" name="level" value="05">05</label>
-                <label><input type="radio" name="level" value="06">06</label>
-                <label><input type="radio" name="level" value="07">07</label>
-                <label><input type="radio" name="level" value="08">08</label>
-                <label><input type="radio" name="level" value="09">09</label>
-                <label><input type="radio" name="level" value="10">10</label>
+                <label><input type="radio" name="level" value="0" checked>01</label>
+                <label><input type="radio" name="level" value="1">02</label>
+                <label><input type="radio" name="level" value="2">03</label>
+                <label><input type="radio" name="level" value="3">04</label>
+                <label><input type="radio" name="level" value="4">05</label>
+                <label><input type="radio" name="level" value="5">06</label>
+                <label><input type="radio" name="level" value="6">07</label>
+                <label><input type="radio" name="level" value="7">08</label>
+                <label><input type="radio" name="level" value="8">09</label>
+                <label><input type="radio" name="level" value="9">10</label>
             </div>
 
             <input type="file" id="fileInput" accept=".vox" />
@@ -246,19 +246,9 @@
     }
     console.log(roadArray)
 
-    // 根據地圖重構街道
-    var mapStr=[' _ _ _ _ _ _ _ _ ',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_ _|_|_|_|_|',
-                '|_|_|_|_| |_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|']
 
-    // 根據地圖重構街道
-    var mapStr=['                 ',
+    var levelInfo=[
+        {map:[  '                 ',
                 '        |        ',
                 '        |        ',
                 '        |        ',
@@ -266,17 +256,136 @@
                 '                 ',
                 '                 ',
                 '                 ',
-                '                 ']
+                '                 '],
+        initPolice:{x:5,y:5,d:0},
+        initThief:{x:5,y:9,d:0},
+        },  
+        {map:[  '         _ _ _ _ ',
+                '        |        ',
+                '        |        ',
+                '        |        ',
+                '        |        ',
+                '                 ',
+                '                 ',
+                '                 ',
+                '                 '],
+        initPolice:{x:5,y:5,d:0},
+        initThief:{x:9,y:9,d:0},
+        }, 
+        {map:[  '         _ _ _ _ ',
+                '        |       |',
+                '        |       |',
+                '        |       |',
+                '        |       |',
+                '                 ',
+                '                 ',
+                '                 ',
+                '                 '],
+        initPolice:{x:5,y:5,d:0},
+        initThief:{x:9,y:5,d:0},
+        },
+        {map:[  '               _ ',
+                '             _|  ',
+                '           _|    ',
+                '         _|      ',
+                '        |        ',
+                '                 ',
+                '                 ',
+                '                 ',
+                '                 '],
+        initPolice:{x:5,y:5,d:0},
+        initThief:{x:9,y:9,d:0},
+        },
+        {map:[  '               _ ',
+                '             _| |',
+                '           _|  _|',
+                '         _|  _|  ',
+                '        |  _|    ',
+                '         _|      ',
+                '                 ',
+                '                 ',
+                '                 '],
+        initPolice:{x:5,y:5,d:0},
+        initThief:{x:5,y:4,d:0},
+        },
+        {map:[  '                 ',
+                '     _ _ _ _ _ _ ',
+                '    |           |',
+                '    |    _ _    |',
+                '    |   |   |   |',
+                '    |       |   |',
+                '    |_ _ _ _|   |',
+                '                |',
+                ' _ _ _ _ _ _ _ _|'],
+        initPolice:{x:5,y:5,d:0},
+        initThief:{x:1,y:1,d:0},
+        },
+        {map:[  '                 ',
+                '   _ _ _|        ',
+                '  |_ _ _ _ _ _   ',
+                '   _ _ _ _ _ _|  ',
+                '  |_ _ _ _ _ _   ',
+                '   _ _ _ _ _ _|  ',
+                '  |_ _ _ _ _ _   ',
+                '         _ _ _|  ',
+                '        |        '],
+        initPolice:{x:5,y:1,d:0},
+        initThief:{x:5,y:9,d:0},
+        },
+        {map:[  ' _ _ _ _ _ _ _ _ ',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|',
+                '|_|_|_|_|_|_|_|_|'],
+            initPolice:{x:5,y:5,d:0},
+            initThief:{x:1,y:1,d:0},
+        },
+    ]
+
+    var currentLevel=0
+    function applyLevel(){
+        buildStreet(levelInfo[currentLevel].map)
+        applyCoor(police,levelInfo[currentLevel].initPolice)
+        applyCoor(thief,levelInfo[currentLevel].initThief)
+    }
+    
+
+    // 获取所有的radio按钮
+    const radios = document.querySelectorAll('input[name="level"]');    
+
+    // 给每个radio按钮添加change事件监听器
+    radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                console.log(`Selected level: ${this.value}`);
+                // 这里可以添加更多的处理逻辑
+                currentLevel=this.value
+                applyLevel()
+            }
+        });
+    });
+
+
 
     function buildStreet(mapStr){
         for(var j=0;j<9;j++){
         for(var i=0;i<17;i++){
             if(mapStr[j][i]==' '){
                 roadArray[j][i].visible=false
+            }else{
+                roadArray[j][i].visible=true
             }
         }}
     }
-    buildStreet(mapStr)
+    function applyCoor(ThreeObj,coor){
+        ThreeObj.position.x= coor.x-5
+        ThreeObj.position.z=-coor.y+5
+        ThreeObj.rotation.z= coor.d*Math.PI/2
+    }
 
 
 
@@ -348,17 +457,19 @@
     }, 100);
 
 
+    // 遊戲第一次載入vox檔後的設置
     setTimeout(function(){
         thief=voxelAnimas["ThiefCar"][0]
         police=voxelAnimas["PoliceCar"][0]
         console.log(thief.position.set(0,0,-4))
         var coor=voxelAnimas["coordinate"][0]
-        console.log(coor.scale.set(5,5,5))
-    },1000)
+        coor.scale.set(5,5,5)
+
+        applyLevel()
+    },500)
+  
 
 
-
-    // var actions='FRFLFRFLFRFLF'
     var actions='FRFLFRFLFRFLFRFL'
     var runtime=0.00
     let intervalId;
@@ -420,9 +531,6 @@
     function turnRight() {
         actions += 'R';
     }
-
-
-   
 
     // 添加OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
