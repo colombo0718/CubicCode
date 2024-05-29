@@ -40,7 +40,7 @@
         <!-- </div> -->
         <div class="ui-container">
             <div class="level-selector">
-                <label>選擇關卡:</label>
+                <label>選擇關卡:</label><br>
                 <label><input type="radio" name="level" value="0" checked>01</label>
                 <label><input type="radio" name="level" value="1">02</label>
                 <label><input type="radio" name="level" value="2">03</label>
@@ -52,10 +52,12 @@
                 <label><input type="radio" name="level" value="8">09</label>
                 <label><input type="radio" name="level" value="9">10</label>
             </div>
-
+            <br>
+<!-- 
             <input type="file" id="fileInput" accept=".vox" />
-            <button id="showActions">Show Actions</button>
-            <button id="runButton">Run Car</button>
+            <button id="showActions">Show Actions</button> -->
+            <button id="reset">重來</button>
+            <button id="runButton">執行</button>
         </div>    
     </div>
     <div  class="blockly-panel" > 
@@ -63,7 +65,7 @@
     </div>
 </div>
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-
+<script src="./levelInfo.js"></script>
 <!-- <script src="https://unpkg.com/blockly/javascript_compressed"></script> -->
 <script type="importmap">
     {
@@ -80,7 +82,7 @@
         Blockly.Blocks['move_forward'] = {
           init: function() {
             this.appendDummyInput()
-                .appendField("前进");
+                .appendField("前進");
             this.setPreviousStatement(true, null);
             this.setNextStatement(true, null);
             this.setColour(160);
@@ -92,7 +94,7 @@
         Blockly.Blocks['turn_left'] = {
           init: function() {
             this.appendDummyInput()
-                .appendField("左转");
+                .appendField("左轉");
             this.setPreviousStatement(true, null);
             this.setNextStatement(true, null);
             this.setColour(160);
@@ -104,7 +106,7 @@
         Blockly.Blocks['turn_right'] = {
           init: function() {
             this.appendDummyInput()
-                .appendField("右转");
+                .appendField("右轉");
             this.setPreviousStatement(true, null);
             this.setNextStatement(true, null);
             this.setColour(160);
@@ -160,8 +162,8 @@
         }
 
 
-        var showbutton=document.getElementById('showActions');
-        showbutton.addEventListener('click',runCode)
+        // var showbutton=document.getElementById('showActions');
+        // showbutton.addEventListener('click',runCode)
 
 
     import * as THREE from 'three';
@@ -244,131 +246,19 @@
         roadArray[j].push(roadMesh)
     }
     }
-    console.log(roadArray)
-
-
-    var levelInfo=[
-        {map:[  '                 ',
-                '                 ',
-                '                 ',
-                '                 ',
-                '        |        ',
-                '                 ',
-                '                 ',
-                '                 ',
-                '                 '],
-        initPolice:{x:5,y:5,d:0},
-        initThief:{x:5,y:9,d:0},
-        },  
-        {map:[  '                 ',
-                '                 ',
-                '                 ',
-                '         _       ',
-                '        |        ',
-                '                 ',
-                '                 ',
-                '                 ',
-                '                 '],
-        initPolice:{x:5,y:5,d:0},
-        initThief:{x:9,y:9,d:1},
-        },{map:[  '         _ _ _ _ ',
-                '        |        ',
-                '        |        ',
-                '        |        ',
-                '        |        ',
-                '                 ',
-                '                 ',
-                '                 ',
-                '                 '],
-        initPolice:{x:5,y:5,d:0},
-        initThief:{x:9,y:9,d:1},
-        }, 
-        {map:[  '         _ _ _ _ ',
-                '        |       |',
-                '        |       |',
-                '        |       |',
-                '        |       |',
-                '                 ',
-                '                 ',
-                '                 ',
-                '                 '],
-        initPolice:{x:5,y:5,d:0},
-        initThief:{x:9,y:5,d:2},
-        },
-        {map:[  '               _ ',
-                '             _|  ',
-                '           _|    ',
-                '         _|      ',
-                '        |        ',
-                '                 ',
-                '                 ',
-                '                 ',
-                '                 '],
-        initPolice:{x:5,y:5,d:0},
-        initThief:{x:9,y:9,d:1},
-        },
-        {map:[  '               _ ',
-                '             _| |',
-                '           _|  _|',
-                '         _|  _|  ',
-                '        |  _|    ',
-                '         _|      ',
-                '                 ',
-                '                 ',
-                '                 '],
-        initPolice:{x:5,y:5,d:0},
-        initThief:{x:5,y:4,d:3},
-        },
-        {map:[  '                 ',
-                '     _ _ _ _ _ _ ',
-                '    |           |',
-                '    |    _ _    |',
-                '    |   |   |   |',
-                '    |       |   |',
-                '    |_ _ _ _|   |',
-                '                |',
-                ' _ _ _ _ _ _ _ _|'],
-        initPolice:{x:5,y:5,d:0},
-        initThief:{x:1,y:1,d:3},
-        },
-        {map:[  '                 ',
-                '   _ _ _|        ',
-                '  |_ _ _ _ _ _   ',
-                '   _ _ _ _ _ _|  ',
-                '  |_ _ _ _ _ _   ',
-                '   _ _ _ _ _ _|  ',
-                '  |_ _ _ _ _ _   ',
-                '         _ _ _|  ',
-                '        |        '],
-        initPolice:{x:5,y:1,d:0},
-        initThief:{x:5,y:9,d:0},
-        },
-        {map:[  ' _ _ _ _ _ _ _ _ ',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|',
-                '|_|_|_|_|_|_|_|_|'],
-            initPolice:{x:5,y:5,d:0},
-            initThief:{x:1,y:1,d:0},
-        },
-    ]
 
     var currentLevel=0
     var levelComplete=true
-    function applyLevel(){
-        buildStreet(levelInfo[currentLevel].map)
-        applyCoor(police,levelInfo[currentLevel].initPolice)
-        applyCoor(thief,levelInfo[currentLevel].initThief)
+    function applyLevel(level){
+        var hint=levelInfo[level].hint
+        console.log(levelInfo[level].hint)
+        buildStreet(levelInfo[level].map)
+        applyCoor(police,levelInfo[level].initPolice)
+        applyCoor(thief,levelInfo[level].initThief)
+        // 延遲半秒顯示提示訊息
+        setTimeout(()=>{if(hint){alert(hint)}},500); 
     }
     
-
-
-
-
     function buildStreet(mapStr){
         for(var j=0;j<9;j++){
         for(var i=0;i<17;i++){
@@ -387,37 +277,24 @@
 
 
     
-    // 获取所有的radio按钮
-    const radios = document.querySelectorAll('input[name="level"]');    
 
-    // 给每个radio按钮添加change事件监听器
-    radios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.checked) {
-                console.log(`Selected level: ${this.value}`);
-                // 这里可以添加更多的处理逻辑
-                currentLevel=this.value
-                levelComplete=false
-                applyLevel()
-            }
-        });
-    });
 
 
 
     // 建置vox動畫必要物件
     const loader = new VOXLoader();
-    var police= new THREE.Object3D();
-    var thief = new THREE.Object3D();
-    scene.add( police );  
+    var police, thief
+    // var police= new THREE.Object3D();
+    // var thief = new THREE.Object3D();
+    // scene.add( police );     
     const meshes = [];
-    let currentIndex = 0;
+    
 
 
 
     const voxelSettings = [
-        { name: "PoliceCar",      opacity: 1,  amount: 1   ,radius:5 },
         { name: "ThiefCar",      opacity: 1,  amount: 1   ,radius:5 },
+        { name: "PoliceCar",      opacity: 1,  amount: 1   ,radius:5 },
         { name: "coordinate",      opacity: 1,  amount: 1   ,radius:5 },
         // 可以添加更多的voxel模型设置
     ];
@@ -456,6 +333,7 @@
         }
 
     // 繪製voxel動畫
+    // let currentIndex = 0;
     var slowIndex=0
     setInterval(function () {
         slowIndex+=1
@@ -473,16 +351,7 @@
     }, 100);
 
 
-    // 遊戲第一次載入vox檔後的設置
-    setTimeout(function(){
-        thief=voxelAnimas["ThiefCar"][0]
-        police=voxelAnimas["PoliceCar"][0]
-        console.log(thief.position.set(0,0,-4))
-        var coor=voxelAnimas["coordinate"][0]
-        coor.scale.set(5,5,5)
 
-        applyLevel()
-    },500)
   
 
     // 控制警車按照文字指令運作
@@ -493,8 +362,8 @@
     runbutton.addEventListener('click',function(){
         runCode()
         clearInterval(intervalId);
-        police.position.set(0,0,0)
-        police.rotation.set(0,0,0)
+        // police.position.set(0,0,0)
+        // police.rotation.set(0,0,0)
         runtime=0.00
         intervalId = setInterval(function() {
             // console.log(police.position.x)
@@ -548,13 +417,52 @@
         actions += 'R';
     }
 
+    
+
+
+    // 获取所有的radio按钮
+    const radios = document.querySelectorAll('input[name="level"]');    
+
+    // 给每个radio按钮添加change事件监听器
+    radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                console.log(`Selected level: ${this.value}`);
+                // 这里可以添加更多的处理逻辑
+                currentLevel=this.value
+                levelComplete=false
+                applyLevel(currentLevel)
+            }
+        });
+    });
+
+    var resetbutton=document.getElementById('reset');
+    resetbutton.addEventListener('click',function(){
+        applyLevel(currentLevel)
+    })
+
+    // 遊戲第一次載入vox檔後的設置
+    setTimeout(function(){
+        thief=voxelAnimas["ThiefCar"][0]
+        police=voxelAnimas["PoliceCar"][0]
+        console.log(thief.position.set(0,0,-4))
+        var coor=voxelAnimas["coordinate"][0]
+        coor.scale.set(5,5,5)
+        levelComplete=false
+        applyLevel(currentLevel)
+    },500)
+
     // 檢測警車是否抓到賊車
     setInterval(function(){
         var dist= police.position.distanceTo(thief.position)
+        console.log(levelComplete)
         if(dist<0.1 && levelComplete==false){
-            alert('fdsa')
+            alert('成功抓到小偷，前往下一個任務')
+            levelComplete=true
         }
-    },1000)
+    },100)
+
+
 
     // 添加OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
