@@ -260,6 +260,7 @@
             roadMesh.position.set(i/2-4,0,j-4); // 稍微抬高以避免与地板重叠
             scene.add(roadMesh);
         }
+        roadMesh.name='road'
         roadArray[j].push(roadMesh)
     }
     }
@@ -378,6 +379,7 @@
     let intervalId;
     var runbutton=document.getElementById('runButton');
     runbutton.addEventListener('click',function(){
+        levelComplete=false
         runCode()
         clearInterval(intervalId);
         runtime=0.00
@@ -385,9 +387,10 @@
     })
 
 
-    var detectRay=new THREE.Raycaster();
+    
 
     function runAction(){
+        if(levelComplete){return 0}
         runtime+=0.01
         var nowAction=actions[Math.floor(runtime)]
         // console.log(nowAction)
@@ -417,20 +420,10 @@
                 police.rotation.y=3*Math.PI/2
                 police.position.x+=.01
             }
-
-            if(Math.round(runtime*100)%10==0){
-                
-
-                detectRay.set(police.position,new THREE.Vector3(0,1, 0))
-                var intersects = detectRay.intersectObjects(scene.children);
-                console.log(intersects.length)
-            }
         }
         // 左右轉
         if(nowAction=='R'){police.rotation.y-=Math.PI/200}
         if(nowAction=='L'){police.rotation.y+=Math.PI/200}
-
-
     }
 
 
@@ -477,15 +470,34 @@
         coor.scale.set(5,5,5)
         levelComplete=false
         applyLevel(currentLevel)
-    },500)
+    },1000)
 
-    // 檢測警車是否抓到賊車
+    
     setInterval(function(){
+        // 檢測警車是否抓到賊車
         var dist= police.position.distanceTo(thief.position)
         // console.log(levelComplete)
         if(dist<0.1 && levelComplete==false){
             alert('成功抓到小偷，前往下一個任務')
             levelComplete=true
+        }
+        // 檢測車子是否開在路上
+        if(levelComplete==false){
+            var detectRay=new THREE.Raycaster();
+            var origin=new THREE.Vector3(police.position.x,police.position.y+0.5, police.position.z)
+            detectRay.set(origin,new THREE.Vector3(0,-1, 0))
+            var intersects = detectRay.intersectObjects(scene.children);
+            var onRoad=false
+            intersects.forEach(function(touch){
+                if(touch.object.name=='road' && touch.object.visible){
+                    onRoad=true
+                }
+            })
+            if(!onRoad){
+                alert('糟糕開到草皮上了，再想想看該怎麼走')
+                levelComplete=true
+                applyLevel(currentLevel)
+            }
         }
     },100)
 
