@@ -421,9 +421,9 @@
             if(Math.round(runtime*100)%10==0){
                 
 
-                detectRay.set(police.position,new THREE.Vector3(0, 1, 0))
+                detectRay.set(police.position,new THREE.Vector3(0,1, 0))
                 var intersects = detectRay.intersectObjects(scene.children);
-                console.log(intersects)
+                console.log(intersects.length)
             }
         }
         // 左右轉
