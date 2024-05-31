@@ -124,17 +124,17 @@
 
         // 生成 JavaScript 代码
         javascript.javascriptGenerator.forBlock['move_forward'] = function(block) {
-          var code = 'moveForward();\n';
+          var code = 'await moveForward();\n';
           return code;
         };
 
         javascript.javascriptGenerator.forBlock['turn_left'] = function(block) {
-          var code = 'turnLeft();\n';
+          var code = 'await turnLeft();\n';
           return code;
         };
 
         javascript.javascriptGenerator.forBlock['turn_right'] = function(block) {
-          var code = 'turnRight();\n';
+          var code = 'await turnRight();\n';
           return code;
         };
 
@@ -169,7 +169,7 @@
         function runCode() {
             actions=''
             var code = Blockly.JavaScript.workspaceToCode(workspace);
-            eval(code);
+            eval(`(async () => { ${code} })()`);  // 變成異步執行
             console.log(code)
             console.log(actions)
         }
@@ -180,8 +180,8 @@
 
 
     import * as THREE from 'three';
-    // import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
-    import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine.js';
+    import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
+    // import { VOXLoader, VOXMesh } from 'https://cubiccode.vercel.app/VOXLoader_mine.js';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
     var fileInput = document.getElementById('fileInput');
@@ -397,16 +397,78 @@
         if(nowAction=='L'){police.rotation.y+=Math.PI/200}
     }
 
-
-    function moveForward() {
-        actions += 'F';
+    function forward(){
+        if(police.rotation.y>=2*Math.PI){
+            police.rotation.y-=2*Math.PI
+        }else if(police.rotation.y<0 ){
+            police.rotation.y+=2*Math.PI
+        }
+        // 校正角度並前進  
+        // console.log(police.rotation.y)
+        if(Math.abs(police.rotation.y-0)<0.1
+        || Math.abs(police.rotation.y-4*Math.PI/2)<0.1){
+            police.rotation.y=0
+            police.position.z-=.01
+        }
+        if(Math.abs(police.rotation.y-Math.PI/2)<0.1){
+            police.rotation.y=Math.PI/2
+            police.position.x-=.01
+        }
+        if(Math.abs(police.rotation.y-Math.PI)<0.1){
+            police.rotation.y=Math.PI
+            police.position.z+=.01
+        }
+        if(Math.abs(police.rotation.y-3*Math.PI/2)<0.1){
+            police.rotation.y=3*Math.PI/2
+            police.position.x+=.01
+        }
     }
 
-    function turnLeft() {
+
+    async function moveForward() {
+        var intervalId=setInterval(()=>{
+            forward()
+            console.log('foward')
+        },10)
+
+        await new Promise(resolve => {
+            setTimeout(() => {
+                console.log('stop')
+                clearInterval(intervalId)
+                resolve()
+            },1000)
+        })    
+    }
+
+    async function turnLeft() {
+        var intervalId=setInterval(()=>{
+            police.rotation.y+=Math.PI/200
+            console.log('left')
+        },10)
+
+        await new Promise(resolve => {
+            setTimeout(() => {
+                console.log('stop')
+                clearInterval(intervalId)
+                resolve()
+            },1000)
+        })  
         actions += 'L';
     }
 
-    function turnRight() {
+    async function turnRight() {
+        var intervalId=setInterval(()=>{
+            police.rotation.y-=Math.PI/200
+            console.log('right')
+        },10)
+
+        await new Promise(resolve => {
+            setTimeout(() => {
+                console.log('stop')
+                clearInterval(intervalId)
+                resolve()
+            },1000)
+        })  
         actions += 'R';
     }
 
@@ -418,7 +480,6 @@
     setTimeout(function(){
         thief=voxelAnimas["ThiefCar"][0]
         police=voxelAnimas["PoliceCar"][0]
-        console.log(thief.position.set(0,0,-4))
         var coor=voxelAnimas["coordinate"][0]
         coor.scale.set(5,5,5)
         levelComplete=false
@@ -455,12 +516,16 @@
     var runtime=0.00
     let intervalId;
     var runbutton=document.getElementById('runButton');
-    runbutton.addEventListener('click',function(){
+    runbutton.addEventListener('click',async function(){
         levelComplete=false
         runCode()
         clearInterval(intervalId);
         runtime=0.00
-        intervalId = setInterval(runAction,10)
+        // intervalId = setInterval(runAction,10)
+        
+        // await moveForward()
+        // await moveForward()
+
     })
    
     setInterval(function(){
