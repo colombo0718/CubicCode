@@ -442,6 +442,9 @@
 
     async function turnLeft() {
         var intervalId=setInterval(()=>{
+            // 汽車位置貼合座標節點
+            police.position.x=Math.round(police.position.x)
+            police.position.z=Math.round(police.position.z)
             police.rotation.y+=Math.PI/200
             console.log('left')
         },10)
@@ -453,11 +456,14 @@
                 resolve()
             },1000)
         })  
-        actions += 'L';
+        // actions += 'L';
     }
 
     async function turnRight() {
         var intervalId=setInterval(()=>{
+            // 汽車位置貼合座標節點
+            police.position.x=Math.round(police.position.x)
+            police.position.z=Math.round(police.position.z)
             police.rotation.y-=Math.PI/200
             console.log('right')
         },10)
@@ -469,7 +475,7 @@
                 resolve()
             },1000)
         })  
-        actions += 'R';
+        // actions += 'R';
     }
 
     // 遊戲流程重要變數
