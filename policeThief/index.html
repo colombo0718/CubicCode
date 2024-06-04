@@ -46,17 +46,6 @@
                 <label><input type="radio" name="level" value="7">08</label>
                 <label><input type="radio" name="level" value="8">09</label>
                 <label><input type="radio" name="level" value="9">10</label>
-                <br>
-                <label><input type="radio" name="level" value="10">11</label>
-                <label><input type="radio" name="level" value="11">12</label>
-                <label><input type="radio" name="level" value="12">13</label>
-                <label><input type="radio" name="level" value="13">14</label>
-                <label><input type="radio" name="level" value="14">15</label>
-                <label><input type="radio" name="level" value="15">16</label>
-                <label><input type="radio" name="level" value="16">17</label>
-                <label><input type="radio" name="level" value="17">18</label>
-                <label><input type="radio" name="level" value="18">19</label>
-                <label><input type="radio" name="level" value="19">20</label>
             </div>
             <br>
 <!-- 
@@ -147,14 +136,6 @@
                     <block type="move_forward"></block>
                     <block type="turn_left"></block>
                     <block type="turn_right"></block>
-                    <block type="controls_repeat_ext">
-                        <value name="TIMES">
-                            <shadow type="math_number">
-                                <field name="NUM">4</field>
-                            </shadow>
-                        </value>
-                    </block>
-                    <block type="controls_if"></block>
                 </xml>
             `
         });
@@ -428,7 +409,6 @@
     async function moveForward() {
         var intervalId=setInterval(()=>{
             forward()
-            console.log(police.position.z)
             console.log('foward')
         },10)
 
