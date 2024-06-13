@@ -35,7 +35,7 @@
         <!-- </div> -->
         <div class="ui-container">
             <div class="level-selector">
-                <label>選擇關卡:</label><br>
+                <label>選擇任務:</label><br>
                 <label><input type="radio" name="level" value="0" checked>01</label>
                 <label><input type="radio" name="level" value="1">02</label>
                 <label><input type="radio" name="level" value="2">03</label>
@@ -46,6 +46,17 @@
                 <label><input type="radio" name="level" value="7">08</label>
                 <label><input type="radio" name="level" value="8">09</label>
                 <label><input type="radio" name="level" value="9">10</label>
+                <br>
+                <label><input type="radio" name="level" value="10">11</label>
+                <label><input type="radio" name="level" value="11">12</label>
+                <label><input type="radio" name="level" value="12">13</label>
+                <label><input type="radio" name="level" value="13">14</label>
+                <label><input type="radio" name="level" value="14">15</label>
+                <label><input type="radio" name="level" value="15">16</label>
+                <label><input type="radio" name="level" value="16">17</label>
+                <label><input type="radio" name="level" value="17">18</label>
+                <label><input type="radio" name="level" value="18">19</label>
+                <label><input type="radio" name="level" value="19">20</label>
             </div>
             <br>
 <!-- 
@@ -136,6 +147,14 @@
                     <block type="move_forward"></block>
                     <block type="turn_left"></block>
                     <block type="turn_right"></block>
+                    <block type="controls_repeat_ext">
+                        <value name="TIMES">
+                            <shadow type="math_number">
+                                <field name="NUM">4</field>
+                            </shadow>
+                        </value>
+                    </block>
+                    <block type="controls_if"></block>
                 </xml>
             `
         });
@@ -243,13 +262,12 @@
     }
 
 
-    function applyLevel(level){
-        var hint=levelInfo[level].hint
-        // console.log(levelInfo[level].hint)
-        // currentMap=levelInfo[level].map
-        buildStreet(levelInfo[level].map)
-        applyCoor(police,levelInfo[level].initPolice)
-        applyCoor(thief,levelInfo[level].initThief)
+    function applyMission(m){
+        var hint=MissionInfo[m].hint
+        buildStreet(MissionInfo[m].map)
+        applyCoor(police,MissionInfo[m].initPolice)
+        applyCoor(thief,MissionInfo[m].initThief)
+        workspace.updateToolbox(toolboxLevel[MissionInfo[m].level]);
         // 延遲半秒顯示提示訊息
         setTimeout(()=>{if(hint){alert(hint)}},500); 
     }
@@ -269,11 +287,6 @@
         ThreeObj.position.z=-coor.y+5
         ThreeObj.rotation.y= -coor.d*Math.PI/2
     }
-
-
-    
-
-
 
 
     // 建置vox動畫必要物件
@@ -341,80 +354,110 @@
     // 控制警車在每瞬間按照文字指令運作
     var actions='FRFLFRFLFRFLFRFL'
 
-    function runAction(){
-        if(levelComplete){return 0}
-        runtime+=0.01
-        var nowAction=actions[Math.floor(runtime)]
-        // console.log(nowAction)
-        if(nowAction=='F'){
-            // 角度拉回0~2pi
-            if(police.rotation.y>=2*Math.PI){
-                police.rotation.y-=2*Math.PI
-            }else if(police.rotation.y<0 ){
-                police.rotation.y+=2*Math.PI
-            }
-            // 校正角度並前進  
-            // console.log(police.rotation.y)
-            if(Math.abs(police.rotation.y-0)<0.1
-            || Math.abs(police.rotation.y-4*Math.PI/2)<0.1){
-                police.rotation.y=0
-                police.position.z-=.01
-            }
-            if(Math.abs(police.rotation.y-Math.PI/2)<0.1){
-                police.rotation.y=Math.PI/2
-                police.position.x-=.01
-            }
-            if(Math.abs(police.rotation.y-Math.PI)<0.1){
-                police.rotation.y=Math.PI
-                police.position.z+=.01
-            }
-            if(Math.abs(police.rotation.y-3*Math.PI/2)<0.1){
-                police.rotation.y=3*Math.PI/2
-                police.position.x+=.01
-            }
+    // function runAction(){
+    //     if(levelComplete){return 0}
+    //     runtime+=0.01
+    //     var nowAction=actions[Math.floor(runtime)]
+    //     // console.log(nowAction)
+    //     if(nowAction=='F'){
+    //         // 角度拉回0~2pi
+    //         if(police.rotation.y>=2*Math.PI){
+    //             police.rotation.y-=2*Math.PI
+    //         }else if(police.rotation.y<0 ){
+    //             police.rotation.y+=2*Math.PI
+    //         }
+    //         // 校正角度並前進  
+    //         // console.log(police.rotation.y)
+    //         if(Math.abs(police.rotation.y-0)<0.1
+    //         || Math.abs(police.rotation.y-4*Math.PI/2)<0.1){
+    //             police.rotation.y=0
+    //             police.position.z-=.01
+    //         }
+    //         if(Math.abs(police.rotation.y-Math.PI/2)<0.1){
+    //             police.rotation.y=Math.PI/2
+    //             police.position.x-=.01
+    //         }
+    //         if(Math.abs(police.rotation.y-Math.PI)<0.1){
+    //             police.rotation.y=Math.PI
+    //             police.position.z+=.01
+    //         }
+    //         if(Math.abs(police.rotation.y-3*Math.PI/2)<0.1){
+    //             police.rotation.y=3*Math.PI/2
+    //             police.position.x+=.01
+    //         }
+    //     }
+    //     // 左右轉
+    //     if(nowAction=='R'){police.rotation.y-=Math.PI/200}
+    //     if(nowAction=='L'){police.rotation.y+=Math.PI/200}
+    // }
+
+    function forward(step){
+        // if(police.rotation.y>=2*Math.PI){
+        //     police.rotation.y-=2*Math.PI
+        // }else if(police.rotation.y<0 ){
+        //     police.rotation.y+=2*Math.PI
+        // }
+        // 校正角度並前進  
+        // console.log(police.rotation.y)
+        if(Math.abs(police.rotation.y-0)<0.1
+        || Math.abs(police.rotation.y-4*Math.PI/2)<0.1){
+            // police.rotation.y=0
+            police.position.z-=step
         }
-        // 左右轉
-        if(nowAction=='R'){police.rotation.y-=Math.PI/200}
-        if(nowAction=='L'){police.rotation.y+=Math.PI/200}
+        if(Math.abs(police.rotation.y-Math.PI/2)<0.1){
+            // police.rotation.y=Math.PI/2
+            police.position.x-=step
+        }
+        if(Math.abs(police.rotation.y-Math.PI)<0.1){
+            // police.rotation.y=Math.PI
+            police.position.z+=step
+        }
+        if(Math.abs(police.rotation.y-3*Math.PI/2)<0.1){
+            // police.rotation.y=3*Math.PI/2
+            police.position.x+=step
+        }
     }
 
-    function forward(){
+    // 校正位置與角度
+    function correctPosRot(){
+        police.position.x=Math.round(police.position.x)
+        police.position.y=Math.round(police.position.y)
+        police.position.z=Math.round(police.position.z)
+
         if(police.rotation.y>=2*Math.PI){
             police.rotation.y-=2*Math.PI
         }else if(police.rotation.y<0 ){
             police.rotation.y+=2*Math.PI
         }
         // 校正角度並前進  
-        // console.log(police.rotation.y)
         if(Math.abs(police.rotation.y-0)<0.1
         || Math.abs(police.rotation.y-4*Math.PI/2)<0.1){
             police.rotation.y=0
-            police.position.z-=.01
         }
         if(Math.abs(police.rotation.y-Math.PI/2)<0.1){
             police.rotation.y=Math.PI/2
-            police.position.x-=.01
         }
         if(Math.abs(police.rotation.y-Math.PI)<0.1){
             police.rotation.y=Math.PI
-            police.position.z+=.01
         }
         if(Math.abs(police.rotation.y-3*Math.PI/2)<0.1){
             police.rotation.y=3*Math.PI/2
-            police.position.x+=.01
         }
     }
 
 
     async function moveForward() {
         var intervalId=setInterval(()=>{
-            forward()
+            var step=0.01
+            forward(step)
+            console.log(police.position.z)
             console.log('foward')
         },10)
 
         await new Promise(resolve => {
             setTimeout(() => {
                 console.log('stop')
+                correctPosRot()
                 clearInterval(intervalId)
                 resolve()
             },1000)
@@ -433,6 +476,7 @@
         await new Promise(resolve => {
             setTimeout(() => {
                 console.log('stop')
+                correctPosRot()
                 clearInterval(intervalId)
                 resolve()
             },1000)
@@ -452,6 +496,7 @@
         await new Promise(resolve => {
             setTimeout(() => {
                 console.log('stop')
+                correctPosRot()
                 clearInterval(intervalId)
                 resolve()
             },1000)
@@ -470,7 +515,7 @@
         var coor=voxelAnimas["coordinate"][0]
         coor.scale.set(5,5,5)
         levelComplete=false
-        applyLevel(currentLevel)
+        applyMission(currentLevel)
     },1000)
     
     // 获取所有的radio按钮
@@ -485,15 +530,16 @@
                 workspace.clear()
                 currentLevel=this.value
                 levelComplete=false
-                applyLevel(currentLevel)
+                applyMission(currentLevel)
             }
         });
     });
-
+    // 按下重來按鈕之後的反應
     var resetbutton=document.getElementById('reset');
     resetbutton.addEventListener('click',async function(){
-        
-        applyLevel(currentLevel)
+        // workspace.updateToolbox(toolboxLevel[0]);
+        // console.log(workspace)
+        applyMission(currentLevel)
         console.log("Start");
         await new Promise(resolve => setTimeout(resolve, 1000));
         console.log("1 second later");
@@ -538,10 +584,10 @@
             if(!onRoad){
                 alert('糟糕開到草皮上了，再想想看該怎麼走')
                 levelComplete=true
-                applyLevel(currentLevel)
+                applyMission(currentLevel)
             }
         }
-    },100)
+    },10)
 
     // 添加OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
