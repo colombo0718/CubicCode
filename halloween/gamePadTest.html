@@ -1,0 +1,59 @@
+<script>
+window.addEventListener("gamepadconnected", function(e) {
+    console.log("控制器已連接，索引：" + e.gamepad.index);
+});
+
+window.addEventListener("gamepaddisconnected", function(e) {
+    console.log("控制器已斷開，索引：" + e.gamepad.index);
+});
+
+function readGamepad() {
+    var gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+    for (var i = 0; i < gamepads.length; i++) {
+        var gp = gamepads[i];
+        if (gp) {
+            // 顯示按鈕狀態
+            for (var j = 0; j < gp.buttons.length; j++) {
+                var button = gp.buttons[j];
+                console.log("Button " + j + ": " + (button.pressed ? "Pressed" : "Not Pressed") + " (Value: " + button.value + ")");
+                // 如果需要顯示到HTML頁面，可以使用以下方式：
+                var buttonElement = document.getElementById("button-" + j);
+                if (buttonElement) {
+                    buttonElement.innerText = "Button " + j + ": " + (button.pressed ? "Pressed" : "Not Pressed") + " (Value: " + button.value + ")";
+                }
+            }
+
+            // 顯示搖桿狀態
+            for (var k = 0; k < gp.axes.length; k++) {
+                console.log("Axis " + k + ": " + gp.axes[k].toFixed(2));
+                // 如果需要顯示到HTML頁面，可以使用以下方式：
+                var axisElement = document.getElementById("axis-" + k);
+                if (axisElement) {
+                    axisElement.innerText = "Axis " + k + ": " + gp.axes[k].toFixed(2);
+                }
+            }
+        }
+    }
+}
+// 每隔100毫秒讀取一次控制器狀態
+setInterval(readGamepad, 100);
+</script>
+
+<!-- 顯示按鈕和搖桿狀態的HTML元素 -->
+<div id="gamepad-status">
+    <h2>按鈕狀態</h2>
+    <p id="button-0">Button 0: Not Pressed</p>
+    <p id="button-1">Button 1: Not Pressed</p>
+    <p id="button-2">Button 2: Not Pressed</p>
+    <p id="button-3">Button 3: Not Pressed</p>
+    <p id="button-4">Button 4: Not Pressed</p>
+    <p id="button-5">Button 5: Not Pressed</p>
+    <p id="button-6">Button 6: Not Pressed</p>
+    <p id="button-7">Button 7: Not Pressed</p>
+    <p id="button-8">Button 8: Not Pressed</p>
+    <p id="button-9">Button 9: Not Pressed</p>
+    
+    <h2>搖桿狀態</h2>
+    <p id="axis-0">Axis 0: 0.00</p>
+    <p id="axis-1">Axis 1: 0.00</p>
+</div>
