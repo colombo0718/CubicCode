@@ -51,8 +51,8 @@
     }
 
     const voxelSettings = [
-        { name: "walk",file: "stick_walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
-        { name: "stand",file: "stick_stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "walk",file: "walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "stand",file: "stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -219,10 +219,10 @@
     var startLoop=function(){}
     function gameProcess(){
         // let score=0
-        let stay=voxelAnimas["b_stand"][0]
-        let walk=voxelAnimas["b_walk"][0]
-        let hack=voxelAnimas["b_throw"][0]
-        let jump=voxelAnimas["b_run"][0]
+        let stay=voxelAnimas["stand"][0]
+        let walk=voxelAnimas["walk"][0]
+        // let hack=voxelAnimas["throw"][0]
+        // let jump=voxelAnimas["run"][0]
 
             // console.log(stay)
 
@@ -286,24 +286,24 @@
 
         walk.visible=false
         stay.visible=false
-        hack.visible=false
+        // hack.visible=false
         // keep.visible=false   
-        jump.visible=false
+        // jump.visible=false
         
         let knight=new THREE.Object3D()
         scene.add(knight)
         knight.add(stay)
         knight.add(walk)
-        knight.add(hack)
+        // knight.add(hack)
         // knight.add(keep)
-        knight.add(jump)
+        // knight.add(jump)
 
         knight.animas=[]
         knight.animas.push(stay)
         knight.animas.push(walk)
-        knight.animas.push(hack)
+        // knight.animas.push(hack)
         // knight.animas.push(keep)
-        knight.animas.push(jump)
+        // knight.animas.push(jump)
 
 
 
@@ -316,7 +316,7 @@
                 if(!walk.visible){
                 walk.visible=true
                 walk.startIndex=slowIndex
-                hack.visible=false
+                // hack.visible=false
                 stay.visible=false
                 // keep.visible=false
                 }
@@ -327,7 +327,7 @@
                 if(!walk.visible){
                 walk.visible=true
                 walk.startIndex=slowIndex
-                hack.visible=false
+                // hack.visible=false
                 stay.visible=false
                 // keep.visible=false
                 }
@@ -339,7 +339,7 @@
                 if(!walk.visible){
                 walk.visible=true
                 walk.startIndex=slowIndex
-                hack.visible=false
+                // hack.visible=false
                 stay.visible=false
                 // keep.visible=false
                 }
@@ -350,7 +350,7 @@
                 if(!walk.visible){
                 walk.visible=true
                 walk.startIndex=slowIndex
-                hack.visible=false
+                // hack.visible=false
                 stay.visible=false
                 // keep.visible=false
                 }
@@ -359,8 +359,8 @@
             }
             if(keys['e']) {
                 if(!hack.visible){
-                hack.visible=true
-                hack.startIndex=slowIndex
+                // hack.visible=true
+                // hack.startIndex=slowIndex
                 stay.visible=false
                 walk.visible=false
                 // keep.visible=false
@@ -370,18 +370,19 @@
                 if(!keep.visible){
                 // keep.visible=true
                 // keep.startIndex=slowIndex
-                hack.visible=false
+                // hack.visible=false
                 stay.visible=false
                 walk.visible=false
                 }
             }
             if(keys.none){
                 // if(knight.animas.every(animation => !animation.visible)){
-                if(!stay.visible && !hack.visible){
+                // if(!stay.visible && !hack.visible){
+                if(!stay.visible ){
                 stay.visible=true
                 stay.startIndex=slowIndex
                 walk.visible=false
-                hack.visible=false
+                // hack.visible=false
                 // keep.visible=false
                 }
             }
