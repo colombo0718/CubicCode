@@ -92,8 +92,9 @@
     const voxelSettings = [
         { name: "walk",file: "walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         { name: "stand",file: "stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
-        { name: "ghost",file: "ghost",faction:'g',  opacity: .5,  amount: 10   ,radius:10 ,loop:true },
-        { name: "pumpkin",file: "pumpkin",faction:'g',  opacity: .7,  amount: 10   ,radius:10 ,loop:true },
+        { name: "candy",file: "candy",faction:'g',  opacity: .5,  amount: 5   ,radius:10 ,loop:true },
+        { name: "ghost",file: "ghost",faction:'g',  opacity: .5,  amount: 5   ,radius:10 ,loop:true },
+        { name: "pumpkin",file: "pumpkin",faction:'g',  opacity: .7,  amount: 5   ,radius:10 ,loop:true },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -316,18 +317,29 @@
         ghosts.forEach(function(ghost){
             ghost.rotation.y = -Math.PI 
             ghost.position.set(Math.random()*20-10,0,Math.random()*20-10)
-            // console.log(ghost)
+            ghost.children[0].castShadow = false;
+            ghost.children[1].castShadow = false;
+            ghost.children[2].castShadow = false;
+            ghost.children[3].castShadow = false;
+            console.log(ghost)
+            var pointLight = new THREE.PointLight(0x00ff00, .3, 1,0); // 顏色, 強度, 最大距離, 衰減率
+            pointLight.position.copy(ghost.position);
+            pointLight.position.y=1   
+            pointLight.position.z+=.5 
+            // pointLight.castShadow = true; // 讓此光能產生陰影
+            scene.add(pointLight)
+
         })
 
         pumpkins.forEach(function(pumpkin){
             pumpkin.rotation.y = -Math.PI 
             pumpkin.position.set(Math.random()*20-10,0,Math.random()*20-10)
             // console.log(pumpkin.children[0].material.emissive.set(0x442200))
-            var pointLight = new THREE.PointLight(0xffff00, .3, 4,0); // 顏色, 強度, 最大距離, 衰減率
+            var pointLight = new THREE.PointLight(0xffff00, .3, 1,0); // 顏色, 強度, 最大距離, 衰減率
             pointLight.position.copy(pumpkin.position);
             pointLight.position.y=.5   
             pointLight.position.z-=.1 
-            pointLight.castShadow = true; // 讓此光能產生陰影
+            // pointLight.castShadow = true; // 讓此光能產生陰影
             scene.add(pointLight)
         })
 
