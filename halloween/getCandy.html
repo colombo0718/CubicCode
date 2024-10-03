@@ -25,21 +25,23 @@
     renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
     canvas.appendChild(renderer.domElement);
 
+    // scene.fog = new THREE.FogExp2(0x000000, 0.01); // 顏色, 密度
+
     // 設置相機
     camera.position.y = 15/Math.sqrt(2);
     camera.position.z = 15/Math.sqrt(2);
     camera.rotation.x=-Math.PI/8
 
     // 添加燈光
-    var ambientLight = new THREE.AmbientLight(0xffffff,.05); // 產生柔和的光
-    scene.add(ambientLight);
+    var ambientLight = new THREE.AmbientLight(0xffffff,.1); // 產生柔和的光
+    // scene.add(ambientLight);
 
     // var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
     // directionalLight.position.set(10, 10, 0);
     // directionalLight.castShadow = true; // 讓此光能產生陰影
     // scene.add(directionalLight);
 
-    var pointLight = new THREE.PointLight(0xffff00, .3, 2,0); // 顏色, 強度, 最大距離, 衰減率
+    var pointLight = new THREE.PointLight(0xffff00, 1, 2,0); // 顏色, 強度, 最大距離, 衰減率
     pointLight.position.set(0, .5, -.5);
     pointLight.castShadow = true; // 讓此光能產生陰影
     // scene.add(pointLight);
@@ -360,7 +362,7 @@
         })
 
         graves.forEach(function(grave){
-            grave.rotation.y = -Math.PI 
+            // grave.rotation.y = -Math.PI 
             grave.position.set(Math.random()*20-10,0,Math.random()*20-10)
             // console.log(pumpkin.children[0].material.emissive.set(0x442200))
             // var pointLight = new THREE.PointLight(0xff0000, .5, 1,0); // 顏色, 強度, 最大距離, 衰減率
