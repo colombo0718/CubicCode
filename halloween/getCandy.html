@@ -31,7 +31,7 @@
     camera.rotation.x=-Math.PI/4
 
     // 添加燈光
-    var ambientLight = new THREE.AmbientLight(0xffffff,.01); // 產生柔和的光
+    var ambientLight = new THREE.AmbientLight(0xffffff,.04); // 產生柔和的光
     scene.add(ambientLight);
 
     // var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
@@ -55,6 +55,7 @@
     spotLight.distance = 5; // 最大照射距離
     spotLight.decay = 0; // 衰減速度
     spotLight.penumbra = 1; // 光束邊緣的柔化程度
+    spotLight.castShadow = true; // 讓此光能產生陰影
     // scene.add(spotLight);
     // scene.add(spotLight.target); // 添加目標物體
 
@@ -371,7 +372,7 @@
         }startLoop()
     }
     
-// gameProcess()
+    setTimeout(function(){gameProcess()},1000)
     window.addEventListener("load", function() {
         const startButton = document.getElementById("startButton");
         startButton.addEventListener("click", function() {
