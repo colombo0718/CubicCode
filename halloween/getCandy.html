@@ -21,6 +21,8 @@
     var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     var renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
@@ -29,68 +31,128 @@
     camera.rotation.x=-Math.PI/4
 
     // 添加燈光
-    var ambientLight = new THREE.AmbientLight(0xffffff, 1); // 產生柔和的光
+    var ambientLight = new THREE.AmbientLight(0xffffff,.01); // 產生柔和的光
     scene.add(ambientLight);
 
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 2); // 產生方向光
-    directionalLight.position.set(1, 1, 0);
-    directionalLight.castShadow = true; // 讓此光能產生陰影
-    scene.add(directionalLight);
+    // var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
+    // directionalLight.position.set(10, 10, 0);
+    // directionalLight.castShadow = true; // 讓此光能產生陰影
+    // scene.add(directionalLight);
 
-    // 添加網格
-    var grids=[]
-    var gridSize = 10; // 網格大小
-    var gridDivisions = 10; // 網格分段數
-    var gridColor1 = 0x00ff00;
-    var gridColor2 = 0x009900;
-    for (var i = -200; i <= 100; i += 100) {
-        var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
-        grid.position.set(0, 0, i);
-        scene.add(grid);
-        grids.push(grid);
-    }
+    var pointLight = new THREE.PointLight(0xffff00, .5, 2,0); // 顏色, 強度, 最大距離, 衰減率
+    pointLight.position.set(0, .5, 0);
+    pointLight.castShadow = true; // 讓此光能產生陰影
+    // scene.add(pointLight);
+
+
+    // 創建聚光燈（SpotLight），設定朝向 Z 方向
+    var spotLight = new THREE.SpotLight(0xffff00, 2); // 顏色和強度
+    spotLight.position.set(0, .5, 0); // 設置光源位置（在Y=50, Z=-50處）
+    spotLight.target.position.set(0, .5, -2); // 聚光燈的目標（將錐狀光照射在原點）
+
+    // 設置聚光燈的錐角和距離
+    spotLight.angle = Math.PI / 6; // 錐角（光束寬度），這裡設置為30度
+    spotLight.distance = 200; // 最大照射距離
+    spotLight.decay = 0; // 衰減速度
+    spotLight.penumbra = 1; // 光束邊緣的柔化程度
+    // scene.add(spotLight);
+    // scene.add(spotLight.target); // 添加目標物體
+
+    // // 設定光源可產生影子的範圍與精細度
+    // directionalLight.shadow.camera.left = -20;
+    // directionalLight.shadow.camera.right = 20;
+    // directionalLight.shadow.camera.top = 20;
+    // directionalLight.shadow.camera.bottom = -20;
+    // directionalLight.shadow.camera.near = .1;
+    // directionalLight.shadow.camera.far = 200;
+
+    // directionalLight.shadow.mapSize.width = 2048;
+    // directionalLight.shadow.mapSize.height = 2048;
+
+    // // 添加網格
+    // var grids=[]
+    // var gridSize = 10; // 網格大小
+    // var gridDivisions = 10; // 網格分段數
+    // var gridColor1 = 0x00ff00;
+    // var gridColor2 = 0x009900;
+    // for (var i = -200; i <= 100; i += 100) {
+    //     var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
+    //     grid.position.set(0, 0, i);
+    //     scene.add(grid);
+    //     grids.push(grid);
+    // }
+
+    // 創建地板
+    var geometry = new THREE.PlaneGeometry(10, 10); // 設定地板的大小
+    var material = new THREE.MeshLambertMaterial({color: 0x00ff00, side: THREE.DoubleSide}); // 設定地板的材質和顏色
+    var floor = new THREE.Mesh(geometry, material);
+
+    // 調整地板的位置和旋轉，使其水平放置
+    floor.rotation.x = - Math.PI / 2; // 旋轉90度使平面水平
+    floor.position.y = 0; // 調整地板的高度
+    scene.add(floor);
+    floor.receiveShadow = true
+    floor.castShadow = true;
+
+    // 創建方塊幾何體
+    var geometry = new THREE.BoxGeometry(10, .01, 10); // 方塊的尺寸
+
+    // 創建綠色材質
+    var material = new THREE.MeshLambertMaterial({ color: 0x00ff00 }); // 綠色
+
+    // 創建網格（方塊）
+    var cube = new THREE.Mesh(geometry, material);
+
+    cube.receiveShadow = true
+    cube.castShadow = true;
+    // cube.clipShadows = true;
+    scene.add(cube);
+
+
+
 
     const voxelSettings = [
         { name: "walk",file: "walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         { name: "stand",file: "stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
+        { name: "ghost",file: "ghost",faction:'g',  opacity: 1,  amount: 10   ,radius:10 ,loop:true },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
 
-    function plotFactionColor(mesh,faction){
+    // function plotFactionColor(mesh,faction){
 
-        const factionColors = {
-            b: { light: [0.5, 0.5, 1.0], dark: [0, 0, 1] }, // 淡蓝和深蓝
-            r: { light: [1.0, 0.5, 0.5], dark: [1, 0, 0] }, // 淡红和深红
-            g: { light: [0.5, 1.0, 0.5], dark: [0, 1, 0] }, // 淡绿和深绿
-        };
+    //     const factionColors = {
+    //         b: { light: [0.5, 0.5, 1.0], dark: [0, 0, 1] }, // 淡蓝和深蓝
+    //         r: { light: [1.0, 0.5, 0.5], dark: [1, 0, 0] }, // 淡红和深红
+    //         g: { light: [0.5, 1.0, 0.5], dark: [0, 1, 0] }, // 淡绿和深绿
+    //     };
 
-        let geo=mesh.geometry
-        let colors = geo.attributes.color.array;
-        // console.log(colors)
-        console.log(faction)
-        let fc=factionColors[faction]
+    //     let geo=mesh.geometry
+    //     let colors = geo.attributes.color.array;
+    //     // console.log(colors)
+    //     console.log(faction)
+    //     let fc=factionColors[faction]
 
-        for (let i = 0; i < colors.length; i += 3) {
-            // 获取当前顶点的颜色
-            let r = colors[i + 0];
-            let g = colors[i + 1];
-            let b = colors[i + 2];
+    //     for (let i = 0; i < colors.length; i += 3) {
+    //         // 获取当前顶点的颜色
+    //         let r = colors[i + 0];
+    //         let g = colors[i + 1];
+    //         let b = colors[i + 2];
 
-            if (r == 1 && g == 1 && b == 1) {
-                colors[i + 0] = fc.light[0];     // 红色分量
-                colors[i + 1] = fc.light[1]; // 绿色分量保持不变
-                colors[i + 2] = fc.light[2]; // 蓝色分量
-            }
-            if (r == 1 && g == 0 && b == 0) {
-                colors[i + 0] = fc.dark[0];     // 红色分量
-                colors[i + 1] = fc.dark[1]; // 绿色分量保持不变
-                colors[i + 2] = fc.dark[2]; // 蓝色分量
-            }
-        }
-        // 标记颜色需要更新
-        geo.attributes.color.needsUpdate = true;
-    }
+    //         if (r == 1 && g == 1 && b == 1) {
+    //             colors[i + 0] = fc.light[0];     // 红色分量
+    //             colors[i + 1] = fc.light[1]; // 绿色分量保持不变
+    //             colors[i + 2] = fc.light[2]; // 蓝色分量
+    //         }
+    //         if (r == 1 && g == 0 && b == 0) {
+    //             colors[i + 0] = fc.dark[0];     // 红色分量
+    //             colors[i + 1] = fc.dark[1]; // 绿色分量保持不变
+    //             colors[i + 2] = fc.dark[2]; // 蓝色分量
+    //         }
+    //     }
+    //     // 标记颜色需要更新
+    //     geo.attributes.color.needsUpdate = true;
+    // }
 
     // 加载voxel模型
         function createModelArray(chunks,faction,opacity,amount,raduis,loop){
@@ -108,33 +170,10 @@
                     // mesh.material.emissive.set(0x008888);
                     mesh.material.opacity = opacity;
                     voxelObject.add(mesh);
+                    mesh.receiveShadow = true
+                    mesh.castShadow = true;
 
-                    plotFactionColor(mesh,faction)
-
-                    // let geo=mesh.geometry
-                    // let colors = geo.attributes.color.array;
-                    // // console.log(colors)
-
-                    // for (let i = 0; i < colors.length; i += 3) {
-                    //     // 获取当前顶点的颜色
-                    //     let r = colors[i];
-                    //     let g = colors[i + 1];
-                    //     let b = colors[i + 2];
-
-                    //     if (r == 1 && g == 1 && b == 1) {
-                    //         colors[i] = 0.5;     // 红色分量
-                    //         colors[i + 1] = 0.5; // 绿色分量保持不变
-                    //         colors[i + 2] = 1.0; // 蓝色分量
-                    //     }
-                    //     if (r == 1 && g == 0 && b == 0) {
-                    //         colors[i] = 0;     // 红色分量
-                    //         colors[i + 1] = 0; // 绿色分量保持不变
-                    //         colors[i + 2] = 1.0; // 蓝色分量
-                    //     }
-                    // }
-                    // // 标记颜色需要更新
-                    // geo.attributes.color.needsUpdate = true;
-
+                    // plotFactionColor(mesh,faction)
                 }
                 // voxelObject.radius=raduis/10
                 // voxelObject.position.x=Math.random()*20-10
@@ -221,68 +260,6 @@
         // let score=0
         let stay=voxelAnimas["stand"][0]
         let walk=voxelAnimas["walk"][0]
-        // let hack=voxelAnimas["throw"][0]
-        // let jump=voxelAnimas["run"][0]
-
-            // console.log(stay)
-
-            // let geo = stay.children[0].geometry;
-            // let colors = geo.attributes.color.array;
-            // console.log(colors)
-
-            // for (let i = 0; i < colors.length; i += 3) {
-            //     // 获取当前顶点的颜色
-            //     let r = colors[i];
-            //     let g = colors[i + 1];
-            //     let b = colors[i + 2];
-
-            //     // 假设你想要替换的颜色是淡蓝色（RGB：0.5, 0.5, 1.0）
-            //     // 并且将其替换为淡红色（RGB：1.0, 0.5, 0.5）
-            //     if (r === 1 && g === 1 && b === 1) {
-            //         colors[i] = 1.0;     // 红色分量
-            //         colors[i + 1] = 0.5; // 绿色分量保持不变
-            //         colors[i + 2] = 0.5; // 蓝色分量
-            //     }
-            // }
-            // // 标记颜色需要更新
-            // geo.attributes.color.needsUpdate = true;
-        
-        // 為每個stick動畫重新上陣營色
-        // 遍歷每種voxel動畫
-        // for (const voxelName in voxelAnimas) {
-        // const voxelObjectsArray = voxelAnimas[voxelName];
-        //     // 遍歷一種動畫的各個複製體
-        //     for (let i = 0; i < voxelObjectsArray.length; i++) {
-        //         const voxelObject = voxelObjectsArray[i];
-        //         // 遍歷voxel動畫裡的每個影格物件
-        //         for (let j = 0; j < voxelObject.children.length; j++) {
-        //             var voxelMesh=voxelObject.children[j]
-        //             let geo=voxelMesh.geometry
-        //             let colors = geo.attributes.color.array;
-        //             // console.log(colors)
-
-        //             for (let i = 0; i < colors.length; i += 3) {
-        //                 // 获取当前顶点的颜色
-        //                 let r = colors[i];
-        //                 let g = colors[i + 1];
-        //                 let b = colors[i + 2];
-
-        //                 if (r == 1 && g == 1 && b == 1) {
-        //                     colors[i] = 0.5;     // 红色分量
-        //                     colors[i + 1] = 0.5; // 绿色分量保持不变
-        //                     colors[i + 2] = 1.0; // 蓝色分量
-        //                 }
-        //                 if (r == 1 && g == 0 && b == 0) {
-        //                     colors[i] = 0;     // 红色分量
-        //                     colors[i + 1] = 0; // 绿色分量保持不变
-        //                     colors[i + 2] = 1.0; // 蓝色分量
-        //                 }
-        //             }
-        //             // 标记颜色需要更新
-        //             geo.attributes.color.needsUpdate = true;
-        //         }
-        //     }
-        // }
 
         walk.visible=false
         stay.visible=false
@@ -294,6 +271,10 @@
         scene.add(knight)
         knight.add(stay)
         knight.add(walk)
+        knight.add(pointLight)
+
+        knight.add(spotLight);
+        knight.add(spotLight.target); // 添加目標物體
         // knight.add(hack)
         // knight.add(keep)
         // knight.add(jump)
