@@ -39,7 +39,7 @@
     // directionalLight.castShadow = true; // 讓此光能產生陰影
     // scene.add(directionalLight);
 
-    var pointLight = new THREE.PointLight(0xffff00, .5, 3,0); // 顏色, 強度, 最大距離, 衰減率
+    var pointLight = new THREE.PointLight(0xffff00, .3, 2,0); // 顏色, 強度, 最大距離, 衰減率
     pointLight.position.set(0, .5, -.5);
     pointLight.castShadow = true; // 讓此光能產生陰影
     // scene.add(pointLight);
@@ -60,10 +60,10 @@
     // scene.add(spotLight.target); // 添加目標物體
 
 
-    // 創建地板
-    var geometry = new THREE.PlaneGeometry(10, 10); // 設定地板的大小
-    var material = new THREE.MeshPhysicalMaterial({color: 0xffffff, side: THREE.DoubleSide}); // 設定地板的材質和顏色
-    var floor = new THREE.Mesh(geometry, material);
+    // // 創建地板
+    // var geometry = new THREE.PlaneGeometry(10, 10); // 設定地板的大小
+    // var material = new THREE.MeshPhysicalMaterial({color: 0xffffff, side: THREE.DoubleSide}); // 設定地板的材質和顏色
+    // var floor = new THREE.Mesh(geometry, material);
 
     // // 調整地板的位置和旋轉，使其水平放置
     // floor.rotation.x = - Math.PI / 2; // 旋轉90度使平面水平
@@ -322,7 +322,13 @@
         pumpkins.forEach(function(pumpkin){
             pumpkin.rotation.y = -Math.PI 
             pumpkin.position.set(Math.random()*20-10,0,Math.random()*20-10)
-            console.log(pumpkin.children[0].material.emissive.set(0x221100))
+            // console.log(pumpkin.children[0].material.emissive.set(0x442200))
+            var pointLight = new THREE.PointLight(0xffff00, .3, 4,0); // 顏色, 強度, 最大距離, 衰減率
+            pointLight.position.copy(pumpkin.position);
+            pointLight.position.y=.5   
+            pointLight.position.z-=.1 
+            pointLight.castShadow = true; // 讓此光能產生陰影
+            scene.add(pointLight)
         })
 
 
