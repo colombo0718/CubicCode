@@ -26,12 +26,12 @@
     canvas.appendChild(renderer.domElement);
 
     // 設置相機
-    camera.position.y = 10/Math.sqrt(2);
-    camera.position.z = 10/Math.sqrt(2);
+    camera.position.y = 15/Math.sqrt(2);
+    camera.position.z = 15/Math.sqrt(2);
     camera.rotation.x=-Math.PI/4
 
     // 添加燈光
-    var ambientLight = new THREE.AmbientLight(0xffffff,.04); // 產生柔和的光
+    var ambientLight = new THREE.AmbientLight(0xffffff,.05); // 產生柔和的光
     scene.add(ambientLight);
 
     // var directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 產生方向光
@@ -39,67 +39,44 @@
     // directionalLight.castShadow = true; // 讓此光能產生陰影
     // scene.add(directionalLight);
 
-    var pointLight = new THREE.PointLight(0xffff00, .5, 2,0); // 顏色, 強度, 最大距離, 衰減率
-    pointLight.position.set(0, .5, 0);
+    var pointLight = new THREE.PointLight(0xffff00, .5, 3,0); // 顏色, 強度, 最大距離, 衰減率
+    pointLight.position.set(0, .5, -.5);
     pointLight.castShadow = true; // 讓此光能產生陰影
     // scene.add(pointLight);
 
 
     // 創建聚光燈（SpotLight），設定朝向 Z 方向
-    var spotLight = new THREE.SpotLight(0xffff00, 2); // 顏色和強度
-    spotLight.position.set(0, .5, 0); // 設置光源位置（在Y=50, Z=-50處）
+    var spotLight = new THREE.SpotLight(0xffff00, 1); // 顏色和強度
+    spotLight.position.set(0, .5, -.5); // 設置光源位置（在Y=50, Z=-50處）
     spotLight.target.position.set(0, .5, -2); // 聚光燈的目標（將錐狀光照射在原點）
 
     // 設置聚光燈的錐角和距離
     spotLight.angle = Math.PI / 6; // 錐角（光束寬度），這裡設置為30度
-    spotLight.distance = 5; // 最大照射距離
+    spotLight.distance = 10; // 最大照射距離
     spotLight.decay = 0; // 衰減速度
     spotLight.penumbra = 1; // 光束邊緣的柔化程度
     spotLight.castShadow = true; // 讓此光能產生陰影
     // scene.add(spotLight);
     // scene.add(spotLight.target); // 添加目標物體
 
-    // // 設定光源可產生影子的範圍與精細度
-    // directionalLight.shadow.camera.left = -20;
-    // directionalLight.shadow.camera.right = 20;
-    // directionalLight.shadow.camera.top = 20;
-    // directionalLight.shadow.camera.bottom = -20;
-    // directionalLight.shadow.camera.near = .1;
-    // directionalLight.shadow.camera.far = 200;
-
-    // directionalLight.shadow.mapSize.width = 2048;
-    // directionalLight.shadow.mapSize.height = 2048;
-
-    // // 添加網格
-    // var grids=[]
-    // var gridSize = 10; // 網格大小
-    // var gridDivisions = 10; // 網格分段數
-    // var gridColor1 = 0x00ff00;
-    // var gridColor2 = 0x009900;
-    // for (var i = -200; i <= 100; i += 100) {
-    //     var grid = new THREE.GridHelper(gridSize, gridDivisions, gridColor1, gridColor2);
-    //     grid.position.set(0, 0, i);
-    //     scene.add(grid);
-    //     grids.push(grid);
-    // }
 
     // 創建地板
     var geometry = new THREE.PlaneGeometry(10, 10); // 設定地板的大小
-    var material = new THREE.MeshLambertMaterial({color: 0x00ff00, side: THREE.DoubleSide}); // 設定地板的材質和顏色
+    var material = new THREE.MeshPhysicalMaterial({color: 0xffffff, side: THREE.DoubleSide}); // 設定地板的材質和顏色
     var floor = new THREE.Mesh(geometry, material);
 
-    // 調整地板的位置和旋轉，使其水平放置
-    floor.rotation.x = - Math.PI / 2; // 旋轉90度使平面水平
-    floor.position.y = 0; // 調整地板的高度
-    scene.add(floor);
-    floor.receiveShadow = true
-    floor.castShadow = true;
+    // // 調整地板的位置和旋轉，使其水平放置
+    // floor.rotation.x = - Math.PI / 2; // 旋轉90度使平面水平
+    // floor.position.y = 0; // 調整地板的高度
+    // scene.add(floor);
+    // floor.receiveShadow = true
+    // floor.castShadow = true;
 
     // 創建方塊幾何體
-    var geometry = new THREE.BoxGeometry(10, .01, 10); // 方塊的尺寸
+    var geometry = new THREE.BoxGeometry(20, .01, 20); // 方塊的尺寸
 
     // 創建綠色材質
-    var material = new THREE.MeshLambertMaterial({ color: 0x00ff00 }); // 綠色
+    var material = new THREE.MeshLambertMaterial({ color: 0xffffff }); // 綠色
 
     // 創建網格（方塊）
     var cube = new THREE.Mesh(geometry, material);
@@ -115,7 +92,7 @@
     const voxelSettings = [
         { name: "walk",file: "walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         { name: "stand",file: "stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
-        { name: "ghost",file: "ghost",faction:'g',  opacity: 1,  amount: 10   ,radius:10 ,loop:true },
+        { name: "ghost",file: "ghost",faction:'g',  opacity: .5,  amount: 10   ,radius:10 ,loop:true },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -174,6 +151,8 @@
                     mesh.receiveShadow = true
                     mesh.castShadow = true;
 
+                    // console.log(mesh.material.emissive.set(0xffffff))
+                    // mesh.material.emissiveIntensity=.01
                     // plotFactionColor(mesh,faction)
                 }
                 // voxelObject.radius=raduis/10
@@ -253,6 +232,48 @@
         keys.none=!Object.values(keys).includes(true)
     });
 
+
+    window.addEventListener("gamepadconnected", function(e) {
+        console.log("控制器已連接，索引：" + e.gamepad.index);
+    });
+
+    window.addEventListener("gamepaddisconnected", function(e) {
+        console.log("控制器已斷開，索引：" + e.gamepad.index);
+    });
+
+    function readGamepad() {
+    var gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+    for (var i = 0; i < gamepads.length; i++) {
+        var gp = gamepads[i];
+        if (gp) {
+        // console.log("Gamepad detected at index " + gp.index);
+        // 讀取按鈕狀態
+        gp.buttons.forEach(function(button, index) {
+            if(button.pressed){console.log(index)}
+            if(index==0){
+                if(button.pressed){keys['e']=true}else{keys['e']=false}
+            }
+            if(index==9 && button.pressed){
+                setup()
+                clearInterval(intervalID);
+                startLoop()
+            }
+        });
+        // 讀取搖桿狀態
+        if(gp.axes[0]<-.5){keys['a']=true}else{keys['a']=false}
+        if(gp.axes[0]> .5){keys['d']=true}else{keys['d']=false}
+        if(gp.axes[1]<-.5){keys['w']=true}else{keys['w']=false}
+        if(gp.axes[1]> .5){keys['s']=true}else{keys['s']=false}
+        // console.log("Left Stick X Axis: " + gp.axes[0].toFixed(2));
+        // console.log("Left Stick Y Axis: " + gp.axes[1].toFixed(2));
+        // console.log("Righ Stick X Axis: " + gp.axes[2].toFixed(2));
+        // console.log("Righ Stick Y Axis: " + gp.axes[3].toFixed(2));
+        }
+    }
+    }
+    // 每隔100毫秒讀取一次控制器狀態
+    setInterval(readGamepad, 100);
+
     // scene.add(voxelAnimas["knight-stay"][0])
     // 遊戲主流程
     var intervalID
@@ -261,6 +282,7 @@
         // let score=0
         let stay=voxelAnimas["stand"][0]
         let walk=voxelAnimas["walk"][0]
+        let ghosts=voxelAnimas["ghost"]
 
         walk.visible=false
         stay.visible=false
@@ -287,6 +309,13 @@
         // knight.animas.push(keep)
         // knight.animas.push(jump)
 
+        // console.log(ghosts)
+        
+        ghosts.forEach(function(ghost){
+            ghost.rotation.y = -Math.PI 
+            ghost.position.set(Math.random()*20-10,0,Math.random()*20-10)
+            console.log(ghost)
+        })
 
 
         
@@ -339,6 +368,11 @@
                 knight.position.x += .05;
                 knight.rotation.y = -Math.PI/2
             }
+
+            camera.position.x = knight.position.x
+            camera.position.y = 15/Math.sqrt(2);
+            camera.position.z = knight.position.z+15/Math.sqrt(2);
+
             if(keys['e']) {
                 if(!hack.visible){
                 // hack.visible=true
