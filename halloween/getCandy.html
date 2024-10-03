@@ -93,6 +93,7 @@
         { name: "walk",file: "walk",faction:'r',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         { name: "stand",file: "stand",faction:'g',  opacity: 1,  amount: 1   ,radius:10 ,loop:true },
         { name: "ghost",file: "ghost",faction:'g',  opacity: .5,  amount: 10   ,radius:10 ,loop:true },
+        { name: "pumpkin",file: "pumpkin",faction:'g',  opacity: 1,  amount: 10   ,radius:10 ,loop:true },
         // 可以添加更多的voxel模型设置
     ];
     const voxelAnimas = {}; // 存储每个voxel模型的数组
@@ -283,6 +284,7 @@
         let stay=voxelAnimas["stand"][0]
         let walk=voxelAnimas["walk"][0]
         let ghosts=voxelAnimas["ghost"]
+        let pumpkins=voxelAnimas["pumpkin"]
 
         walk.visible=false
         stay.visible=false
@@ -314,7 +316,13 @@
         ghosts.forEach(function(ghost){
             ghost.rotation.y = -Math.PI 
             ghost.position.set(Math.random()*20-10,0,Math.random()*20-10)
-            console.log(ghost)
+            // console.log(ghost)
+        })
+
+        pumpkins.forEach(function(pumpkin){
+            pumpkin.rotation.y = -Math.PI 
+            pumpkin.position.set(Math.random()*20-10,0,Math.random()*20-10)
+            console.log(pumpkin.children[0].material.emissive.set(0x221100))
         })
 
 
