@@ -348,12 +348,12 @@
             candy.rotation.y = -Math.PI 
             candy.position.set(Math.random()*20-10,0,Math.random()*20-10)
             // console.log(pumpkin.children[0].material.emissive.set(0x442200))
-            var pointLight = new THREE.PointLight(0xff0000, .3, 1,0); // 顏色, 強度, 最大距離, 衰減率
+            var pointLight = new THREE.PointLight(0xff0000, .5, 1,0); // 顏色, 強度, 最大距離, 衰減率
             pointLight.position.copy(candy.position);
-            pointLight.position.y=1   
+            pointLight.position.y=.7   
             // pointLight.position.z-=.1 
             // pointLight.castShadow = true; // 讓此光能產生陰影
-            scene.add(pointLight)
+            // scene.add(pointLight)
         })
 
 
