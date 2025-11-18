@@ -22,8 +22,8 @@
 <!-- <h3>W:向上飛 / E:丟禮物 </h3> -->
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 <div id="hud" >
-    聖誕老人準備送禮物啦~<br>
-    按下[空白鍵]開始遊戲
+    Santa's ready!<br>
+    Press [Space] to start
 </div>
 <script type="importmap">
     {
@@ -277,13 +277,13 @@
         intervalID=
         setInterval(function() {
 
-            if(Vx>0){
-                var hud=document.getElementById("hud");
-                hud.innerHTML="W：飛起, E：發射  <br>"+
-                    "距離："+Math.floor(distence)+"<br>"+
-                    "禮物："+giftNum+"<br>"+
-                    "送達："+score+"<br><br>"
-                distence+=0.01*Vx/0.2
+            if(Vx > 0){
+                var hud = document.getElementById("hud");
+                hud.innerHTML = "W: Fly, E: Shoot Gift<br>" + 
+                                "Distence: " + Math.floor(distence) + "<br>" + 
+                                "Gifts Left: " + giftNum + "<br>" + 
+                                "Delivered: " + score + "<br><br>"
+                distence += 0.01 * Vx / 0.3
             }
 
 
@@ -311,7 +311,7 @@
             }
 
             function collision(){
-                hud.innerHTML+="好棒喔~~<br>截圖分享你送了多少禮物吧<br>按下[空白鍵]重新挑戰"
+                hud.innerHTML+="Well done!<br>Screenshot to share how many gifts you delivered!<br>Press [Space] to restart"
                 hit.play()
                 Vx=0
                 runDeer.visible=false
